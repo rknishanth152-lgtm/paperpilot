@@ -66,6 +66,8 @@ This runs the unit tests only: fast and offline. Tests that need PostgreSQL or G
 uv run pytest -m integration
 ```
 
+Schema tests never touch your development database: they create a temporary database (`<POSTGRES_DB>_test`) on the same server, migrate it with Alembic, and drop it afterwards.
+
 Test folders: `tests/unit` (default), `tests/integration` (marker `integration`), `tests/evaluation` (marker `evaluation`, from Phase 4). Markers are applied by folder in `tests/conftest.py`.
 
 ```bash

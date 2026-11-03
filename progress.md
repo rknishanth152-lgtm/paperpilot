@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phase 0 complete. Local services, Python tooling, configuration module, backend skeleton (health endpoint) and test conventions exist; no feature code. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M4: Database schema and migrations (`in_progress`: P2-T1 to P2-T4 done). M1, M2 and M3 `completed` 2026-11-03. |
+| Current milestone | M4: Database schema and migrations (`in_progress`: P2-T1 to P2-T5 done). M1, M2 and M3 `completed` 2026-11-03. |
 | Current phase | Phase 2, core persistence and provenance (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -62,6 +62,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Database layer: `backend/app/database/` (engine, sessions), `backend/app/models/base.py` (naming convention), Alembic environment in `backend/migrations/` with settings in `pyproject.toml`; no tables yet; dependencies SQLAlchemy, Alembic, psycopg | Tests and Alembic commands (see §7) | 2026-11-03 |
 | Core schema in PostgreSQL: `papers`, `documents`, `passages` (migration `d2ea199dd3d3`, models in `backend/app/models/`), immutability trigger on `passages` | Applied, inspected, downgraded and re-applied (see §7) | 2026-11-03 |
 | DOI normalisation: `backend/app/services/doi.py` (`normalize_doi`), 31 unit tests | Tests and mutation check (see §7) | 2026-11-03 |
+| Schema tests: `tests/integration/test_schema_migration.py` (2) and `test_schema_constraints.py` (51), on a throwaway database | Run and mutation-checked (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -100,7 +101,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 2 (M4): core persistence and provenance. P2-T1 (schema design note), P2-T2 (database layer, Alembic) P2-T3 (first migration) and P2-T4 (DOI normalisation) `completed`; next **P2-T5**, constraint tests against PostgreSQL. |
+| Task | Phase 2 (M4): core persistence and provenance. P2-T1 (schema design note), P2-T2 (database layer, Alembic) P2-T3 (first migration), P2-T4 (DOI normalisation) and P2-T5 (constraint tests) `completed`; next **P2-T6**, schema documentation and the Phase 2 exit check. |
 | Inputs | `docs/design/parser-output.md` (fields to store, passage regions, failure reasons), PRD §8, `DR-001`..`DR-009`, `FR-ING-008` |
 | Status | `in_progress`. Phase 0 and Phase 1 are `completed` (M1, M2, M3). |
 
@@ -112,7 +113,7 @@ In dependency order.
 
 1. ~~P2-T1~~ `completed`: `docs/design/schema.md`.
 2. ~~P2-T2~~ `completed`: database layer and Alembic environment.
-3. ~~P2-T3~~ `completed` (migration `d2ea199dd3d3`). ~~P2-T4~~ `completed`. Next: **P2-T5** constraint tests against PostgreSQL, **P2-T6** schema documentation.
+3. ~~P2-T3~~ `completed` (migration `d2ea199dd3d3`). ~~P2-T4~~ and ~~P2-T5~~ `completed`. Next: **P2-T6** schema documentation and the Phase 2 acceptance check.
 4. Deferred from Phase 0: P0-T8 (frontend toolchain check, before Phase 3) and P0-T9 (CI).
 
 ## 6. Decisions and blockers
@@ -330,5 +331,9 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P2-T4: DOI values in the five GROBID outputs | Header DOIs for 4 of 5 papers, matching the DOIs checked on the publishers' pages (BERT none); reference-list DOIs plain, 12 with capitals; no prefixes or whitespace observed |
 | 2026-11-03 | P2-T4: `tests/unit/test_doi.py` written first and run before the function existed (collection error), then `backend/app/services/doi.py` (`normalize_doi`) | 31 passed |
 | 2026-11-03 | P2-T4: mutation check: removed lower-casing, removed trimming, loosened the DOI pattern (one at a time), file restored (hash identical) | 3, 1 and 3 tests failed respectively. All checks: ruff, mypy (31 files) clean; unit 50 passed; all 54 passed. **P2-T4 `completed`** |
+
+| 2026-11-03 | P2-T5: `env.py` accepts a test connection; fixtures create a throwaway database (`<POSTGRES_DB>_test`), migrate it with Alembic and drop it; `tests/integration/test_schema_migration.py` (empty database migrates; downgrade and re-upgrade) and `test_schema_constraints.py` (each rejection checks the named constraint PostgreSQL reports) | 57 integration tests passed; ruff, mypy (33 files) clean |
+| 2026-11-03 | P2-T5: targeted mutations of the migration, one at a time: page check `>= 0`; trigger attached to the wrong table; unique hash removed; file restored (hash identical) | Each caught by the intended test only (the trigger change also failed the downgrade test, which drops that trigger). A first, too broad mutation (trigger on INSERT) failed 21 tests and was replaced by these |
+| 2026-11-03 | P2-T5: all tests; `alembic check` on the development database; development row counts and leftover test databases before and after | 107 passed; no model/database difference; development database unchanged (head `d2ea199dd3d3`, 0 rows); no test database left. **P2-T5 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
