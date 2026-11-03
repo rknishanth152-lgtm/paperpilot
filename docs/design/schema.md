@@ -42,7 +42,7 @@ A scholarly work at metadata level (PRD §1.6).
 | `authors` | `text[]` | no | default `'{}'`; empty array when none are found |
 | `abstract` | `text` | yes | `CHECK (abstract <> '')`. Metadata copy; the abstract is also stored as `abstract` passages for citation |
 | `doi` | `text` | yes | As found in the document, for display |
-| `doi_normalized` | `text` | yes | **Unique** (`uq_papers_doi_normalized`); several papers without a DOI are allowed (checked live: `UNIQUE` permits many `NULL`s). `CHECK (doi_normalized LIKE '10.%')`. Produced by the P2-T4 function |
+| `doi_normalized` | `text` | yes | **Unique** (`uq_papers_doi_normalized`); several papers without a DOI are allowed (checked live: `UNIQUE` permits many `NULL`s). `CHECK (doi_normalized LIKE '10.%')`. Produced by `normalize_doi` in `backend/app/services/doi.py` (P2-T4): trimmed, resolver prefix or `doi:` removed, lower-cased. A value that is not a DOI gives `NULL` for both `doi` and `doi_normalized` |
 | `metadata_source` | `text` | no | `CHECK (metadata_source IN ('grobid'))` (`FR-ING-006`) |
 | `created_at` | `timestamptz` | no | default `now()` |
 
