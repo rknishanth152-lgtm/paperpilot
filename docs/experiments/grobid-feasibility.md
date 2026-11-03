@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers), P1-T3 (GROBID runs), P1-T4 (inspection) and P1-T5 (failure inputs) done 2026-11-03. P1-T6 to P1-T8 not started. |
+| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers), P1-T3 (GROBID runs), P1-T4 (inspection), P1-T5 (failure inputs) and P1-T6 (answers, §7) done 2026-11-03. P1-T7 and P1-T8 not started. |
 | Answers | `OQ-001`, `OQ-002`, `OQ-003`, `OQ-005`, `OQ-013`, `OQ-016` (in P1-T6) |
 | Rule | Nothing here is a claim about real papers until it has been observed. Where documentation and observation differ, observation wins and the difference is recorded. |
 
@@ -245,10 +245,74 @@ Script: `scripts/grobid_failures.py` (throwaway). `inputs` mode generates test f
 8. **Restarting GROBID takes about 23–24 s** before it accepts requests; the first request afterwards is slower (P1-T3).
 9. **Not observed:** HTTP 204, `TIMEOUT`, `TOO_MANY_BLOCKS`, `PDFALTO_CONVERSION_FAILURE`, encrypted PDFs, and a real scanned paper.
 
-## 7. Still to do
+## 7. P1-T6: answers to the open questions (2026-11-03)
+
+Each answer rests on five born-digital, English papers (§3) and GROBID 0.9.1 CRF (§1). "Answered" means the evidence is enough to design Phases 2 and 3; "provisional" means a later phase must confirm it; "deferred" means the question is not needed yet.
+
+Extra checks made for this task:
+- All body `note` elements have `place="foot"`, so footnotes and running headers cannot be told apart by attribute.
+- GROBID body text contains almost no line-end hyphen splits (0–2 per paper) and no curly quotes or typographic dashes.
+- Back-matter `div` elements carry a `type`: `annex`, `acknowledgement`, `funding`, `availability`, `conflict`, `contribution`, `references`.
+- All 36 figure and table captions (`figDesc`) are non-empty.
+
+### OQ-001: are section hierarchy and page information reliable? **Answered (with limits).**
+
+- **Pages: yes.** Every body paragraph (242/242) and heading has a page from `coords`. A paragraph's first box gives `page_start`, its last box `page_end`; 1–14 paragraphs per paper cross a page, so both fields are needed (as `FR-ING-007` already says). Page stays nullable (`DR-007`) for parses without coordinates.
+- **Hierarchy: flat.** GROBID never nests sections. A section is one `head` (title) plus its paragraphs; `head/@n` gives the printed number when the paper numbers its headings (BERT only). `section_path` therefore holds only the title, optionally prefixed by the number; no `sections` table is needed (PRD §8.2 stands).
+- **Limits:** headings are mostly right, but sidebar and pull-quote text became sections in PLOS Medicine, and BERT's appendix sections sit in `back`.
+
+### OQ-002: what passage granularity works? **Provisional: paragraph (`AD-004`) stands, with two repair rules. Confirm with Recall@5 in Phase 4.**
+
+- Paragraph sizes suit retrieval and citation: median 315–1,024 characters, maximum 2,843 (roughly 450–700 tokens).
+- **Split paragraphs:** 0–3 per paper are split at a column or page break (8 in total). Proposed rule for P3-T4: join a paragraph to the previous one in the same section when it starts with a lowercase letter and the previous one does not end with sentence-ending punctuation. The joined passage keeps the earlier `page_start` and the later `page_end`.
+- **Junk paragraphs:** BERT has two paragraphs containing only "..." and a footnote turned into a paragraph. Proposed rule: a paragraph with no letters is not stored as a passage, and the number skipped is recorded with the document (never silently).
+- Both rules are hypotheses; their effect is measured by Recall@5 on the evaluation set (Phase 4).
+
+### OQ-003: are references stored, and excluded from retrieval? **Answered for VS-1.**
+
+- GROBID returns every reference as structured `biblStruct` plus the raw string (`includeRawCitations=1`) in `back//listBibl`, separate from body paragraphs: 239 references across the five papers, all with page coordinates.
+- **VS-1:** references are **not** passages and are not retrievable. They remain available in the stored raw TEI (`FR-ING-005`); a structured references table is not needed until a feature uses it.
+- **Back matter other than references** (`annex`, `availability`, `acknowledgement`, `funding`, `conflict`, `contribution`) is real source text: data-availability statements matter for reproducibility (`FR-REP-001`) and appendices hold real results (BERT). Whether it becomes passages is decided in P1-T7.
+- Body `note` elements (footnotes and running headers mixed) are **not** passages in VS-1, because the two cannot be separated reliably.
+
+### OQ-005: what is the default upload limit? **Answered: keep 50 MB (configurable).**
+
+- The five papers are 0.09–1.85 MB. GROBID has no size limit of its own (a 64 MB file was accepted, §6.3) and fails over-long documents by token count (`TOO_MANY_TOKENS` above 1,000,000 tokens; 3,000 synthetic pages gave 2.9 million).
+- 50 MB is about 27 times the largest real paper and leaves room for figure-heavy papers. PaperPilot enforces it before calling GROBID (`FR-ING-001`); over-long documents are caught by GROBID's token limit and reported with their own reason.
+
+### OQ-013: which quote normalisation rules? **Provisional; tested in Phase 5 (P5-T6).**
+
+- Quotes are verified against the **stored passage text**, not the PDF text layer, which cannot be matched reliably (78–93% even with aggressive normalisation, §5.4) because GROBID rewrites citation markers and text order differs.
+- Proposed normalisation, applied identically to quote and passage:
+  - Unicode NFKC;
+  - ligature characters to letters;
+  - single quotes, double quotes and dashes folded to their ASCII forms;
+  - whitespace collapsed;
+  - a single space removed inside words split after `fi`, `fl` or `ff` (for example "confi rmation" → "confirmation"; 125 occurrences in PLOS Medicine).
+- Line-end hyphenation needs no rule for passage text: GROBID already joins it.
+- Risk: the ligature rule could join a real word boundary; its false-match rate is measured in P5-T6 before it is adopted.
+
+### OQ-016: do tables and figures need handling in the MVP? Is tracing needed? **Deferred, with evidence.**
+
+- GROBID found tables with row structure in four papers, but with errors: a table labelled as a figure, a missing figure, appendix tables outside the body, table cells read as a formula (§5.3). Table **cells** are not reliable enough to cite in VS-1.
+- **VS-1:** table cells and figure images are not passages. Whether captions (36/36 present) become passages is decided in P1-T7.
+- **Revisit in Phase 7:** reported results (dataset, metric, value) often live in tables (`FR-CMP-004`, `OQ-008`).
+- **Tracing:** the experiment needed nothing beyond saved files and logs; the question stays with Phase 6 (`AD-016`).
+
+## 8. Limitations of this experiment
+
+- **Small sample:** five papers, all born-digital and in English, from biomedicine and computer science, from three publishers. Other fields, languages, preprint layouts and scanned papers are not covered.
+- **No real scanned paper:** a synthetic image-only page stood in for one (§6.3).
+- **One GROBID configuration:** CRF image, fixed options. The deep-learning image and other options were not compared.
+- **Quality judged by counts and short snippets**, not a full manual read of every paragraph; problems the checks did not look for (for example reading order inside a paragraph) may exist.
+- **Reference counts were not compared** with each paper's printed reference list.
+- **Timings come from one laptop** with sequential requests and a warm service, except where noted.
+
+**Decisions handed to P1-T7 (parser-output representation):** whether back matter other than references, and figure/table captions, become passages, and how they are marked.
+
+## 9. Still to do
 
 | Task | What |
 |---|---|
-| P1-T6 | Answers or deferrals for the open questions. |
 | P1-T7 | Parser-output representation (design note). |
 | P1-T8 | Go / go-with-limits / no-go. |

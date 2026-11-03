@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phase 0 complete. Local services, Python tooling, configuration module, backend skeleton (health endpoint) and test conventions exist; no feature code. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M3: GROBID parsing experiment (`in_progress`: P1-T1 to P1-T5 done). M1 and M2 `completed` 2026-11-03. |
+| Current milestone | M3: GROBID parsing experiment (`in_progress`: P1-T1 to P1-T6 done). M1 and M2 `completed` 2026-11-03. |
 | Current phase | Phase 1, GROBID feasibility experiment (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -97,7 +97,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1: P1-T1 to P1-T5 `completed` (failure behaviour recorded; a 200 response can have an empty body). Next: **P1-T6**, answering the open questions in the report. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1: P1-T1 to P1-T6 `completed` (open questions answered or deferred in the experiment doc §7). Pending: developer approval of PRD updates. Next: **P1-T7**, parser-output representation. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
 
 ## 5. Next actions
 
@@ -279,5 +279,7 @@ Only checks actually performed. Nothing in this log refers to application behavi
 
 | 2026-11-03 | P1-T5: `scripts/grobid_failures.py inputs` (ruff, mypy clean): 11 generated inputs | Non-PDF, empty, corrupt and truncated: 500 `BAD_INPUT_DATA`. Image-only, blank, 64 MB image: 500 `NO_BLOCKS`. 3,000 pages: 500 `TOO_MANY_TOKENS` (2,883,000 tokens, limit 1,000,000). Synthetic 1- and 300-page text: **200 with an empty body** (text in `back`). Details in the experiment doc §6 |
 | 2026-11-03 | P1-T5: `scripts/grobid_failures.py service` | GROBID stopped: `ConnectError`. Stopped mid-request: `RemoteProtocolError`. Restart to alive: 24.4 s and 22.7 s. 25 concurrent requests: 10 × 200, 15 × 503 (HTML body). GROBID healthy afterwards. **P1-T5 `completed`**. Not observed: 204, `TIMEOUT`, `TOO_MANY_BLOCKS`, encrypted PDF, real scanned paper |
+
+| 2026-11-03 | P1-T6: extra checks on the TEI (note `place`, hyphen splits, curly quotes, back-matter `div` types, captions) and answers written in the experiment doc §7, limitations in §8 | Answered: `OQ-001` (pages for every paragraph; sections flat), `OQ-003` (references not passages in VS-1), `OQ-005` (keep 50 MB). Provisional: `OQ-002` (paragraph passages plus two repair rules, confirm with Recall@5), `OQ-013` (normalisation rules, test in P5-T6). Deferred: `OQ-016` (tables to Phase 7; tracing to Phase 6). **P1-T6 `completed`**. PRD not yet updated (needs developer approval) |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
