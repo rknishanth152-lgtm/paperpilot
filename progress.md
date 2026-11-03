@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 done). M1–M4 `completed` 2026-11-03. |
+| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1, P3-T2 done). M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -64,6 +64,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | DOI normalisation: `backend/app/services/doi.py` (`normalize_doi`), 31 unit tests | Tests and mutation check (see §7) | 2026-11-03 |
 | Schema tests: `tests/integration/test_schema_migration.py` (2) and `test_schema_constraints.py` (51), on a throwaway database | Run and mutation-checked (see §7) | 2026-11-03 |
 | File storage: `backend/app/storage.py` (save/read/delete by generated key, local folder `data/storage`), 28 unit tests | Tests, mutation check, probe (see §7) | 2026-11-03 |
+| Upload validation: `backend/app/services/ingestion/validation.py` (empty, size, `%PDF-` signature by content; display-only filename), 34 unit tests | Tests, real-file run, mutation check (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -102,7 +103,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage) `completed`; next **P3-T2**, upload validation. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage) and P3-T2 (upload validation) `completed`; next **P3-T3**, the GROBID client. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
 | Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
 
@@ -113,7 +114,7 @@ Summary of what is done (details in §3, §6 and §7): planning documents review
 In dependency order (roadmap Phase 3).
 
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
-2. **P3-T2:** upload validation (PDF signature, empty file, size limit); rejections are API errors, not stored documents (`docs/design/schema.md` §6).
+2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. Carried to P3-T8: the upload endpoint must read the request in bounded chunks and stop above `MAX_UPLOAD_MB`, so a huge upload is never held in memory.
 3. **P3-T3 to P3-T8:** GROBID client, TEI parsing (`parse_tei`), ingestion orchestration, duplicates and retries, startup recovery, HTTP API.
 4. **P3-T9:** first frontend pages. Before it: P0-T8 (frontend toolchain check), and the colour theme is explained to the developer and agreed (`docs/design-system.md` §1).
 5. P0-T9 (CI) remains deferred.
@@ -345,5 +346,9 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P3-T1: `tests/unit/test_storage.py` written first (collection error before the module existed), then `backend/app/storage.py` (`Storage` interface, `LocalStorage`, `get_storage`) | 28 passed |
 | 2026-11-03 | P3-T1: mutation check, one at a time: key-shape check removed; exclusive create replaced by overwrite; partial-file cleanup removed; file restored (hash identical) | 10, 1 and 1 tests failed respectively. With the key-shape check removed, the four `../` cases were still refused by the second (resolved-path) guard |
 | 2026-11-03 | P3-T1: ruff, mypy (35 files), all tests; probe through `get_storage()` with the real settings, then deleted | All clean; 140 passed. Probe stored under `data/storage/pdf/<uuid7>.pdf`, git-ignored, read back intact, deleted; no files left. **P3-T1 `completed`** |
+
+| 2026-11-03 | P3-T2: real PDF headers checked (`%PDF-1.3`/`%PDF-1.4` for the 5 papers); `tests/unit/test_upload_validation.py` written first (collection error before the module existed), then `backend/app/services/ingestion/validation.py` (`validate_upload`, `display_filename`) | 34 passed |
+| 2026-11-03 | P3-T2: validator run on the 5 papers and the 11 Phase 1 failure inputs with the real 50 MB limit | Papers accepted with correct SHA-256. Rejected: text renamed `.pdf` (`not_pdf`), empty (`empty_file`), 64 MB (`file_too_large`). Accepted as designed, for GROBID to judge: corrupt, truncated, image-only, blank, long synthetic PDFs |
+| 2026-11-03 | P3-T2: mutation check, one at a time: trust filename instead of content; `>=` limit; keep path parts; keep control characters | 10, 1, 4 and 1 tests failed respectively; file restored; ruff, mypy (38 files) clean; all tests 174 passed. **P3-T2 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

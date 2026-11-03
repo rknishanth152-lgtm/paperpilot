@@ -104,7 +104,7 @@ All text fields are `None` when absent, never `""` (`FR-ING-006`, `DR-007`).
 
 A document ends `parsed` only when `parse_tei` returns at least one `body` passage. Otherwise it ends `failed` with one `failure_reason` and a short message without paper text. "Observed" refers to the experiment (§6).
 
-**Upload rejections (no document is created).** Corrected 2026-11-03 in P2-T1: `FR-ING-001` says invalid uploads are *rejected*, so these are structured API error codes returned by the upload endpoint, not stored `failure_reason` values.
+**Upload rejections (no document is created).** Corrected 2026-11-03 in P2-T1: `FR-ING-001` says invalid uploads are *rejected*, so these are structured API error codes returned by the upload endpoint, not stored `failure_reason` values. Implemented in `backend/app/services/ingestion/validation.py` (P3-T2), checked in the order empty, size, signature. A file with a valid `%PDF-` header but broken content (corrupt, truncated) passes this check and is reported by GROBID (`unreadable_pdf`).
 
 | Check (before storing) | Error code | Observed? |
 |---|---|---|
