@@ -97,7 +97,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1: P1-T1 to P1-T6 `completed` (open questions answered or deferred in the experiment doc §7). Pending: developer approval of PRD updates. Next: **P1-T7**, parser-output representation. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1: P1-T1 to P1-T6 `completed` (open questions answered or deferred in the experiment doc §7). PRD updated to v0.5 with the answers (§6.9). Next: **P1-T7**, parser-output representation. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
 
 ## 5. Next actions
 
@@ -183,6 +183,21 @@ The developer asked Claude to settle the remaining Phase 0 questions with the be
 | `OQ-014` frontend | Vite + React + TypeScript (strict), **pnpm** as package manager (installed at P0-T8/P3 with `npm install -g pnpm`, the method pnpm recommends on Windows). Node 24 is already installed (Vite needs 20.19+ or 22.12+). **No component library, data-fetching library or animation library chosen now**: decided at P3-T9 against `NFR-UX-001`; Motion for React (`motion`, imported from `motion/react`) is the candidate if CSS transitions are not enough. | Avoids committing to libraries before the first page exists (`CLAUDE.md` §10). | — |
 | Repository contents (P0-T2) | Commit `notes/` (the developer's own learning notes). Do **not** commit `transcripts/` (add to `.gitignore`). | Transcripts are third-party video content (`RISK-13`); notes are the developer's own writing. | — |
 | OneDrive original folder | Left in place. The developer deletes it when satisfied. | Deleting the developer's data is the developer's call. | — |
+
+### 6.9 PRD updates from Phase 1 (2026-11-03)
+
+Developer approved recording the P1-T6 answers in the PRD (now v0.5). Reason: the open-questions register and `AD-004` should reflect evidence from the GROBID experiment (`docs/experiments/grobid-feasibility.md` §7) rather than pre-experiment assumptions.
+
+| PRD item | Change |
+|---|---|
+| `OQ-001` | Answered: pages for every paragraph; flat sections; store `page_start` and `page_end` |
+| `OQ-002` | Provisional: paragraph passages plus two repair rules; confirm with Recall@5 in Phase 4 |
+| `OQ-003` | Answered: references are not passages in VS-1; back matter decided in P1-T7 |
+| `OQ-005` | Answered: 50 MB default, configurable |
+| `OQ-013` | Provisional: verify against passage text; normalisation rules tested in P5-T6 |
+| `OQ-016` | Deferred: table cells to Phase 7; captions decided in P1-T7; tracing at Phase 6 |
+| `AD-004` | Reason column notes that paragraph passages stand, with the two provisional repair rules |
+| Appendix A.3 | Page/section assumption marked as checked; upload limit no longer a placeholder |
 
 ## 7. Verification log
 
@@ -281,5 +296,7 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P1-T5: `scripts/grobid_failures.py service` | GROBID stopped: `ConnectError`. Stopped mid-request: `RemoteProtocolError`. Restart to alive: 24.4 s and 22.7 s. 25 concurrent requests: 10 × 200, 15 × 503 (HTML body). GROBID healthy afterwards. **P1-T5 `completed`**. Not observed: 204, `TIMEOUT`, `TOO_MANY_BLOCKS`, encrypted PDF, real scanned paper |
 
 | 2026-11-03 | P1-T6: extra checks on the TEI (note `place`, hyphen splits, curly quotes, back-matter `div` types, captions) and answers written in the experiment doc §7, limitations in §8 | Answered: `OQ-001` (pages for every paragraph; sections flat), `OQ-003` (references not passages in VS-1), `OQ-005` (keep 50 MB). Provisional: `OQ-002` (paragraph passages plus two repair rules, confirm with Recall@5), `OQ-013` (normalisation rules, test in P5-T6). Deferred: `OQ-016` (tables to Phase 7; tracing to Phase 6). **P1-T6 `completed`**. PRD not yet updated (needs developer approval) |
+
+| 2026-11-03 | PRD v0.5: recorded Phase 1 answers (developer approved); cross-document consistency script on PRD, CLAUDE.md, progress.md, roadmap, README, design system, experiment doc and project skill | Passed: 147 IDs defined, 103 tasks, 14 milestones; references, fences and table columns consistent across 8 files |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

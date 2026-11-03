@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.4 (P0-T1 review changes and Phase 0 decisions, 2026-11-03; see `progress.md` §6.7, §6.8) |
+| Version | 0.5 (Phase 1 answers to OQ-001, -002, -003, -005, -013, -016 recorded, 2026-11-03; see `progress.md` §6.9) |
 | Date | 2026-11-03 |
 | Status | Planning. No application code exists yet (see `progress.md`). |
 | Companion documents | `CLAUDE.md` (development rules), `progress.md` (actual state), `docs/implementation-roadmap.md` (sequence and exit criteria) |
@@ -161,7 +161,7 @@ Basis column: **[P]** project direction, **[E]** engineering recommendation, **[
 | AD-001 | Modular monolith with package boundaries per capability. | One deployable unit keeps the MVP comprehensible. | Microservices: operational cost with no demonstrated need. | A module needs independent scaling or deployment. | [P] |
 | AD-002 | PostgreSQL is the source of truth. Files on local disk behind a small storage interface (save/read/delete by key). | Spec separates relational data from file storage. The interface avoids a later rewrite. | Storing PDFs in Postgres: harder to inspect, no benefit. Supabase Storage (used in both videos): adds a hosted dependency not in the spec. | Object storage is justified by deployment. | [P] |
 | AD-003 | GROBID is the initial parser. Feasibility is **unproven** until Phase 1 (`OQ-001`, `OQ-002`, `OQ-015`, `OQ-016`). | Project direction; designed for scholarly structure. | Docling (used in both videos, but on SEC filings and appliance manuals, not papers) as a documented fallback only if Phase 1 shows GROBID inadequate. | Phase 1 findings. | [P] |
-| AD-004 | Passage = one paragraph from the parsed body, with section and page when known. | Smallest unit that is readable as evidence. A hypothesis. | Fixed-size token chunks (shown in the videos) lose section boundaries; sentence-level may fragment meaning. | Phase 1 inspection or Phase 4 Recall@5 shows poor boundaries. | [E] |
+| AD-004 | Passage = one paragraph from the parsed body, with section and page when known. | Smallest unit that is readable as evidence. A hypothesis. Phase 1 (2026-11-03): paragraph stands, with two provisional repair rules: re-join a paragraph split mid-sentence at a column or page break, and skip paragraphs with no letters while recording the count (`docs/experiments/grobid-feasibility.md` §7, `OQ-002`). | Fixed-size token chunks (shown in the videos) lose section boundaries; sentence-level may fragment meaning. | Phase 1 inspection or Phase 4 Recall@5 shows poor boundaries. | [E] |
 | AD-005 | Keyword retrieval (PostgreSQL full-text search) first; establish a measured baseline before semantic search. | Project requirement. Simple and inspectable. | Semantic first: needs an embedding model, cost and an index before a baseline exists. | Never skip the baseline. | [P] |
 | AD-006 | Plain RAG: one retrieval step, one LLM call, structured output. No agent loop. | Project requirement. The agent-loop build in the videos took about a minute and an estimated $1–2 per query with a frontier model, and its behaviour was not validated by its author. | Agent loop: can self-correct; hard to evaluate and cost-control. | Evaluation shows single-pass answers fail on questions needing multiple lookups. | [P][T] |
 | AD-007 | The LLM cites **prompt-local aliases** (e.g. `P1`, `P2`), mapped by code to real passage IDs. Page and section shown to users always come from the database, never from model output. | Short, checkable identifiers. Prevents fabricated pages. | Letting the model emit UUIDs or page numbers: easier to fabricate and harder to read. | Alias scheme proves error-prone. | [E] |
@@ -492,11 +492,11 @@ Human correction workflow, knowledge graph, research-gap exploration (as hypothe
 
 | ID | Question | Resolve by | Needed before |
 |---|---|---|---|
-| OQ-001 | How reliable are GROBID's section hierarchy and page/coordinate information on real papers? | Phase 1 experiment | Phase 2 schema |
-| OQ-002 | What passage granularity works (paragraph vs larger/smaller)? | Phase 1 inspection, Phase 4 Recall@5 | Phase 3 passage creation |
-| OQ-003 | Are references stored (structured or raw only)? Are bibliography entries excluded from retrieval? | Phase 1 | Phase 3 |
+| OQ-001 | How reliable are GROBID's section hierarchy and page/coordinate information on real papers? | **Answered 2026-11-03** (`docs/experiments/grobid-feasibility.md` §7): every body paragraph and heading had a page from GROBID coordinates (242/242 on five papers); store `page_start` and `page_end`. Sections are always flat; no `sections` table. | Phase 2 schema |
+| OQ-002 | What passage granularity works (paragraph vs larger/smaller)? | **Provisional 2026-11-03** (`docs/experiments/grobid-feasibility.md` §7): paragraph passages plus two repair rules (see `AD-004`). Confirm with Recall@5 in Phase 4. | Phase 3 passage creation |
+| OQ-003 | Are references stored (structured or raw only)? Are bibliography entries excluded from retrieval? | **Answered 2026-11-03** (`docs/experiments/grobid-feasibility.md` §7): GROBID returns structured and raw references separately from body text. References are not passages in VS-1; they stay in the stored raw TEI. Whether non-reference back matter (appendix, data availability, funding) becomes passages is decided in P1-T7. | Phase 3 |
 | OQ-004 | FTS language configuration and query function (e.g. `english` vs `simple`; `websearch_to_tsquery` vs others). Ranking function and its limits. | Phase 4 experiment on the evaluation set | Phase 4 |
-| OQ-005 | Upload size limit default. | Measure real paper sizes in Phase 1 | Phase 3 |
+| OQ-005 | Upload size limit default. | **Answered 2026-11-03** (`docs/experiments/grobid-feasibility.md` §7): default 50 MB, configurable. Real papers were 0.09–1.85 MB; GROBID has no size limit and rejects over-long documents with `TOO_MANY_TOKENS`. | Phase 3 |
 | OQ-006 | Re-parse policy: how to keep evidence links valid when passages are regenerated. | Design review | Phase 7 |
 | OQ-007 | Paper matching when DOI is absent. | Phase 9 experiment | Phase 9 |
 | OQ-008 | Representation of reported results (table, JSON, typed items). | Design review with hand-built examples | Phase 10 |
@@ -504,10 +504,10 @@ Human correction workflow, knowledge graph, research-gap exploration (as hypothe
 | OQ-010 | Initial reproducibility checklist items. | Hand-label 3 papers | Phase 11 |
 | OQ-011 | LLM provider and model for answers and extraction (cost, structured-output support). | Short comparison on the evaluation set | Phase 5 |
 | OQ-012 | Embedding model, dimension, pgvector index choice and limits. Verify limits in pgvector docs. | Phase 8 | Phase 8 |
-| OQ-013 | Quote normalisation rules for PDF text artifacts. | Phase 1 samples, Phase 5 tests | Phase 5 |
+| OQ-013 | Quote normalisation rules for PDF text artifacts. | **Provisional 2026-11-03** (`docs/experiments/grobid-feasibility.md` §7): verify quotes against stored passage text, never the PDF text layer. Rules: Unicode NFKC, ligatures, quote and dash folding, whitespace, split ligatures inside words. Test in P5-T6. | Phase 5 |
 | OQ-014 | Tooling: Python packaging/dependency tool, linter/formatter, type checker, test runner, frontend package manager and UI library, SQLAlchemy/driver versions. (Earlier videos used uv, pnpm, pytest and ruff [T]; none is mandated here.) | **Resolved 2026-11-03** (`progress.md` §6.8): Python 3.14 via uv, pytest, ruff, mypy, SQLAlchemy 2.1 + Alembic + psycopg 3; frontend Vite + React + TypeScript with pnpm, no component library or animation library chosen yet (P3-T9). | Phase 0 |
 | OQ-015 | GROBID image/tag, resource needs, and which model variant to use; PostgreSQL image that can later enable pgvector. | **Resolved 2026-11-03** (`progress.md` §6.8): `grobid/grobid:0.9.1-crf` (CPU, about 0.5 GB, needs about 4 GB RAM for full text); `pgvector/pgvector:0.8.7-pg18-trixie` (PostgreSQL 18, extension not enabled until Phase 8). Both bound to 127.0.0.1 only. | Phase 0 |
-| OQ-016 | Whether tables and figures need handling in the MVP; whether tracing tooling is needed beyond structured logs. | Phase 1; revisit at Phase 6 | Phase 3 / Phase 6 |
+| OQ-016 | Whether tables and figures need handling in the MVP; whether tracing tooling is needed beyond structured logs. | **Deferred 2026-11-03** (`docs/experiments/grobid-feasibility.md` §7): table cells are not reliable enough to cite in VS-1; revisit in Phase 7. Whether captions become passages is decided in P1-T7. Tracing: revisit at Phase 6. | Phase 3 / Phase 6 |
 | OQ-017 | Local runtime feasibility for `AD-015`: the developer's machine has no Docker or WSL2 and about 18 GB free on C:. Disk and memory needs of the chosen GROBID image must fit. | **Resolved 2026-11-03** (`progress.md` §6.8): WSL2 + Docker Desktop installed by the developer with `--installation-dir` and `--wsl-default-data-root` on E:, so images do not use C:. Installation verified 2026-11-03 (engine running, data disk on E:, `hello-world` succeeded). | Phase 0 (P0-T3) |
 
 ---
@@ -541,8 +541,8 @@ The earlier notes (`notes/architecture-notes-*.md`, `implementation-notes.md`, `
 
 ### A.3 Unsupported or unverified assumptions
 
-- That GROBID gives usable page numbers and section structure (`OQ-001`).
+- ~~That GROBID gives usable page numbers and section structure (`OQ-001`).~~ Checked in Phase 1 on five papers: pages yes, sections flat (`docs/experiments/grobid-feasibility.md`).
 - Pgvector index limits quoted in the notes came from a third-party summary and have not been checked against the pgvector documentation (`OQ-012`).
 - GROBID endpoint and option details in the notes came from a documentation branch rather than the current stable pages (`OQ-015`).
 - Any specific model, model price, or latency mentioned in the videos is the speaker's statement about one setup and does not predict PaperPilot's behaviour.
-- The upload size limit, timeouts and top-k values are placeholders until measured.
+- Timeouts and top-k values are placeholders until measured. The upload limit (50 MB) is now based on Phase 1 measurements (`OQ-005`).
