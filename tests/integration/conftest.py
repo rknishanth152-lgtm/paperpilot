@@ -7,8 +7,11 @@ mistaken for a passing run.
 
 import httpx
 import pytest
+from sqlalchemy import Engine, text
+from sqlalchemy.exc import OperationalError
 
 from app.config import Settings, get_settings
+from app.database import get_engine
 
 START_SERVICES = "Start the services with `docker compose up -d --wait`."
 
@@ -28,3 +31,18 @@ def grobid_url(settings: Settings) -> str:
             f"GROBID is not reachable at {url} ({type(exc).__name__}). {START_SERVICES}"
         )
     return url
+
+
+@pytest.fixture(scope="session")
+def db_engine(settings: Settings) -> Engine:
+    engine = get_engine()
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+    except OperationalError as exc:
+        # Only the error type: the message could include connection details.
+        where = f"{settings.postgres_host}:{settings.postgres_port}"
+        pytest.fail(
+            f"PostgreSQL is not reachable at {where} ({type(exc.orig).__name__}). {START_SERVICES}"
+        )
+    return engine

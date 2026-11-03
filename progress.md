@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phase 0 complete. Local services, Python tooling, configuration module, backend skeleton (health endpoint) and test conventions exist; no feature code. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M4: Database schema and migrations (`in_progress`: P2-T1 done). M1, M2 and M3 `completed` 2026-11-03. |
+| Current milestone | M4: Database schema and migrations (`in_progress`: P2-T1, P2-T2 done). M1, M2 and M3 `completed` 2026-11-03. |
 | Current phase | Phase 2, core persistence and provenance (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -59,6 +59,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | `docs/experiments/grobid-feasibility.md` (P1-T1 to P1-T5); throwaway `scripts/grobid_experiment.py`, `scripts/inspect_tei.py`, `scripts/quote_match.py`, `scripts/grobid_failures.py`; TEI, pdfalto text, generated failure inputs and measurements in git-ignored `data/` | See §7 | 2026-11-03 |
 | `docs/design/parser-output.md`: parser output contract (`ParsedDocument`, `ParsedPassage`), passage regions and rules, page rules, failure-reason mapping. Design only, not implemented | Rules checked against the five TEI outputs (see §7) | 2026-11-03 |
 | `docs/design/schema.md`: `papers`, `documents`, `passages` columns, constraints, failure reasons, indexes, immutability trigger. Design only, not implemented | Key PostgreSQL features checked live (see §7) | 2026-11-03 |
+| Database layer: `backend/app/database/` (engine, sessions), `backend/app/models/base.py` (naming convention), Alembic environment in `backend/migrations/` with settings in `pyproject.toml`; no tables yet; dependencies SQLAlchemy, Alembic, psycopg | Tests and Alembic commands (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -97,7 +98,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 2 (M4): core persistence and provenance. P2-T1 (schema design note) `completed`; next **P2-T2**, database access layer and migrations. |
+| Task | Phase 2 (M4): core persistence and provenance. P2-T1 (schema design note) and P2-T2 (database layer, Alembic) `completed`; next **P2-T3**, the first migration. |
 | Inputs | `docs/design/parser-output.md` (fields to store, passage regions, failure reasons), PRD §8, `DR-001`..`DR-009`, `FR-ING-008` |
 | Status | `in_progress`. Phase 0 and Phase 1 are `completed` (M1, M2, M3). |
 
@@ -108,7 +109,7 @@ Summary of what is done (details in §3, §6 and §7): planning documents review
 In dependency order.
 
 1. ~~P2-T1~~ `completed`: `docs/design/schema.md`.
-2. **P2-T2:** database access layer and migrations. Adds SQLAlchemy, Alembic and psycopg (decided in §6.8; the developer approves each dependency when added).
+2. ~~P2-T2~~ `completed`: database layer and Alembic environment.
 3. **P2-T3 to P2-T6:** first migration, DOI normalisation, constraint tests against PostgreSQL, schema documentation.
 4. Deferred from Phase 0: P0-T8 (frontend toolchain check, before Phase 3) and P0-T9 (CI).
 
@@ -313,5 +314,10 @@ Only checks actually performed. Nothing in this log refers to application behavi
 
 | 2026-11-03 | P2-T1: PostgreSQL 18.6 feature checks in rolled-back transactions (`uuidv7()`, `UNIQUE` with several `NULL`s, generated `section_path`, `BEFORE UPDATE` trigger, page `CHECK`s) | All behaved as designed: `uuidv7()` time-ordered; many `NULL` DOIs allowed and a duplicate DOI rejected; `section_path` "3.1 Methods" / "Intro"; update blocked with "passages are immutable"; page 0 rejected. Nothing kept |
 | 2026-11-03 | P2-T1: `docs/design/schema.md` written; `docs/design/parser-output.md` §7 corrected (`not_pdf`, `empty_file`, `file_too_large` are upload rejections, not stored reasons, per `FR-ING-001`; `storage_error` added) | **P2-T1 `completed`** |
+
+| 2026-11-03 | P2-T2: `uv add sqlalchemy alembic psycopg[binary]` (developer approved) | SQLAlchemy 2.1.6 (MIT), Alembic 1.20.1 (MIT), psycopg and psycopg-binary 3.3.7 (LGPL-3.0, used unmodified; note for the M14 licence review), plus Mako, MarkupSafe, tzdata |
+| 2026-11-03 | P2-T2: `alembic init --template pyproject backend/migrations`; `env.py` takes the URL from the settings module (not `alembic.ini`); models `Base` with a constraint naming convention; `app/database` engine (lazy, `pool_pre_ping`) and `session_scope`/`get_session` | ruff and mypy (23 files) clean |
+| 2026-11-03 | P2-T2: tests: unit (naming convention; importing the app creates no engine, in a fresh interpreter); integration (psycopg 3 to PostgreSQL 18; a failed `session_scope` rolls back) | Default run 19 passed; `-m integration` 4 passed; combined 23 passed |
+| 2026-11-03 | P2-T2: `uv run alembic current`, `heads`, `check`, `upgrade head`, `upgrade head --sql` from the repository folder | All exit 0; `check`: "No new upgrade operations detected"; `upgrade head` created only the `alembic_version` table. From another folder Alembic cannot find its `pyproject.toml` settings (an Alembic limitation), so commands are documented as run from the repository folder. **P2-T2 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

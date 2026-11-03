@@ -72,6 +72,20 @@ Test folders: `tests/unit` (default), `tests/integration` (marker `integration`)
 uv run mypy .
 ```
 
+## Database migrations
+
+The schema is managed with Alembic (migrations in `backend/migrations/`). The database connection comes from `.env` through `backend/app/config.py`; `alembic.ini` holds only logging settings. Run from the repository folder with PostgreSQL running (verified 2026-11-03):
+
+```bash
+uv run alembic upgrade head
+```
+
+```bash
+uv run alembic current
+```
+
+`uv run alembic check` reports whether the models and the migrations disagree. Alembic reads its settings from `pyproject.toml` in the current folder, so run these commands from the repository folder.
+
 ## Configuration
 
 All settings are read in one place, `backend/app/config.py`, from environment variables and `.env`. `.env.example` lists every setting with a placeholder; the same `POSTGRES_*` values configure Docker Compose and the backend. The backend refuses to start with a missing or invalid value.
