@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers), P1-T3 (GROBID runs), P1-T4 (inspection), P1-T5 (failure inputs), P1-T6 (answers, §7) and P1-T7 (representation: `docs/design/parser-output.md`) done 2026-11-03. P1-T8 not started. |
+| Status | **Completed.** P1-T1 (documentation), P1-T2 (papers), P1-T3 (GROBID runs), P1-T4 (inspection), P1-T5 (failure inputs), P1-T6 (answers, §7), P1-T7 (representation: `docs/design/parser-output.md`) and P1-T8 (decision, §9) done 2026-11-03. |
 | Answers | `OQ-001`, `OQ-002`, `OQ-003`, `OQ-005`, `OQ-013`, `OQ-016` (in P1-T6) |
 | Rule | Nothing here is a claim about real papers until it has been observed. Where documentation and observation differ, observation wins and the difference is recorded. |
 
@@ -310,8 +310,27 @@ Extra checks made for this task:
 
 **Decisions handed to P1-T7:** settled 2026-11-03 in `docs/design/parser-output.md`. Abstract, captions and back matter other than references become passages, each marked with its region. Testing rule R1 on the five papers showed that most split paragraphs cannot be safely re-joined (see the note).
 
-## 9. Still to do
+## 9. P1-T8: decision (2026-11-03)
 
-| Task | What |
-|---|---|
-| P1-T8 | Go / go-with-limits / no-go. |
+**Go with limits.** Decided by the developer on the evidence in this report. GROBID 0.9.1 (CRF image) stays the parser for VS-1 (`AD-003`); the fallback parser is not evaluated.
+
+| Need for VS-1 | Evidence | Met |
+|---|---|---|
+| Metadata | Title, authors and abstract for 5/5 papers; DOI for 4/5 (§5.2) | Yes |
+| Passages with section and page | Every passage has pages (324/324 after the rules in `docs/design/parser-output.md`); sections flat but usable (§5, §7) | Yes |
+| References kept out of passages | Separate `listBibl`, 239 references (§5.2) | Yes |
+| Distinct failure statuses | Clear codes for bad, empty, text-less and over-long input and for service failures; a 200 with an empty body is detectable (§6) | Yes |
+| Repeatable derivation | Identical output across runs apart from random IDs (not used) and a timestamp (§4.2) | Yes |
+| Speed | 1.4–2.9 s per paper after warm-up (§4.1) | Yes |
+| Privacy | No external calls with consolidation off (§4.2) | Yes, with the rule below |
+
+**Limits accepted:**
+
+1. Some paragraphs are split mid-sentence and cannot be safely re-joined (7 of 239 body paragraphs); measured by Recall@5 in Phase 4.
+2. Footnote fragments in some layouts (BERT) and sidebar text becoming sections (PLOS Medicine).
+3. Table cells are not citable; revisit in Phase 7.
+4. Quotes are verified against stored passage text, not the PDF text layer.
+5. Every request must send `consolidateHeader=0`.
+6. Evidence comes from five born-digital English papers; no real scanned paper was tested.
+
+**Revisit if:** Phase 4 Recall@5 misses are traced to passage boundaries; papers from other fields or layouts behave much worse; or table content becomes necessary (Phase 7).
