@@ -39,11 +39,26 @@ extend-exclude = [".claude"]
 testpaths = ["tests"]
 # Backend code is imported as `app` (backend/app).
 pythonpath = ["backend"]
+# The default run is unit tests only: fast and offline. Markers are applied by
+# folder in tests/conftest.py. Run service tests with `-m integration`.
+addopts = [
+    "--strict-markers",
+    "--import-mode=importlib",
+    "-m",
+    "not integration and not evaluation",
+]
+markers = [
+    "integration: needs local services from compose.yaml (PostgreSQL and/or GROBID); excluded by default",
+    "evaluation: evaluation-harness runs (Phase 4 onwards); excluded by default",
+]
 
 [tool.mypy]
 python_version = "3.14"
 strict = true
-mypy_path = "backend"
+# Module names come from folder paths: backend/app -> `app`, tests/... -> `tests....`
+# (needed because several test folders have a conftest.py).
+mypy_path = "backend,."
+explicit_package_bases = true
 # Pydantic's official plugin: lets mypy understand settings filled from the environment.
 plugins = ["pydantic.mypy"]
 exclude = ['^\.claude/']

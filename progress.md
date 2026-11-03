@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Environment setup. Documentation reviewed and approved; no application code written. |
 | Overall status | `in_progress` (documentation only) |
 | Last updated | 2026-11-03 |
-| Current milestone | M2: Repository and development environment setup (`in_progress`: P0-T2 to P0-T6 completed; next P0-T7). M1 `completed` 2026-11-03. |
+| Current milestone | M2: Repository and development environment setup (`in_progress`: P0-T2 to P0-T7 completed; next the fresh-clone check). M1 `completed` 2026-11-03. |
 | Current phase | Phase 0 (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -55,6 +55,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Python environment: uv 0.13.7, Python 3.14.10 on E: (`.python-version`), `pyproject.toml` with pytest/ruff/mypy, `uv.lock`; README and `CLAUDE.md` commands | Installed and run (see §7) | 2026-11-03 |
 | Configuration: `backend/app/config.py` (`Settings`, `get_settings()`), complete `.env.example`, `tests/unit/test_config.py` (15 tests); dependencies pydantic and pydantic-settings | Tests, mutation check, lint and type check (see §7) | 2026-11-03 |
 | Backend skeleton: `backend/app/main.py` (`create_app`, startup settings check), `api/health.py`, `schemas/health.py`; `tests/unit/test_health.py` (2 tests); dependencies fastapi, uvicorn; dev httpx | Tests, mutation check, real server run (see §7) | 2026-11-03 |
+| Test conventions: `tests/conftest.py` (markers by folder), `tests/integration/` (GROBID fixture with loud failure, 2 tests), `tests/evaluation/README.md`; pytest `addopts` excludes `integration` and `evaluation` by default | Selection, failure-path and typo checks (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -95,7 +96,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). Next Phase 0 task: **P0-T7**. |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed` (test conventions). Next: the M2 fresh-clone check, then Phase 1. |
 
 ## 5. Next actions
 
@@ -103,7 +104,7 @@ In dependency order. The first technical task after documentation is the GROBID 
 
 1. ~~P0-T2~~ `completed` 2026-11-03 (commit `e860441`). Pushed to a private GitHub repository on 2026-11-03 (§3.1).
 2. ~~P0-T3~~ `completed` 2026-11-03: PostgreSQL and GROBID run with Compose; commands in `README.md`.
-3. ~~P0-T4~~, ~~P0-T5~~ and ~~P0-T6~~ `completed` 2026-11-03. Remaining Phase 0: **P0-T7** (test conventions: `tests/integration`, `tests/evaluation`, a marker separating tests that need PostgreSQL/GROBID); P0-T8 (frontend toolchain check) and P0-T9 (CI) may wait.
+3. ~~P0-T4~~ to ~~P0-T7~~ `completed` 2026-11-03. **To complete M2:** a fresh-clone check (clone from GitHub into a new folder, follow only the README, start services, run the smoke and integration tests). P0-T8 (frontend toolchain check) and P0-T9 (CI) are optional before Phase 1. No PostgreSQL integration test exists yet: it needs the database driver, added in P2-T2.
 4. **Phase 1 GROBID experiment** on 3–5 permitted papers, then inspection of the returned structure and failure behaviour, written up in `docs/experiments/grobid-feasibility.md` (P1-T1..T8).
 
 ## 6. Decisions and blockers
@@ -250,5 +251,10 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P0-T6: mutation check: health route made to raise, smoke tests run, file restored (hash identical) | `test_health_returns_ok` failed as expected; all pass after restore |
 | 2026-11-03 | P0-T6: `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy .` | All passed; mypy: no issues in 9 source files |
 | 2026-11-03 | P0-T6: started `uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000` with the real `.env`; `GET /health`, `GET /does-not-exist`; listener and Wi-Fi checks; stopped | Startup complete; `/health` 200 `{"status":"ok"}`; unknown route 404 `{"detail":"Not Found"}`; listening on 127.0.0.1 only; refused on the Wi-Fi address; port free after stop. **P0-T6 `completed`** |
+
+| 2026-11-03 | P0-T7: pytest selections: `uv run pytest`, `-m integration`, `-m evaluation`, `--collect-only` | Default: 17 passed, 2 deselected. Integration: 2 passed (GROBID alive, version 0.9.1). Evaluation: no tests yet (exit 5). The two integration tests carry the marker from their folder |
+| 2026-11-03 | P0-T7: stopped GROBID, ran `-m integration`, then the default run, restarted GROBID | Integration errored with "GROBID is not reachable at http://127.0.0.1:8070 (ConnectError). Start the services with `docker compose up -d --wait`."; the default run still passed offline (17); GROBID healthy again and integration 2 passed |
+| 2026-11-03 | P0-T7: temporary test using an unregistered marker (`integrashun`), then removed | Rejected: "'integrashun' not found in `markers` configuration option" |
+| 2026-11-03 | P0-T7: `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy .` | ruff passed; mypy first reported two modules named `conftest`; fixed with `explicit_package_bases`; then no issues in 12 source files. **P0-T7 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

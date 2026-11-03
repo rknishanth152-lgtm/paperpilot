@@ -60,6 +60,14 @@ uv run ruff format --check .
 uv run pytest
 ```
 
+This runs the unit tests only: fast and offline. Tests that need PostgreSQL or GROBID live in `tests/integration` and run only when asked, with the services started (`docker compose up -d --wait`). If a service is down they fail with instructions rather than being skipped:
+
+```bash
+uv run pytest -m integration
+```
+
+Test folders: `tests/unit` (default), `tests/integration` (marker `integration`), `tests/evaluation` (marker `evaluation`, from Phase 4). Markers are applied by folder in `tests/conftest.py`.
+
 ```bash
 uv run mypy .
 ```
