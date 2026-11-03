@@ -105,6 +105,8 @@ curl.exe http://127.0.0.1:8070/api/isalive
 
 The last command prints `true` when GROBID is ready. In Windows PowerShell, type `curl.exe`, not `curl` (which is a different PowerShell command).
 
+`compose.yaml` fixes the Docker project name to `paperpilot`. A second checkout of this repository on the same computer therefore controls the **same** containers and database volume. To run a separate copy (for example a fresh-clone check), stop the first one and set `COMPOSE_PROJECT_NAME` to another name in that terminal.
+
 Stop the services (database data is kept in the `paperpilot_postgres-data` volume):
 
 ```bash

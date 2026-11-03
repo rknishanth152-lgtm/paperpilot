@@ -7,11 +7,11 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Field | Value |
 |---|---|
 | Project | PaperPilot |
-| Current stage | Environment setup. Documentation reviewed and approved; no application code written. |
-| Overall status | `in_progress` (documentation only) |
+| Current stage | Phase 0 complete. Local services, Python tooling, configuration module, backend skeleton (health endpoint) and test conventions exist; no feature code. |
+| Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M2: Repository and development environment setup (`in_progress`: P0-T2 to P0-T7 completed; next the fresh-clone check). M1 `completed` 2026-11-03. |
-| Current phase | Phase 0 (`docs/implementation-roadmap.md`) |
+| Current milestone | M3: GROBID parsing experiment (`not_started`). M1 and M2 `completed` 2026-11-03. |
+| Current phase | Phase 1, GROBID feasibility experiment (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
 Generated documents and transcript analysis are **planning artefacts**. They are not implementation.
@@ -23,7 +23,7 @@ Milestones are proposals from the roadmap, not claims of completion. Statuses: `
 | ID | Milestone (Phase) | Status | Objective | Completion criteria (summary) | Evidence | Blockers / dependencies |
 |---|---|---|---|---|---|---|
 | M1 | Requirements and architecture documentation (0) | `completed` | Agreed PRD, rules, roadmap, status file | Developer has reviewed the four documents; `OQ-` triage recorded (roadmap P0-T1) | 2026-11-03: developer approved the architecture and incremental strategy; requested corrections applied and verified (§6.7 rows 8–9, §7); developer delegated the remaining Phase 0 decisions (§6.8); `OQ-` triage in §6.7 | None |
-| M2 | Repository and development environment setup (0) | `in_progress` | Repo, Compose with PostgreSQL + GROBID, tooling, test conventions | A fresh clone plus README reproduces running services and a passing smoke test | None | `OQ-014`, `OQ-015` |
+| M2 | Repository and development environment setup (0) | `completed` | Repo, Compose with PostgreSQL + GROBID, tooling, test conventions | A fresh clone plus README reproduces running services and a passing smoke test | 2026-11-03: fresh clone from GitHub plus README reproduced running services, passing unit and integration tests and the backend health check (§7); tooling decisions recorded with dates (§6.8) | None |
 | M3 | GROBID parsing experiment (1) | `not_started` | Learn real GROBID behaviour on 3–5 permitted papers | `docs/experiments/grobid-feasibility.md` with observations, failures, go/no-go | None | M2 (minimal subset: P0-T2, P0-T3, Python environment) |
 | M4 | Database schema and migrations (2) | `not_started` | `papers`, `documents`, `passages` with constraints | Migration applies to an empty DB; constraint tests pass | None | M3 |
 | M5 | Paper ingestion and passage persistence (3) | `not_started` | Upload → GROBID → passages, honest statuses | `AC-VS-01`..`AC-VS-04` evidenced | None | M4 |
@@ -96,7 +96,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed` (test conventions). Next: the M2 fresh-clone check, then Phase 1. |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Next: **Phase 1, P1-T1** (read current GROBID service documentation). Needs 3–5 papers the developer is permitted to use (P1-T2). |
 
 ## 5. Next actions
 
@@ -104,7 +104,7 @@ In dependency order. The first technical task after documentation is the GROBID 
 
 1. ~~P0-T2~~ `completed` 2026-11-03 (commit `e860441`). Pushed to a private GitHub repository on 2026-11-03 (§3.1).
 2. ~~P0-T3~~ `completed` 2026-11-03: PostgreSQL and GROBID run with Compose; commands in `README.md`.
-3. ~~P0-T4~~ to ~~P0-T7~~ `completed` 2026-11-03. **To complete M2:** a fresh-clone check (clone from GitHub into a new folder, follow only the README, start services, run the smoke and integration tests). P0-T8 (frontend toolchain check) and P0-T9 (CI) are optional before Phase 1. No PostgreSQL integration test exists yet: it needs the database driver, added in P2-T2.
+3. ~~P0-T4~~ to ~~P0-T7~~ `completed`; M2 fresh-clone check passed 2026-11-03. P0-T8 (frontend toolchain check) and P0-T9 (CI) are deferred, as the roadmap allows. No PostgreSQL integration test exists yet: it needs the database driver, added in P2-T2.
 4. **Phase 1 GROBID experiment** on 3–5 permitted papers, then inspection of the returned structure and failure behaviour, written up in `docs/experiments/grobid-feasibility.md` (P1-T1..T8).
 
 ## 6. Decisions and blockers
@@ -256,5 +256,10 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P0-T7: stopped GROBID, ran `-m integration`, then the default run, restarted GROBID | Integration errored with "GROBID is not reachable at http://127.0.0.1:8070 (ConnectError). Start the services with `docker compose up -d --wait`."; the default run still passed offline (17); GROBID healthy again and integration 2 passed |
 | 2026-11-03 | P0-T7: temporary test using an unregistered marker (`integrashun`), then removed | Rejected: "'integrashun' not found in `markers` configuration option" |
 | 2026-11-03 | P0-T7: `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy .` | ruff passed; mypy first reported two modules named `conftest`; fixed with `explicit_package_bases`; then no issues in 12 source files. **P0-T7 `completed`** |
+
+| 2026-11-03 | M2 fresh-clone check: `git clone` from GitHub into a new folder (`f5e9c32`, 134 files; no `.env`, `.venv`, `data/` or transcripts); `uv lock --check`; `uv sync --locked`; `.env` created from `.env.example` with a new password | Lock matches `pyproject.toml`; fresh `.venv` with Python 3.14.10 and 31 packages |
+| 2026-11-03 | M2 fresh-clone check: original services stopped (volume kept); clone services started with `docker compose up -d --wait` under a throwaway project name (`COMPOSE_PROJECT_NAME=paperpilot-freshcheck`) so a new database volume was created | Both healthy after 22 s on 127.0.0.1; GROBID `isalive` true. Finding: the fixed project name means a second checkout would otherwise take over the same containers and volume; documented in README |
+| 2026-11-03 | M2 fresh-clone check, in the clone: `uv run ruff check .`, `ruff format --check .`, `mypy .`, `pytest`, `pytest -m integration`, then uvicorn and `GET /health` | All exit 0: 17 unit passed, 2 integration passed, mypy no issues in 12 files; `/health` 200 `{"status":"ok"}` |
+| 2026-11-03 | M2 fresh-clone check cleanup: `docker compose down -v` for the throwaway project; original `docker compose up -d --wait`; clone folder deleted | Throwaway containers, network and test volume removed; original services healthy with `paperpilot_postgres-data` intact; clone removed. **M2 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
