@@ -24,7 +24,39 @@ Verified on the developer's machine on 2026-11-03 (see `progress.md` §7):
 - Git
 - Node.js 24 (frontend, later phases)
 
-Python tooling (uv, Python 3.14) is decided but not yet installed (P0-T4).
+- uv 0.13 and Python 3.14 (below)
+
+## Python environment
+
+The project uses [uv](https://docs.astral.sh/uv/) with Python 3.14 (pinned in `.python-version`). Tools: pytest, ruff, mypy (`pyproject.toml`).
+
+**One-time machine setup** (done on the developer's machine 2026-11-03):
+
+```bash
+winget install --id astral-sh.uv -e --scope user
+```
+
+Set two user environment variables so uv keeps Python and its cache on E: (C: is short of space, and the Claude desktop app cannot use uv's default AppData location): `UV_PYTHON_INSTALL_DIR=E:\uv\python` and `UV_CACHE_DIR=E:\uv\cache`. Open a new terminal afterwards. Then:
+
+```bash
+uv python install 3.14
+```
+
+**In the repository** (verified 2026-11-03):
+
+```bash
+uv sync
+```
+
+```bash
+uv run ruff check .
+```
+
+```bash
+uv run ruff format --check .
+```
+
+`uv run pytest` and `uv run mypy .` work but have nothing to check until the backend skeleton exists (P0-T6): pytest exits with code 5 ("no tests ran") and mypy reports that there are no Python files.
 
 ## Local services (PostgreSQL and GROBID)
 

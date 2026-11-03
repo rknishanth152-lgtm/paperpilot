@@ -1,0 +1,33 @@
+[project]
+name = "paperpilot"
+version = "0.0.0"
+description = "Evidence-first research intelligence and scientific-reproducibility platform."
+readme = "README.md"
+requires-python = ">=3.14,<3.15"
+# Application dependencies are added with the backend skeleton (P0-T6).
+dependencies = []
+
+[dependency-groups]
+# Tooling decided in progress.md §6.8 (OQ-014).
+dev = [
+    "mypy>=2.4",
+    "pytest>=9.2",
+    "ruff>=0.17",
+]
+
+[tool.uv]
+# Not built or published as a package yet.
+package = false
+
+[tool.ruff]
+target-version = "py314"
+# Python files only: ruff can also format code blocks in Markdown, and the
+# planning documents must not be reformatted by tooling.
+include = ["*.py", "*.pyi"]
+# Vendored third-party skill code is not PaperPilot code; it is kept unmodified.
+extend-exclude = [".claude"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+exclude = ['^\.claude/']
