@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`not_started`). M1–M4 `completed` 2026-11-03. |
+| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 done). M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -26,7 +26,7 @@ Milestones are proposals from the roadmap, not claims of completion. Statuses: `
 | M2 | Repository and development environment setup (0) | `completed` | Repo, Compose with PostgreSQL + GROBID, tooling, test conventions | A fresh clone plus README reproduces running services and a passing smoke test | 2026-11-03: fresh clone from GitHub plus README reproduced running services, passing unit and integration tests and the backend health check (§7); tooling decisions recorded with dates (§6.8) | None |
 | M3 | GROBID parsing experiment (1) | `completed` | Learn real GROBID behaviour on 3–5 permitted papers | `docs/experiments/grobid-feasibility.md` with observations, failures, go/no-go | 2026-11-03: 5 papers processed and inspected; failure inputs attempted (real scanned paper impossible, reason recorded); answers in §7, limitations §8, representation `docs/design/parser-output.md`, decision go with limits (§9); PRD updated | M2 (minimal subset: P0-T2, P0-T3, Python environment) |
 | M4 | Database schema and migrations (2) | `completed` | `papers`, `documents`, `passages` with constraints | Migration applies to an empty DB; constraint tests pass | 2026-11-03: migration `d2ea199dd3d3` applies to an empty database and reverses; all 38 named check/unique/foreign-key constraints have passing failing-case tests (62 integration tests); repeat-ingestion rules tested; immutability documented in `CLAUDE.md` and enforced by a trigger; only the three tables (plus `alembic_version`); `docs/design/schema.md` §10 | M3 |
-| M5 | Paper ingestion and passage persistence (3) | `not_started` | Upload → GROBID → passages, honest statuses | `AC-VS-01`..`AC-VS-04` evidenced | None | M4 |
+| M5 | Paper ingestion and passage persistence (3) | `in_progress` | Upload → GROBID → passages, honest statuses | `AC-VS-01`..`AC-VS-04` evidenced | None | M4 |
 | M6 | Keyword retrieval (4) | `not_started` | PostgreSQL full-text retrieval; evaluation set; Recall@5 baseline | `AC-VS-05`; baseline file recorded | None | M5 |
 | M7 | Evidence-backed question answering (5) | `not_started` | Retrieval → structured answer → citation validation | `AC-VS-06`..`AC-VS-08` | None | M6; `OQ-011` |
 | M8 | Evaluation harness (6) | `not_started` | Repeatable evaluation; VS-1 acceptance | `AC-VS-09`, `AC-VS-10` | None | M7 |
@@ -63,6 +63,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Core schema in PostgreSQL: `papers`, `documents`, `passages` (migration `d2ea199dd3d3`, models in `backend/app/models/`), immutability trigger on `passages` | Applied, inspected, downgraded and re-applied (see §7) | 2026-11-03 |
 | DOI normalisation: `backend/app/services/doi.py` (`normalize_doi`), 31 unit tests | Tests and mutation check (see §7) | 2026-11-03 |
 | Schema tests: `tests/integration/test_schema_migration.py` (2) and `test_schema_constraints.py` (51), on a throwaway database | Run and mutation-checked (see §7) | 2026-11-03 |
+| File storage: `backend/app/storage.py` (save/read/delete by generated key, local folder `data/storage`), 28 unit tests | Tests, mutation check, probe (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -101,9 +102,9 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. First task **P3-T1**, the storage interface with a local-filesystem implementation. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage) `completed`; next **P3-T2**, upload validation. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
-| Status | `not_started`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
+| Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
 
 Summary of what is done (details in §3, §6 and §7): planning documents reviewed and approved (P0-T1); repository on E:, private on GitHub (P0-T2); PostgreSQL 18 and GROBID 0.9.1 via Compose (P0-T3); Python 3.14 with uv, pytest, ruff, mypy (P0-T4); settings module (P0-T5); FastAPI skeleton with `/health` (P0-T6); test conventions (P0-T7); GROBID experiment, decision **go with limits** (Phase 1); parser-output contract and schema design notes; database layer and Alembic; tables `papers`, `documents`, `passages` with an immutability trigger; DOI normalisation; 112 tests (Phase 2). Standing rule: every GROBID request sends `consolidateHeader=0`.
 
@@ -111,7 +112,7 @@ Summary of what is done (details in §3, §6 and §7): planning documents review
 
 In dependency order (roadmap Phase 3).
 
-1. **P3-T1:** storage interface (save, read, delete by generated key) and local-filesystem implementation, with tests for key generation, path traversal and write failure.
+1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. **P3-T2:** upload validation (PDF signature, empty file, size limit); rejections are API errors, not stored documents (`docs/design/schema.md` §6).
 3. **P3-T3 to P3-T8:** GROBID client, TEI parsing (`parse_tei`), ingestion orchestration, duplicates and retries, startup recovery, HTTP API.
 4. **P3-T9:** first frontend pages. Before it: P0-T8 (frontend toolchain check), and the colour theme is explained to the developer and agreed (`docs/design-system.md` §1).
@@ -340,5 +341,9 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P2-T6: exported constraints from the development database and cross-checked them against the tests | 38 named check/unique/foreign-key constraints; 33 had a test asserting the name. Added the 5 missing cases (`failure_message` length, `joined_paragraphs`, empty `tei_storage_key`, duplicate `storage_key` and `tei_storage_key`): 38/38; integration 62 passed |
 | 2026-11-03 | P2-T6: `docs/design/schema.md` §10 written from the database export; inspect command checked in Windows PowerShell (the first form, with nested quotes, failed there and was replaced) | Reference matches the database |
 | 2026-11-03 | P2-T6: Phase 2 acceptance check: ruff, mypy (33 files), all tests, the roadmap's P2-T5 list, `alembic check`, table list, `CLAUDE.md` | All clean; 112 passed; P2-T5 list 7 passed; no model/database difference; only `papers`, `documents`, `passages`, `alembic_version`. **P2-T6 `completed`, M4 `completed`** |
+
+| 2026-11-03 | P3-T1: `tests/unit/test_storage.py` written first (collection error before the module existed), then `backend/app/storage.py` (`Storage` interface, `LocalStorage`, `get_storage`) | 28 passed |
+| 2026-11-03 | P3-T1: mutation check, one at a time: key-shape check removed; exclusive create replaced by overwrite; partial-file cleanup removed; file restored (hash identical) | 10, 1 and 1 tests failed respectively. With the key-shape check removed, the four `../` cases were still refused by the second (resolved-path) guard |
+| 2026-11-03 | P3-T1: ruff, mypy (35 files), all tests; probe through `get_storage()` with the real settings, then deleted | All clean; 140 passed. Probe stored under `data/storage/pdf/<uuid7>.pdf`, git-ignored, read back intact, deleted; no files left. **P3-T1 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
