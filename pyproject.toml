@@ -4,8 +4,11 @@ version = "0.0.0"
 description = "Evidence-first research intelligence and scientific-reproducibility platform."
 readme = "README.md"
 requires-python = ">=3.14,<3.15"
-# Application dependencies are added with the backend skeleton (P0-T6).
-dependencies = []
+# Application dependencies; each one is approved and recorded in progress.md.
+dependencies = [
+    "pydantic>=2.14",
+    "pydantic-settings>=2.11",
+]
 
 [dependency-groups]
 # Tooling decided in progress.md §6.8 (OQ-014).
@@ -21,13 +24,23 @@ package = false
 
 [tool.ruff]
 target-version = "py314"
+# First-party code lives in backend/ (imported as `app`).
+src = ["backend"]
 # Python files only: ruff can also format code blocks in Markdown, and the
 # planning documents must not be reformatted by tooling.
 include = ["*.py", "*.pyi"]
 # Vendored third-party skill code is not PaperPilot code; it is kept unmodified.
 extend-exclude = [".claude"]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Backend code is imported as `app` (backend/app).
+pythonpath = ["backend"]
+
 [tool.mypy]
 python_version = "3.14"
 strict = true
+mypy_path = "backend"
+# Pydantic's official plugin: lets mypy understand settings filled from the environment.
+plugins = ["pydantic.mypy"]
 exclude = ['^\.claude/']

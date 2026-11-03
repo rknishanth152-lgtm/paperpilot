@@ -56,7 +56,17 @@ uv run ruff check .
 uv run ruff format --check .
 ```
 
-`uv run pytest` and `uv run mypy .` work but have nothing to check until the backend skeleton exists (P0-T6): pytest exits with code 5 ("no tests ran") and mypy reports that there are no Python files.
+```bash
+uv run pytest
+```
+
+```bash
+uv run mypy .
+```
+
+## Configuration
+
+All settings are read in one place, `backend/app/config.py`, from environment variables and `.env`. `.env.example` lists every setting with a placeholder; the same `POSTGRES_*` values configure Docker Compose and the backend. The backend refuses to start with a missing or invalid value.
 
 ## Local services (PostgreSQL and GROBID)
 

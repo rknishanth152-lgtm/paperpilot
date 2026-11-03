@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Environment setup. Documentation reviewed and approved; no application code written. |
 | Overall status | `in_progress` (documentation only) |
 | Last updated | 2026-11-03 |
-| Current milestone | M2: Repository and development environment setup (`in_progress`: P0-T2, P0-T3, P0-T4 completed; next P0-T5). M1 `completed` 2026-11-03. |
+| Current milestone | M2: Repository and development environment setup (`in_progress`: P0-T2 to P0-T5 completed; next P0-T6). M1 `completed` 2026-11-03. |
 | Current phase | Phase 0 (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -53,6 +53,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Git repository at `E:\dev\paperpilot` (branch `main`, first commit `e860441`), `.gitignore`, `.gitattributes`, `README.md` stub | `git check-ignore` tests and staged-content scan (see §7) | 2026-11-03 |
 | Local services: `compose.yaml` (PostgreSQL 18 with pgvector available, GROBID 0.9.1 CRF), `.env.example` (compose settings only), local `.env` with a generated password (not committed); README commands | Started, queried and restarted (see §7) | 2026-11-03 |
 | Python environment: uv 0.13.7, Python 3.14.10 on E: (`.python-version`), `pyproject.toml` with pytest/ruff/mypy, `uv.lock`; README and `CLAUDE.md` commands | Installed and run (see §7) | 2026-11-03 |
+| Configuration: `backend/app/config.py` (`Settings`, `get_settings()`), complete `.env.example`, `tests/unit/test_config.py` (15 tests); dependencies pydantic and pydantic-settings | Tests, mutation check, lint and type check (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
 
@@ -92,7 +93,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. Next Phase 0 task: **P0-T5**. |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). Next Phase 0 task: **P0-T6**. |
 
 ## 5. Next actions
 
@@ -100,7 +101,7 @@ In dependency order. The first technical task after documentation is the GROBID 
 
 1. ~~P0-T2~~ `completed` 2026-11-03 (commit `e860441`). Remote hosting (for example GitHub) is not set up and not required yet.
 2. ~~P0-T3~~ `completed` 2026-11-03: PostgreSQL and GROBID run with Compose; commands in `README.md`.
-3. ~~P0-T4~~ `completed` 2026-11-03. Remaining Phase 0 tasks: P0-T5 (`.env.example` and configuration module), P0-T6 (backend skeleton with health endpoint and smoke test), P0-T7 (test conventions); P0-T8 and P0-T9 may wait.
+3. ~~P0-T4~~ and ~~P0-T5~~ `completed` 2026-11-03. Remaining Phase 0 tasks: P0-T6 (backend skeleton with health endpoint and smoke test; reuses `backend/app/config.py`), P0-T7 (test conventions; `tests/unit` already exists); P0-T8 and P0-T9 may wait.
 4. **Phase 1 GROBID experiment** on 3–5 permitted papers, then inspection of the returned structure and failure behaviour, written up in `docs/experiments/grobid-feasibility.md` (P1-T1..T8).
 
 ## 6. Decisions and blockers
@@ -233,5 +234,11 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P0-T4: `uv python pin 3.14`, `pyproject.toml` (dev group: pytest, ruff, mypy), `uv sync` | `.python-version` = 3.14; `.venv` created with CPython 3.14.10; pytest 9.2.0, ruff 0.17.3, mypy 2.4.1; `uv.lock` written |
 | 2026-11-03 | P0-T4: `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy .`, `uv run pytest -q` | First ruff run found 53 issues, all in vendored `.claude/skills/ui-ux-pro-max/scripts`; `.claude` excluded. ruff 0.17 also formats Markdown code blocks, so ruff is limited to `*.py`/`*.pyi`. Then ruff check and format check pass (no Python files yet); mypy exit 2 (no Python files); pytest exit 5 (no tests). Expected before P0-T6 |
 | 2026-11-03 | P0-T4: throwaway venv on E: with fastapi, pydantic, sqlalchemy, alembic, psycopg[binary], httpx, lxml, uvicorn; imported each; venv deleted | All install and import on Python 3.14.10: fastapi 0.162.0, pydantic 2.14.2 (core 2.50.2), SQLAlchemy 2.1.6, Alembic 1.20.1, psycopg 3.3.7 (binary implementation), httpx 0.28.1, lxml 6.1.3, uvicorn 0.54.0. Python 3.14 confirmed for `OQ-014`. **P0-T4 `completed`** |
+
+| 2026-11-03 | P0-T5: `uv add pydantic pydantic-settings` (developer approved the new dependency) | pydantic 2.14.2, pydantic-settings 2.16.2 (MIT), plus python-dotenv 1.2.4 and two small helpers as their dependencies |
+| 2026-11-03 | P0-T5: `uv run pytest` on `tests/unit/test_config.py` | 15 passed |
+| 2026-11-03 | P0-T5: mutation check: removed `env_ignore_empty` and the empty-password check, ran the tests, restored the file (hash identical) | The two expected tests failed (`test_empty_password_is_rejected`, `test_values_are_read_from_env_file`); 15 passed after restore |
+| 2026-11-03 | P0-T5: `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy .` (strict, pydantic mypy plugin) | All passed; mypy: no issues in 3 source files |
+| 2026-11-03 | P0-T5: loaded the developer's real `.env` through `get_settings()`, printing only non-secret facts | Loaded; password present; GROBID URL default; storage `data/storage`; no LLM configured. **P0-T5 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
