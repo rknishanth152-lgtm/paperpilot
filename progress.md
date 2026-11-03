@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phase 0 complete. Local services, Python tooling, configuration module, backend skeleton (health endpoint) and test conventions exist; no feature code. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M3: GROBID parsing experiment (`in_progress`: P1-T1 done). M1 and M2 `completed` 2026-11-03. |
+| Current milestone | M3: GROBID parsing experiment (`in_progress`: P1-T1, P1-T2 done). M1 and M2 `completed` 2026-11-03. |
 | Current phase | Phase 1, GROBID feasibility experiment (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -97,7 +97,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1 started: P1-T1 `completed`. Next: **P1-T2**, choosing 3–5 papers the developer is permitted to use. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1: P1-T1 and P1-T2 `completed` (5 CC BY papers in `data/papers/`). Next: **P1-T3**, a throwaway script sending each paper to GROBID. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
 
 ## 5. Next actions
 
@@ -266,5 +266,8 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P1-T1: read the current GROBID service, consolidation, coordinates, configuration, docker, TEI and flavor documentation | Recorded in `docs/experiments/grobid-feasibility.md` §2 |
 | 2026-11-03 | P1-T1: compared the docs with the running GROBID: image `grobid.yaml` key settings; `POST` with no file; `GET` on the full-text endpoint; outbound reach from the container to `api.crossref.org` | 400 and 405 as documented. Image config differs from docs: pdfalto `timeoutSec` 120 (docs 60), `blocksMax` 200000 (docs 100000). Consolidation service is CrossRef with no `mailto`, and the container can reach CrossRef: with the default `consolidateHeader=1` extracted metadata would leave the machine. **P1-T1 `completed`** |
 | 2026-11-03 | UI direction from the developer: light theme, no dark/neon look, polished motion, colour theme explained before any UI is built | Recorded in `docs/design-system.md` §1 and the page-process skill reference |
+
+| 2026-11-03 | P1-T2: licence checks on publisher pages for candidate papers | CC BY shown for ACL Anthology N19-1423, eLife 71601, PLOS Med e124, PLOS ONE e308 and e24357. Not CC BY: arXiv 2304.02643, 2010.11929, 1706.03762 (arXiv non-exclusive licence); JMLR v15 srivastava14a ("© JMLR 2014"). Excluded |
+| 2026-11-03 | P1-T2: HEAD checks, then download of the 5 approved PDFs (developer approved, about 3.2 MB) into `data/papers/` | All 5 are `application/pdf`, start with `%PDF-`, and are git-ignored; sizes and SHA-256 in the experiment doc §3. The eLife signed download link returned HTML, so the eLife CDN URL was used. **P1-T2 `completed`**. No scanned PDF with a verified licence was found |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

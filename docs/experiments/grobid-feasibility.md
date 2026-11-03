@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **In progress.** P1-T1 (documentation) done 2026-11-03. P1-T2 to P1-T8 not started. |
+| Status | **In progress.** P1-T1 (documentation) and P1-T2 (papers) done 2026-11-03. P1-T3 to P1-T8 not started. |
 | Answers | `OQ-001`, `OQ-002`, `OQ-003`, `OQ-005`, `OQ-013`, `OQ-016` (in P1-T6) |
 | Rule | Nothing here is a claim about real papers until it has been observed. Where documentation and observation differ, observation wins and the difference is recorded. |
 
@@ -87,11 +87,34 @@ The TEI documentation page describes only the schema (`grobid-home/schemas/`), n
 - No page-count or file-size limit is documented beyond the block, token, memory and timeout limits. The upload limit (`OQ-005`) comes from measuring real papers.
 - Memory: docs recommend 4 GB for full-text processing; the container used about 3.2 GB at idle (P0-T3).
 
-## 3. Still to do
+## 3. P1-T2: papers (2026-11-03)
+
+Proposed by Claude, approved by the developer. Each licence statement was read on the publisher's page and each PDF was downloaded from the publisher. The PDFs are stored in `data/papers/` (git-ignored) and are **not** committed (`RISK-13`). Page counts are rough estimates from the file; GROBID's `<facsimile>` gives the exact count in P1-T3.
+
+| ID | Paper | Source (PDF) | Licence (where seen) | Chosen to test |
+|---|---|---|---|---|
+| p1 | Devlin, Chang, Lee, Toutanova. "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding." NAACL 2019. doi:10.18653/v1/N19-1423 | https://aclanthology.org/N19-1423.pdf | CC BY 4.0: ACL Anthology, "Materials published in or after 2016 are licensed on a Creative Commons Attribution 4.0 International License" ([page](https://aclanthology.org/N19-1423/)) | Two-column conference layout, tables, equations, numbered sections |
+| p2 | Errington et al. "Investigating the replicability of preclinical cancer biology." eLife 10:e71601, 2021. doi:10.7554/eLife.71601 | https://cdn.elifesciences.org/articles/71601/elife-71601-v3.pdf | CC BY 4.0: "This article is distributed under the terms of the Creative Commons Attribution License" ([page](https://elifesciences.org/articles/71601)) | Long paper, many figures and tables, statistics |
+| p3 | Ioannidis. "Why Most Published Research Findings Are False." PLoS Med 2(8): e124, 2005. doi:10.1371/journal.pmed.0020124 | https://journals.plos.org/plosmedicine/article/file?id=10.1371/journal.pmed.0020124&type=printable | CC BY: "open-access article distributed under the terms of the Creative Commons Attribution License" ([page](https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0020124)) | Essay structure, unusual headings, formulas, tables, older layout |
+| p4 | Piwowar, Day, Fridsma. "Sharing Detailed Research Data Is Associated with Increased Citation Rate." PLoS ONE 2(3): e308, 2007. doi:10.1371/journal.pone.0000308 | https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0000308&type=printable | CC BY: "Copyright: © 2007 Piwowar et al. This is an open-access article distributed under the terms of the Creative Commons Attribution License…" ([page](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0000308)) | Short empirical study, 3 tables, 2 figures |
+| p5 | Alsheikh-Ali, Qureshi, Al-Mallah, Ioannidis. "Public Availability of Published Research Data in High-Impact Journals." PLoS ONE 6(9): e24357, 2011. doi:10.1371/journal.pone.0024357 | https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0024357&type=printable | CC BY: "Copyright: © 2011 Alsheikh-Ali et al. This is an open-access article distributed under the terms of the Creative Commons Attribution License…" ([page](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0024357)) | Short paper with few tables, later PLOS ONE layout |
+
+| File | Bytes | Rough pages | SHA-256 |
+|---|---|---|---|
+| `p1-devlin2019-bert.pdf` | 786,279 | ~16 | `987545ffb087f1ece898142c403a516baeabeb70ce19089397fac6f7db12c3d4` |
+| `p2-errington2021-elife.pdf` | 1,846,907 | ~30 | `dc1f6a4c3d4824d70855cd7316c75f8d1783349d37b822a9cdb1b665fb609fad` |
+| `p3-ioannidis2005-plosmed.pdf` | 255,629 | ~6 | `ffc1005680cb620eec4c913437dfabbf311b535cfe16cbaeb2faec1f92afc362` |
+| `p4-piwowar2007-plosone.pdf` | 91,408 | ~5 | `b52ca44dfd09d240543b80315f0cd43fe9ba7946f2b5650d5580213ed5d9186c` |
+| `p5-alsheikhali2011-plosone.pdf` | 172,614 | ~4 | `2090a6ed5d95f5f2af6349170c739e80c9362271d66a6f952e315c803290a0cb` |
+
+**Gaps in the sample:** no scanned or weak-text PDF with a verified licence was found, so that case may be impossible in P1-T5 (to be recorded with the reason). Excluded: papers whose pages show only the arXiv non-exclusive licence (for example arXiv 1706.03762) or "© JMLR" (JMLR v15 srivastava14a), because no CC BY statement applies.
+
+To obtain the same files: download each "Source (PDF)" URL into `data/papers/` with the file name above and compare the SHA-256.
+
+## 4. Still to do
 
 | Task | What |
 |---|---|
-| P1-T2 | Choose 3–5 papers the developer is permitted to use, with varied layouts. Record title, source and licence. PDFs stay out of git (`data/` is ignored). |
 | P1-T3 | Script under `scripts/` sends each paper with `consolidateHeader=0` and the coordinates above; saves raw TEI under `data/`; records status and time. |
 | P1-T4 | Inspect each TEI against the checklist in the roadmap; fill §2.4 and §2.5 with observations. |
 | P1-T5 | Failure inputs; record actual codes against §2.2. |
