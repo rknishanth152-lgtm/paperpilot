@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T3 done). M1–M4 `completed` 2026-11-03. |
+| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T4 done). M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -66,6 +66,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | File storage: `backend/app/storage.py` (save/read/delete by generated key, local folder `data/storage`), 28 unit tests | Tests, mutation check, probe (see §7) | 2026-11-03 |
 | Upload validation: `backend/app/services/ingestion/validation.py` (empty, size, `%PDF-` signature by content; display-only filename), 34 unit tests | Tests, real-file run, mutation check (see §7) | 2026-11-03 |
 | GROBID client: `backend/app/services/ingestion/grobid.py` (fixed privacy-safe request, timeout and 503 retries from settings, failure-reason mapping), 30 unit and 4 integration tests | Stub server, real GROBID, mutation check (see §7) | 2026-11-03 |
+| TEI parsing: `backend/app/services/ingestion/tei.py` (`parse_tei`: metadata, four passage regions, pages from coordinates, rules R1/R2, `malformed_tei`/`empty_parse`), 38 unit tests | Tests, real-paper counts, mutation check (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -104,7 +105,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation) and P3-T3 (GROBID client) `completed`; next **P3-T4**, TEI parsing (`parse_tei`). |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client) and P3-T4 (TEI parsing) `completed`; next **P3-T5**, ingestion orchestration. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
 | Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
 
@@ -116,7 +117,7 @@ In dependency order (roadmap Phase 3).
 
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. Carried to P3-T8: the upload endpoint must read the request in bounded chunks and stop above `MAX_UPLOAD_MB`, so a huge upload is never held in memory.
-3. ~~P3-T3~~ `completed`: `backend/app/services/ingestion/grobid.py`. Next **P3-T4** TEI parsing (`parse_tei`), then P3-T5 to P3-T8: ingestion orchestration, duplicates and retries, startup recovery, HTTP API.
+3. ~~P3-T3~~ and ~~P3-T4~~ `completed`. Next **P3-T5** ingestion orchestration, then P3-T6 to P3-T8: duplicates and retries, startup recovery, HTTP API.
 4. **P3-T9:** first frontend pages. Before it: P0-T8 (frontend toolchain check), and the colour theme is explained to the developer and agreed (`docs/design-system.md` §1).
 5. P0-T9 (CI) remains deferred.
 
@@ -357,5 +358,10 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P3-T3: `tests/integration/test_grobid_client.py` against the running GROBID (synthetic PDFs) | 4 passed: text page returns TEI; text bytes `unreadable_pdf`; blank page `no_text_layer`; closed port `parser_unreachable` |
 | 2026-11-03 | P3-T3: one-off run on the five papers through `GrobidClient.from_settings` | All returned TEI (57–297 KB, 1.8–13.6 s; first includes warm-up), no consolidation markers |
 | 2026-11-03 | P3-T3: mutation check, one at a time: consolidation on; no 503 retry; `NO_BLOCKS` unmapped; empty 200 accepted; disconnect mapped as unreachable; file restored (hash identical) | 2, 2, 1, 1, 2 tests failed respectively. ruff, mypy (41 files) clean; all tests 208 passed. **P3-T3 `completed`** |
+
+| 2026-11-03 | P3-T4: expat 2.9.0 bundled; none of the five TEI outputs contain `<!DOCTYPE` or `<!ENTITY`. Python's built-in XML parser used instead of lxml (no new dependency); DOCTYPE/ENTITY rejected as `malformed_tei`; `ParsedDocument.abstract` added for `papers.abstract` | Recorded in `docs/design/parser-output.md` |
+| 2026-11-03 | P3-T4: `tests/unit/test_parse_tei.py` written first (collection error before the module existed), then `backend/app/services/ingestion/tei.py` (`parse_tei`) | 33 of 34 passed; the failure was a test that could not fail (its text had letters); test corrected; 34 passed |
+| 2026-11-03 | P3-T4: `parse_tei` on the five papers, from the Phase 1 TEI and from fresh client TEI | Both: 324 passages (abstract 9, body 239, caption 37, back 39), 1 join, 2 skipped, none without pages: exactly the P1-T7 counts. Passages and metadata identical between the two TEI sources; DOIs normalise to the verified values |
+| 2026-11-03 | P3-T4: mutation check, seven changes one at a time | First round: four caught, three survived (R1 not reset after a figure; references section not excluded; DOCTYPE guard), showing test gaps. Added three tests; each surviving change is now caught. 38 parser tests; ruff, mypy (43 files) clean; all tests 246 passed. **P3-T4 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

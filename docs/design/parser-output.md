@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Agreed 2026-11-03 (developer chose the passage regions). Implemented in Phase 3 (P3-T3, P3-T4); not implemented yet. |
+| Status | Agreed 2026-11-03 (developer chose the passage regions). Implemented: GROBID client `backend/app/services/ingestion/grobid.py` (P3-T3), `parse_tei` in `backend/app/services/ingestion/tei.py` (P3-T4). |
 | Evidence | `docs/experiments/grobid-feasibility.md` (§ numbers below refer to it) |
 | Requirements | `FR-ING-003`..`FR-ING-007`, `DR-001`..`DR-007`, `AD-004`, `OQ-002`, `OQ-003`, `OQ-016` |
 
@@ -20,7 +20,7 @@ PDF bytes ─► validation (P3-T2) ─► GROBID client (P3-T3) ─► raw TEI 
                                          persist paper, document, passages in one transaction (P3-T5)
 ```
 
-`parse_tei` is a **pure function** of the stored TEI bytes: same input, same output, no network, no clock, no randomness. Re-running it on a stored artifact reproduces the passages exactly (`FR-ING-005`). GROBID's `generateIDs` IDs are random per run (§4.2), so they are not requested and never used.
+`parse_tei` is a **pure function** of the stored TEI bytes. It uses Python's built-in XML parser (no lxml needed) and rejects any input containing `<!DOCTYPE` or `<!ENTITY` as `malformed_tei`; GROBID never emits them. It is deterministic: same input, same output, no network, no clock, no randomness. Re-running it on a stored artifact reproduces the passages exactly (`FR-ING-005`). GROBID's `generateIDs` IDs are random per run (§4.2), so they are not requested and never used.
 
 ## 2. GROBID request (fixed)
 
@@ -43,6 +43,7 @@ All text fields are `None` when absent, never `""` (`FR-ING-006`, `DR-007`).
 | `parser_version` | `str` | `teiHeader//appInfo/application[@ident='GROBID']/@version` | `0.9.1` observed |
 | `title` | `str \| None` | `fileDesc/titleStmt/title` | |
 | `authors` | `list[str]` | `sourceDesc/biblStruct/analytic/author/persName` (forenames + surname) | Empty list when none |
+| `abstract` | `str \| None` | abstract paragraphs joined with a blank line | Metadata for `papers.abstract` (`FR-ING-006`); added in P3-T4. The same paragraphs are also `abstract` passages |
 | `doi` | `str \| None` | `sourceDesc/biblStruct/idno[@type='DOI']` | Raw value; normalised by P2-T4 |
 | `page_count` | `int \| None` | number of `facsimile/surface` | |
 | `passages` | `list[ParsedPassage]` | §4 | In source order |
