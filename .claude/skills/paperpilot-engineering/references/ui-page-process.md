@@ -4,7 +4,7 @@ Follow these steps in order for every new or reshaped page. Do not start from a 
 
 1. **Purpose.** What is this page for, and what is the one primary task (for example: "check whether this answer's citations are valid and read the evidence")? Which PRD requirements does it serve?
 2. **Existing system.** Read `docs/design-system.md` and the neighbouring pages. List the tokens and components you will reuse.
-3. **Direction and hierarchy.** Propose the visual direction and information hierarchy: what the eye lands on first, second, third. Evidence and status come before decoration. Use `frontend-design` for the plan-review pass; use `ui-ux-pro-max` searches for specific UX or accessibility questions.
+3. **Direction and hierarchy.** Light theme only; never a dark/neon look (`docs/design-system.md` §1). If the colour theme is not yet agreed, explain it to the developer first (named colours, hex values, where each is used, why) and wait for agreement. Propose the visual direction and information hierarchy: what the eye lands on first, second, third. Evidence and status come before decoration. Use `frontend-design` for the plan-review pass; use `ui-ux-pro-max` searches for specific UX or accessibility questions.
 4. **Components and interactions.** Name the reusable components and the page-specific interactions. For each interaction, decide whether it needs motion at all (frequency gate in `design-motion-principles`) and which motion token it uses.
 5. **Responsive and accessibility.** Define behaviour at ~375 px, ~768 px and ≥1280 px. List keyboard paths, focus order, labels, text-based statuses, and reduced-motion behaviour.
 6. **Implement** only the agreed scope.

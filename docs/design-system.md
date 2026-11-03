@@ -13,6 +13,12 @@ This document is where tokens live once agreed. Components use tokens from here,
 
 PaperPilot is a concentration tool for reading and checking evidence. The interface should feel **precise, calm and trustworthy**: the evidence and its status are the most important things on any screen. Visual direction (palette, typography, layout) is **not yet chosen**; it is decided at P3-T9 using the page process in `.claude/skills/paperpilot-engineering/references/ui-page-process.md`.
 
+**Developer requirements (2026-11-03):**
+
+- **Light theme first.** The primary design is a light theme. No dark background with neon or acid-bright accents: the developer considers that look "AI slop". A dark mode, if ever added, is secondary and also avoids neon.
+- **Polished, purposeful motion** as defined in §3.
+- **Colour theme explained before building.** Before any UI is implemented, the proposed palette is presented to the developer (named colours, hex values, where each is used and why) and agreed.
+
 ## 2. Visual tokens
 
 To be defined at P3-T9: colour (with text-based status pairs that meet `NFR-ACC-001`), typography scale, spacing, radius, elevation, breakpoints.
