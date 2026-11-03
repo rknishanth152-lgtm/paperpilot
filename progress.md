@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phase 0 complete. Local services, Python tooling, configuration module, backend skeleton (health endpoint) and test conventions exist; no feature code. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M3: GROBID parsing experiment (`in_progress`: P1-T1 to P1-T6 done). M1 and M2 `completed` 2026-11-03. |
+| Current milestone | M3: GROBID parsing experiment (`in_progress`: P1-T1 to P1-T7 done). M1 and M2 `completed` 2026-11-03. |
 | Current phase | Phase 1, GROBID feasibility experiment (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -57,6 +57,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Backend skeleton: `backend/app/main.py` (`create_app`, startup settings check), `api/health.py`, `schemas/health.py`; `tests/unit/test_health.py` (2 tests); dependencies fastapi, uvicorn; dev httpx | Tests, mutation check, real server run (see §7) | 2026-11-03 |
 | Test conventions: `tests/conftest.py` (markers by folder), `tests/integration/` (GROBID fixture with loud failure, 2 tests), `tests/evaluation/README.md`; pytest `addopts` excludes `integration` and `evaluation` by default | Selection, failure-path and typo checks (see §7) | 2026-11-03 |
 | `docs/experiments/grobid-feasibility.md` (P1-T1 to P1-T5); throwaway `scripts/grobid_experiment.py`, `scripts/inspect_tei.py`, `scripts/quote_match.py`, `scripts/grobid_failures.py`; TEI, pdfalto text, generated failure inputs and measurements in git-ignored `data/` | See §7 | 2026-11-03 |
+| `docs/design/parser-output.md`: parser output contract (`ParsedDocument`, `ParsedPassage`), passage regions and rules, page rules, failure-reason mapping. Design only, not implemented | Rules checked against the five TEI outputs (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -97,7 +98,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1: P1-T1 to P1-T6 `completed` (open questions answered or deferred in the experiment doc §7). PRD updated to v0.5 with the answers (§6.9). Next: **P1-T7**, parser-output representation. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1: P1-T1 to P1-T6 `completed` (open questions answered or deferred in the experiment doc §7). P1-T7 `completed`: `docs/design/parser-output.md`; PRD v0.6. Next: **P1-T8**, the go / go-with-limits / no-go decision. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
 
 ## 5. Next actions
 
@@ -198,6 +199,7 @@ Developer approved recording the P1-T6 answers in the PRD (now v0.5). Reason: th
 | `OQ-016` | Deferred: table cells to Phase 7; captions decided in P1-T7; tracing at Phase 6 |
 | `AD-004` | Reason column notes that paragraph passages stand, with the two provisional repair rules |
 | Appendix A.3 | Page/section assumption marked as checked; upload limit no longer a placeholder |
+| `FR-ING-007`, §8.2 Passage (v0.6, P1-T7) | Passages come from abstract, body, captions and back matter (not references, footnotes or table cells), each with a region; a document is `parsed` only with at least one body passage. Developer chose the regions |
 
 ## 7. Verification log
 
@@ -298,5 +300,9 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P1-T6: extra checks on the TEI (note `place`, hyphen splits, curly quotes, back-matter `div` types, captions) and answers written in the experiment doc §7, limitations in §8 | Answered: `OQ-001` (pages for every paragraph; sections flat), `OQ-003` (references not passages in VS-1), `OQ-005` (keep 50 MB). Provisional: `OQ-002` (paragraph passages plus two repair rules, confirm with Recall@5), `OQ-013` (normalisation rules, test in P5-T6). Deferred: `OQ-016` (tables to Phase 7; tracing to Phase 6). **P1-T6 `completed`**. PRD not yet updated (needs developer approval) |
 
 | 2026-11-03 | PRD v0.5: recorded Phase 1 answers (developer approved); cross-document consistency script on PRD, CLAUDE.md, progress.md, roadmap, README, design system, experiment doc and project skill | Passed: 147 IDs defined, 103 tasks, 14 milestones; references, fences and table columns consistent across 8 files |
+
+| 2026-11-03 | P1-T7: checked the TEI shape of abstract, back matter and captions on the five papers | Abstract `abstract/div/p` with coordinates; back matter `back/div[@type]/div/p` with coordinates; captions `figure/figDesc` without coordinates but the enclosing `figure` always has them |
+| 2026-11-03 | P1-T7: applied the region rules and rules R1/R2 to the five TEI files | 324 passages (abstract 9, body 239, caption 37, back 39); every passage has pages; 2 skipped. R1 joined only 1 of 8 mid-sentence fragments: in 7 cases other text sits between the halves. A looser nearest-unfinished rule would join at least 3 of 8 to the wrong text, so R1 stays strict |
+| 2026-11-03 | P1-T7: `docs/design/parser-output.md` written; PRD v0.6 (`FR-ING-007`, §8.2) | Developer chose the regions. **P1-T7 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

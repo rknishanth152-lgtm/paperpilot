@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers), P1-T3 (GROBID runs), P1-T4 (inspection), P1-T5 (failure inputs) and P1-T6 (answers, §7) done 2026-11-03. P1-T7 and P1-T8 not started. |
+| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers), P1-T3 (GROBID runs), P1-T4 (inspection), P1-T5 (failure inputs), P1-T6 (answers, §7) and P1-T7 (representation: `docs/design/parser-output.md`) done 2026-11-03. P1-T8 not started. |
 | Answers | `OQ-001`, `OQ-002`, `OQ-003`, `OQ-005`, `OQ-013`, `OQ-016` (in P1-T6) |
 | Rule | Nothing here is a claim about real papers until it has been observed. Where documentation and observation differ, observation wins and the difference is recorded. |
 
@@ -308,11 +308,10 @@ Extra checks made for this task:
 - **Reference counts were not compared** with each paper's printed reference list.
 - **Timings come from one laptop** with sequential requests and a warm service, except where noted.
 
-**Decisions handed to P1-T7 (parser-output representation):** whether back matter other than references, and figure/table captions, become passages, and how they are marked.
+**Decisions handed to P1-T7:** settled 2026-11-03 in `docs/design/parser-output.md`. Abstract, captions and back matter other than references become passages, each marked with its region. Testing rule R1 on the five papers showed that most split paragraphs cannot be safely re-joined (see the note).
 
 ## 9. Still to do
 
 | Task | What |
 |---|---|
-| P1-T7 | Parser-output representation (design note). |
 | P1-T8 | Go / go-with-limits / no-go. |
