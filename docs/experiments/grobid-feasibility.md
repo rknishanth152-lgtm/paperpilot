@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers), P1-T3 (GROBID runs) and P1-T4 (inspection) done 2026-11-03. P1-T5 to P1-T8 not started. |
+| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers), P1-T3 (GROBID runs), P1-T4 (inspection) and P1-T5 (failure inputs) done 2026-11-03. P1-T6 to P1-T8 not started. |
 | Answers | `OQ-001`, `OQ-002`, `OQ-003`, `OQ-005`, `OQ-013`, `OQ-016` (in P1-T6) |
 | Rule | Nothing here is a claim about real papers until it has been observed. Where documentation and observation differ, observation wins and the difference is recorded. |
 
@@ -50,7 +50,7 @@ Other documented endpoints: `/api/isalive` (checked), `/api/health` (checked), `
 | 500 | internal error, with a code in the message: `BAD_INPUT_DATA`, `NO_BLOCKS`, `TOO_MANY_BLOCKS`, `TOO_MANY_TOKENS`, `TIMEOUT`, `TAGGING_ERROR`, `PARSING_ERROR`, `GENERAL`, `PDFALTO_CONVERSION_FAILURE` | `failed`, reason from the code |
 | 503 | all threads busy | Retry after 5–10 s (documented advice), then `failed` |
 
-Only 400 and 405 have been observed so far. Which inputs produce which code is tested in P1-T5.
+**Observed in P1-T5 (§6):** 400, 405, 500 with `BAD_INPUT_DATA`, `NO_BLOCKS` and `TOO_MANY_TOKENS`, 503 under load, and **200 with an empty body**. 204 was not observed.
 
 ### 2.3 Consolidation sends data outside the machine
 
@@ -204,11 +204,51 @@ Of the sentences missed even at the upper bound (34, 48, 36, 8, 6), between 2 an
 
 **What this means (input to P1-T6):** quotes cannot be verified reliably against the PDF text layer. They must be verified against the stored passage text, which is what `FR-CIT-002` already specifies, with normalisation for at least whitespace, Unicode compatibility forms, ligature characters, line-end hyphenation and space-split ligatures. Highlighting a quote inside the original PDF would need separate, fuzzy matching and is not part of VS-1.
 
-## 6. Still to do
+## 6. P1-T5: failure inputs (2026-11-03)
+
+Script: `scripts/grobid_failures.py` (throwaway). `inputs` mode generates test files in git-ignored `data/failure-inputs/` with the standard library (synthetic text, no real paper content, except truncated copies of p1 and p2) and posts each with all consolidation off. `service` mode stops and restarts GROBID with Docker Compose. Results: `data/grobid-output/failures-*.json`.
+
+### 6.1 Bad and extreme inputs
+
+| Input | Bytes | Result | GROBID message | Seconds |
+|---|---|---|---|---|
+| Text file renamed `.pdf` | 760 | 500 | `[BAD_INPUT_DATA] PDF to XML conversion failed with error code: 1` | 0.06 |
+| Empty file | 0 | 500 | same `BAD_INPUT_DATA` | 1.01 |
+| `%PDF-1.4` header then random bytes | 50,009 | 500 | same `BAD_INPUT_DATA` | 1.02 |
+| p1 truncated to 50% | 393,139 | 500 | same `BAD_INPUT_DATA` | 1.03 |
+| p2 truncated to 10% | 184,690 | 500 | same `BAD_INPUT_DATA` | 1.03 |
+| Synthetic 1-page text PDF (control) | 3,455 | **200, body empty** | text placed in one `back` paragraph | 1.08 |
+| Image-only page, no text layer (stand-in for a scanned PDF) | 21,743 | 500 | `[NO_BLOCKS] PDF parsing resulted in empty content` | 1.02 |
+| Blank page | 549 | 500 | same `NO_BLOCKS` | 1.02 |
+| Synthetic 300-page text PDF | 960,013 | **200, body empty** | as the 1-page control | 10.29 |
+| Synthetic 3,000-page text PDF | 9,727,865 | 500 | `[TOO_MANY_TOKENS] The document has 2883000 tokens, but the limit is 1000000` | 16.86 |
+| One-page PDF with a 64 MB noise image | 67,500,318 | 500 | `NO_BLOCKS` | 1.86 |
+
+### 6.2 Service failures
+
+| Case | Result | Seconds |
+|---|---|---|
+| GROBID stopped before the request | `httpx.ConnectError` (connection refused) | 2.05 |
+| GROBID stopped 5 s into a request (3,000-page input) | `httpx.RemoteProtocolError`: "Server disconnected without sending a response." | 8.53 |
+| Time from `docker compose start grobid` until `/api/isalive` is `true` | 24.4 and 22.7 (two restarts) | — |
+| 25 concurrent requests (p2, `concurrency: 10`) | **10 × 200, 15 × 503**; the 503 body is an HTML error page, not JSON | 1.5–27.5 |
+
+### 6.3 Observations
+
+1. **A 200 response does not mean the paper was parsed.** GROBID returned 200 with an empty body for synthetic text that does not look like an article. Ingestion must check for body paragraphs and set `failed` with `empty_parse` when there are none (`FR-ING-003`).
+2. **Non-PDF, empty, corrupt and truncated files all give the same `BAD_INPUT_DATA` code.** GROBID does not distinguish them, so PaperPilot's own upload validation (PDF signature, empty file, size; `FR-ING-001`) must catch what it can **before** calling GROBID, with its own reason codes. A truncated file with a valid header passes a signature check and is reported by GROBID.
+3. **No-text PDFs are detectable:** image-only and blank pages give `NO_BLOCKS`. A real scanned paper was not tested (no licensed example), so mapping `NO_BLOCKS` to a "likely scanned" reason is a reasonable inference, not an observation.
+4. **Long documents fail with a clear code** (`TOO_MANY_TOKENS`) rather than timing out; 300 synthetic pages took about 10 s and 3,000 pages about 17 s.
+5. **GROBID has no file-size limit of its own:** a 64 MB file was accepted and processed in under 2 s. The upload limit (`OQ-005`) must be enforced by PaperPilot; the five real papers are 0.09–1.85 MB.
+6. **Unreachable and interrupted GROBID give different transport errors** (`ConnectError`, `RemoteProtocolError`); both must map to `failed` with distinct reasons, and an interrupted request leaves nothing to clean up on GROBID's side.
+7. **503 under load is real** and arrives as HTML. The client must retry after a pause (documented advice: 5–10 s) and must not try to parse the 503 body.
+8. **Restarting GROBID takes about 23–24 s** before it accepts requests; the first request afterwards is slower (P1-T3).
+9. **Not observed:** HTTP 204, `TIMEOUT`, `TOO_MANY_BLOCKS`, `PDFALTO_CONVERSION_FAILURE`, encrypted PDFs, and a real scanned paper.
+
+## 7. Still to do
 
 | Task | What |
 |---|---|
-| P1-T5 | Failure inputs; record actual codes against §2.2. |
 | P1-T6 | Answers or deferrals for the open questions. |
 | P1-T7 | Parser-output representation (design note). |
 | P1-T8 | Go / go-with-limits / no-go. |

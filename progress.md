@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phase 0 complete. Local services, Python tooling, configuration module, backend skeleton (health endpoint) and test conventions exist; no feature code. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M3: GROBID parsing experiment (`in_progress`: P1-T1 to P1-T4 done). M1 and M2 `completed` 2026-11-03. |
+| Current milestone | M3: GROBID parsing experiment (`in_progress`: P1-T1 to P1-T5 done). M1 and M2 `completed` 2026-11-03. |
 | Current phase | Phase 1, GROBID feasibility experiment (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -56,7 +56,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Configuration: `backend/app/config.py` (`Settings`, `get_settings()`), complete `.env.example`, `tests/unit/test_config.py` (15 tests); dependencies pydantic and pydantic-settings | Tests, mutation check, lint and type check (see §7) | 2026-11-03 |
 | Backend skeleton: `backend/app/main.py` (`create_app`, startup settings check), `api/health.py`, `schemas/health.py`; `tests/unit/test_health.py` (2 tests); dependencies fastapi, uvicorn; dev httpx | Tests, mutation check, real server run (see §7) | 2026-11-03 |
 | Test conventions: `tests/conftest.py` (markers by folder), `tests/integration/` (GROBID fixture with loud failure, 2 tests), `tests/evaluation/README.md`; pytest `addopts` excludes `integration` and `evaluation` by default | Selection, failure-path and typo checks (see §7) | 2026-11-03 |
-| `docs/experiments/grobid-feasibility.md` (P1-T1 docs, P1-T2 papers, P1-T3 runs, P1-T4 inspection); throwaway `scripts/grobid_experiment.py`, `scripts/inspect_tei.py`, `scripts/quote_match.py`; TEI, pdfalto text and measurements in git-ignored `data/` | See §7 | 2026-11-03 |
+| `docs/experiments/grobid-feasibility.md` (P1-T1 to P1-T5); throwaway `scripts/grobid_experiment.py`, `scripts/inspect_tei.py`, `scripts/quote_match.py`, `scripts/grobid_failures.py`; TEI, pdfalto text, generated failure inputs and measurements in git-ignored `data/` | See §7 | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -97,7 +97,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1: P1-T1 to P1-T4 `completed` (pages available for every paragraph; quote matching must use passage text). Next: **P1-T5**, failure inputs. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). P0-T7 `completed`; M2 fresh-clone check passed, M2 `completed`. Phase 1: P1-T1 to P1-T5 `completed` (failure behaviour recorded; a 200 response can have an empty body). Next: **P1-T6**, answering the open questions in the report. Rule from P1-T1: every GROBID request sends `consolidateHeader=0` so no paper metadata goes to CrossRef. |
 
 ## 5. Next actions
 
@@ -276,5 +276,8 @@ Only checks actually performed. Nothing in this log refers to application behavi
 
 | 2026-11-03 | P1-T4: `scripts/inspect_tei.py` on the 5 TEI outputs (ruff, mypy clean) | Every body paragraph (242/242) and heading has a page from `coords`; 1–14 paragraphs per paper span two pages; sections always flat; no `<pb>`; running headers/footers go to body `note`, not paragraphs. Problems: paragraphs split mid-sentence at column/page breaks (0–3 per paper), BERT footnotes in body text, PLOS Medicine sidebar text as sections, several figure/table misclassifications, BERT appendix in `back` |
 | 2026-11-03 | P1-T4: pdfalto 0.6.2 in the GROBID container extracted each PDF's text layer; `scripts/quote_match.py` searched GROBID body sentences in it at three normalisation levels | Found: 24–85% (whitespace only), 63–86% (ligatures, hyphenation), 78–93% (no spaces or hyphens). Causes of the remaining misses confirmed on examples: GROBID rewrites citation markers ("[9–11]" → "[9][10][11]"), mid-word ligature splits from the PDF itself ("confi rmation"), different text order. **P1-T4 `completed`** |
+
+| 2026-11-03 | P1-T5: `scripts/grobid_failures.py inputs` (ruff, mypy clean): 11 generated inputs | Non-PDF, empty, corrupt and truncated: 500 `BAD_INPUT_DATA`. Image-only, blank, 64 MB image: 500 `NO_BLOCKS`. 3,000 pages: 500 `TOO_MANY_TOKENS` (2,883,000 tokens, limit 1,000,000). Synthetic 1- and 300-page text: **200 with an empty body** (text in `back`). Details in the experiment doc §6 |
+| 2026-11-03 | P1-T5: `scripts/grobid_failures.py service` | GROBID stopped: `ConnectError`. Stopped mid-request: `RemoteProtocolError`. Restart to alive: 24.4 s and 22.7 s. 25 concurrent requests: 10 × 200, 15 × 503 (HTML body). GROBID healthy afterwards. **P1-T5 `completed`**. Not observed: 204, `TIMEOUT`, `TOO_MANY_BLOCKS`, encrypted PDF, real scanned paper |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
