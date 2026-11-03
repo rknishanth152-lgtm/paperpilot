@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Environment setup. Documentation reviewed and approved; no application code written. |
 | Overall status | `in_progress` (documentation only) |
 | Last updated | 2026-11-03 |
-| Current milestone | M2: Repository and development environment setup (`not_started`; Docker prerequisite done). M1 `completed` 2026-11-03. |
+| Current milestone | M2: Repository and development environment setup (`in_progress`: Docker verified, P0-T2 completed; next P0-T3). M1 `completed` 2026-11-03. |
 | Current phase | Phase 0 (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -23,7 +23,7 @@ Milestones are proposals from the roadmap, not claims of completion. Statuses: `
 | ID | Milestone (Phase) | Status | Objective | Completion criteria (summary) | Evidence | Blockers / dependencies |
 |---|---|---|---|---|---|---|
 | M1 | Requirements and architecture documentation (0) | `completed` | Agreed PRD, rules, roadmap, status file | Developer has reviewed the four documents; `OQ-` triage recorded (roadmap P0-T1) | 2026-11-03: developer approved the architecture and incremental strategy; requested corrections applied and verified (§6.7 rows 8–9, §7); developer delegated the remaining Phase 0 decisions (§6.8); `OQ-` triage in §6.7 | None |
-| M2 | Repository and development environment setup (0) | `not_started` | Repo, Compose with PostgreSQL + GROBID, tooling, test conventions | A fresh clone plus README reproduces running services and a passing smoke test | None | `OQ-014`, `OQ-015` |
+| M2 | Repository and development environment setup (0) | `in_progress` | Repo, Compose with PostgreSQL + GROBID, tooling, test conventions | A fresh clone plus README reproduces running services and a passing smoke test | None | `OQ-014`, `OQ-015` |
 | M3 | GROBID parsing experiment (1) | `not_started` | Learn real GROBID behaviour on 3–5 permitted papers | `docs/experiments/grobid-feasibility.md` with observations, failures, go/no-go | None | M2 (minimal subset: P0-T2, P0-T3, Python environment) |
 | M4 | Database schema and migrations (2) | `not_started` | `papers`, `documents`, `passages` with constraints | Migration applies to an empty DB; constraint tests pass | None | M3 |
 | M5 | Paper ingestion and passage persistence (3) | `not_started` | Upload → GROBID → passages, honest statuses | `AC-VS-01`..`AC-VS-04` evidenced | None | M4 |
@@ -50,7 +50,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Learning notes: `notes/architecture-notes-fullstack-rag.md`, `notes/architecture-notes-claude-code-rag.md`, `notes/implementation-notes.md`, `notes/claude-code-workflow.md`, `notes/knowledge-gaps.md` | Folder listing of the developer's connected folder | 2026-11-03 |
 | Source transcripts: `transcripts/fullstack-rag.txt`, `transcripts/claude-code-rag.txt` | Same listing | 2026-11-03 |
 | Planning documents: `PRD.md`, `CLAUDE.md`, `progress.md`, `docs/implementation-roadmap.md` | Created in this session; consistency scripts run on drafts (see §7) | 2026-11-03 |
-| Git repository at `E:\dev\paperpilot` (branch `main`, no commits yet), `.gitignore`, `.gitattributes`, `README.md` stub | `git check-ignore` tests and staged-content scan (see §7) | 2026-11-03 |
+| Git repository at `E:\dev\paperpilot` (branch `main`, first commit `e860441`), `.gitignore`, `.gitattributes`, `README.md` stub | `git check-ignore` tests and staged-content scan (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
 
@@ -90,13 +90,13 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). Next task: **P0-T2** (initialise the repository). |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). Next task: **P0-T3** (PostgreSQL and GROBID with Compose). |
 
 ## 5. Next actions
 
 In dependency order. The first technical task after documentation is the GROBID experiment; it is **not yet done**.
 
-1. **Finish P0-T2: make the first commit** after the developer fixes the git email (the global `user.email` looks like a placeholder). Everything else in P0-T2 is done and verified (§7). Original step: **Initialise the repository at `E:\dev\paperpilot`** (files already copied there, §6.6): `git init`, `.gitignore` (including §6.5a entries and `transcripts/`; `notes/` is committed, §6.8) and a README stub (P0-T2). Start future Claude Code sessions in `E:\dev\paperpilot`.
+1. ~~P0-T2~~ `completed` 2026-11-03 (commit `e860441`). Remote hosting (for example GitHub) is not set up and not required yet.
 2. **Bring up PostgreSQL and GROBID locally** with Compose using the images in §6.8, ports bound to 127.0.0.1; record the commands in `README.md` (P0-T3, `OQ-015`, `OQ-017`).
 3. **Install the chosen Python tooling** (P0-T4, decided in §6.8): uv, then a uv-managed Python 3.14 pinned in `.python-version`; confirm FastAPI and pydantic install on 3.14 (not yet verified) and record commands in `README.md`.
 4. **Phase 1 GROBID experiment** on 3–5 permitted papers, then inspection of the returned structure and failure behaviour, written up in `docs/experiments/grobid-feasibility.md` (P1-T1..T8).
@@ -214,5 +214,7 @@ Only checks actually performed. Nothing in this log refers to application behavi
 
 | 2026-11-03 | P0-T2: `git init -b main` in `E:\dev\paperpilot`; dummy `.env`, `.env.local`, `data/probe.txt`, `probe.pdf`, `.claude/settings.local.json`, `.venv/`, `node_modules/` created and checked with `git check-ignore -v` and `git status`, then deleted | All ignored by the intended `.gitignore` rule; `transcripts/` ignored; `notes/`, `README.md`, `.claude/settings.json`, skills and `.env.example` not ignored |
 | 2026-11-03 | P0-T2: `git add -A` (staged, **not committed**); staged-file summary; `git grep --cached` for API-key, token, private-key and database-URL patterns | 116 files staged; no PDF, `.env` or transcript staged. One match: `token: 'mock-token'` in a Playwright skill documentation example (not a secret). No credentials found |
+
+| 2026-11-03 | P0-T2 first commit: identity re-checked, staged set and secret scan re-run, `git commit`, then `git log` and `git ls-tree` | Commit `e860441` on `main`, author `rknishanth152-lgtm <rknishanth.152@gmail.com>`, 116 files; no PDF, `.env` or transcript in the commit. Secret-pattern hits were false positives ("task-based" in two documentation URLs). **P0-T2 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
