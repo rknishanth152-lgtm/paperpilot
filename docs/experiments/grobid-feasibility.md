@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers) and P1-T3 (GROBID runs) done 2026-11-03. P1-T4 to P1-T8 not started. |
+| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers), P1-T3 (GROBID runs) and P1-T4 (inspection) done 2026-11-03. P1-T5 to P1-T8 not started. |
 | Answers | `OQ-001`, `OQ-002`, `OQ-003`, `OQ-005`, `OQ-013`, `OQ-016` (in P1-T6) |
 | Rule | Nothing here is a claim about real papers until it has been observed. Where documentation and observation differ, observation wins and the difference is recorded. |
 
@@ -63,12 +63,12 @@ Only 400 and 405 have been observed so far. Which inputs produce which code is t
 
 - The docs: "Page numbers are not directly in TEI elements." They are recovered from `coords` attributes requested with `teiCoordinates`.
 - `coords` format: boxes separated by `;`, each `page,x,y,width,height`, page starting at 1, PDF units, origin top-left. Page sizes appear in `<facsimile><surface n=".." ...>`.
-- `<pb>` page-break elements: not mentioned in the docs. **Unknown until observed.**
+- `<pb>` page-break elements: not mentioned in the docs. **Observed (P1-T4): none in any of the five outputs.**
 - Plan for P1-T3: request `teiCoordinates` for `p`, `head`, `figure` and `biblStruct` and check whether every paragraph gets a page (and whether a paragraph can span pages, giving two boxes on different pages).
 
 ### 2.5 TEI structure
 
-The TEI documentation page describes only the schema (`grobid-home/schemas/`), not where each element appears. Where title, authors, abstract, DOI, sections, paragraphs, references, figures and tables appear in the output is **unknown until observed** in P1-T4 and recorded there.
+The TEI documentation page describes only the schema (`grobid-home/schemas/`), not where each element appears. **Observed in P1-T4: see §5.1.**
 
 ### 2.6 Limits and configuration
 
@@ -142,11 +142,72 @@ GROBID 0.9.1, CRF image, CPU only, sequential requests, on the developer's lapto
 - **Output is repeatable except for IDs and a timestamp.** Two runs produced different bytes (68–211 changed lines per file), but after removing `xml:id`/`ref` values of the form `_XXXXXXX` and the `when` timestamp, all five outputs were identical, body included. `generateIDs=1` creates **random IDs on every run**, so they must never be used as stable identifiers for passages or evidence (passage IDs come from PaperPilot's own database, `DR-003`).
 - **No consolidation happened.** The TEI contains no `status="consolidated"` or `source="crossref"`/`"glutton"` markers, and the GROBID container log has no line mentioning CrossRef or consolidation.
 
-## 5. Still to do
+## 5. P1-T4: inspection of the output (2026-11-03)
+
+Tools (throwaway, in `scripts/`): `inspect_tei.py` counts checklist items per paper; `quote_match.py` checks whether GROBID sentences occur in the PDF text layer, extracted with `pdfalto` 0.6.2 inside the GROBID container (`-skipGraphs -readingOrder`). Results are saved in git-ignored `data/`. Paragraph text was looked at only as short snippets.
+
+### 5.1 Where things are in the TEI (observed)
+
+| Item | Location |
+|---|---|
+| Title | `teiHeader/fileDesc/titleStmt/title` |
+| Authors | `teiHeader/fileDesc/sourceDesc/biblStruct/analytic/author/persName` |
+| Abstract | `teiHeader/profileDesc/abstract//p` |
+| DOI | `teiHeader/fileDesc/sourceDesc/biblStruct/idno[@type='DOI']` |
+| Sections | `text/body/div`, each with one `head` and its `p` elements; **always flat** (no nested `div` in any paper) |
+| Section numbers | `head/@n` when the paper numbers its headings (BERT only) |
+| Footnotes, running headers and footers | `text/body/note` (separate from paragraphs) |
+| Figures and tables | `text/body/figure`; tables have `@type='table'` and `table/row` |
+| References | `text/back//listBibl/biblStruct`, with the raw string in `note[@type='raw_reference']` |
+| Acknowledgements, funding, appendices | `text/back/div` |
+| Pages | `facsimile/surface` (one per page); per element in `@coords`, as line-level boxes `page,x,y,w,h;…`. No `<pb>` elements |
+
+### 5.2 Checklist results
+
+| Check | p1 BERT | p2 eLife | p3 PLOS Med | p4 PLOS ONE 2007 | p5 PLOS ONE 2011 |
+|---|---|---|---|---|---|
+| Title / authors / abstract | yes / 4 / yes | yes / 7 / yes | yes / 1 / yes | yes / 3 / yes | yes / 4 / yes |
+| DOI in TEI | no (not checked whether printed in the PDF) | yes | yes | yes | yes |
+| Body sections (headings numbered) | 28 (18) | 30 (0) | 10 (0) | 8 (0) | 4 (0) |
+| Body paragraphs; median length (chars) | 99; 315 | 77; 801 | 25; 1,024 | 29; 447 | 12; 966 |
+| Paragraphs with a page from `coords` | **99/99** | **77/77** | **25/25** | **29/29** | **12/12** |
+| Paragraphs spanning two pages | 8 | 14 | 3 | 1 | 2 |
+| Paragraphs starting lowercase (split mid-sentence) | 3 | 3 | 2 | 0 | 0 |
+| Running header/footer text inside paragraphs (pattern search) | none found | none found | none found | none found | none found |
+| Header/footer text captured as body `note` | — | yes ("Errington et al. eLife 2021;…") | — | yes ("PLoS ONE \| www.plosone.org", issue line) | yes (same) |
+| Tables found / with rows | 3 / 3 | 6 / 6 | 4 / 4 | 2 / 2 | 0 / 0 |
+| References (all with raw string and page) | 55 | 84 | 37 | 37 | 26 |
+
+### 5.3 Problems found
+
+1. **Paragraphs split at column or page breaks.** Up to three per paper start mid-sentence with a lowercase word, continuing the previous paragraph (for example a paragraph ending "…Additional" followed by one starting "ablation studies can be found in Appendix C."). One logical paragraph becomes two passages with broken sentences (`OQ-002`, `RISK-03`).
+2. **Footnotes leak into body text in BERT.** A footnote became its own paragraph ("10 https://gluebenchmark.com/leaderboard"), footnote markers remain as stray numbers ("…by a wide margin. 12"), and two paragraphs contain only "...".
+3. **Sidebar and pull-quote text becomes sections** in PLOS Medicine: the journal's box "The Essay section contains opinion pieces…" and a pull quote appear as section headings with their own paragraphs.
+4. **Figure/table errors.** PLOS ONE 2007: Table 2 typed as a figure (the paper has 3 tables; 2 found). eLife: Figure 5 not among the figures; one reference ("Wilson DJ. 2019…") captured as a body note. BERT: Table 3 not identified as a table; the appendix (including Tables 5–8) is placed in `back`, not `body`. PLOS ONE 2011: one figure entry with no label. PLOS Medicine: the one `formula` element contains table-cell text. eLife: the funding table's cells appear as headings in `back`.
+5. **Citation markers are rewritten.** GROBID changes in-text citations: "[9–11]" in the PDF becomes "[9][10][11]", and "(Peters et al., 2017, 2018a)" becomes "(Peters et al., 2017(Peters et al., , 2018a) )". Passage text is therefore **not** verbatim PDF text around citations.
+6. **Broken ligatures come from the PDF itself.** PLOS Medicine's text layer contains "fi ndings", "confi rmation", "defi ned" (125 such splits in the body), and GROBID copies them. They occur mid-word as well as at word starts.
+7. **`generateIDs` IDs are random per run** (P1-T3); only usable inside one parse.
+
+### 5.4 Matching GROBID text to the PDF text layer (`OQ-013`)
+
+Sentences of at least 40 characters from body paragraphs, searched in the pdfalto text after normalising both sides:
+
+| Paper | Sentences | Whitespace only | + NFKC, ligature characters, line-end hyphenation, "fi x" splits at word start | Upper bound: no spaces or hyphens, lower-case |
+|---|---|---|---|---|
+| p1 BERT | 261 | 28% | 82% | 87% |
+| p2 eLife | 398 | 53% | 63% | 88% |
+| p3 PLOS Med | 167 | 24% | 77% | 78% |
+| p4 PLOS ONE 2007 | 107 | 65% | 68% | 93% |
+| p5 PLOS ONE 2011 | 65 | 85% | 86% | 91% |
+
+Of the sentences missed even at the upper bound (34, 48, 36, 8, 6), between 2 and 16 per paper are **interrupted** in the PDF text (both halves found, separated by other text); the rest **differ**, mainly because of rewritten citation markers (item 5), mid-word ligature splits (item 6) and different text order between pdfalto and GROBID.
+
+**What this means (input to P1-T6):** quotes cannot be verified reliably against the PDF text layer. They must be verified against the stored passage text, which is what `FR-CIT-002` already specifies, with normalisation for at least whitespace, Unicode compatibility forms, ligature characters, line-end hyphenation and space-split ligatures. Highlighting a quote inside the original PDF would need separate, fuzzy matching and is not part of VS-1.
+
+## 6. Still to do
 
 | Task | What |
 |---|---|
-| P1-T4 | Inspect each TEI against the checklist in the roadmap; fill §2.4 and §2.5 with observations. |
 | P1-T5 | Failure inputs; record actual codes against §2.2. |
 | P1-T6 | Answers or deferrals for the open questions. |
 | P1-T7 | Parser-output representation (design note). |
