@@ -1,0 +1,47 @@
+# Secrets and local configuration (NFR-SEC-001). Only .env.example is committed.
+.env
+.env.*
+!.env.example
+
+# Local data: stored PDFs, raw GROBID output, experiment output, database dumps.
+# Configuration (P0-T5) should point local storage here.
+/data/
+
+# Papers are never committed (RISK-13). Licensed or synthetic fixtures may be
+# allowed later with an explicit exception next to the fixture directory.
+*.pdf
+
+# Third-party learning material (RISK-13); notes/ is committed.
+/transcripts/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Node / frontend
+node_modules/
+*.tsbuildinfo
+
+# Logs
+*.log
+
+# Claude Code and browser tooling: local, per-developer files
+.claude/settings.local.json
+.playwright-cli/
+.playwright/
+
+# Editors and operating system
+.idea/
+.vscode/
+Thumbs.db
+desktop.ini
+.DS_Store

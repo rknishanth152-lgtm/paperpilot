@@ -1,0 +1,3 @@
+# Normalise text files to LF in the repository; Git converts on checkout as configured.
+# Prevents Windows line-ending noise in diffs.
+* text=auto
