@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **In progress.** P1-T1 (documentation) and P1-T2 (papers) done 2026-11-03. P1-T3 to P1-T8 not started. |
+| Status | **In progress.** P1-T1 (documentation), P1-T2 (papers) and P1-T3 (GROBID runs) done 2026-11-03. P1-T4 to P1-T8 not started. |
 | Answers | `OQ-001`, `OQ-002`, `OQ-003`, `OQ-005`, `OQ-013`, `OQ-016` (in P1-T6) |
 | Rule | Nothing here is a claim about real papers until it has been observed. Where documentation and observation differ, observation wins and the difference is recorded. |
 
@@ -111,11 +111,41 @@ Proposed by Claude, approved by the developer. Each licence statement was read o
 
 To obtain the same files: download each "Source (PDF)" URL into `data/papers/` with the file name above and compare the SHA-256.
 
-## 4. Still to do
+## 4. P1-T3: sending the papers to GROBID (2026-11-03)
+
+Script: `scripts/grobid_experiment.py` (throwaway). Run from the repository root with the services up:
+
+```bash
+$env:PYTHONPATH = "backend"; uv run python scripts/grobid_experiment.py
+```
+
+It posts each PDF in `data/papers/` to `/api/processFulltextDocument` one at a time with a 300 s client timeout, saves `data/grobid-output/<paper>.tei.xml` and a JSON run record (`run-<UTC time>.json`: GROBID version, form fields, per-file SHA-256, status, seconds, TEI size, page count). It prints no paper text. Outputs are git-ignored.
+
+Form fields used for every paper: `consolidateHeader=0`, `consolidateCitations=0`, `consolidateFunders=0`, `includeRawCitations=1`, `generateIDs=1`, `teiCoordinates` = `p`, `head`, `figure`, `biblStruct`.
+
+### 4.1 Results
+
+| Paper | HTTP | Seconds, run 1 | Seconds, run 2 | Pages (`<facsimile>`) | TEI bytes |
+|---|---|---|---|---|---|
+| p1 BERT | 200 | 11.04 | 2.37 | 16 | 187,303 |
+| p2 eLife | 200 | 5.47 | 2.93 | 30 | 302,588 |
+| p3 PLOS Med | 200 | 1.82 | 1.60 | 6 | 105,576 |
+| p4 PLOS ONE 2007 | 200 | 1.72 | 1.61 | 5 | 88,113 |
+| p5 PLOS ONE 2011 | 200 | 1.43 | 1.38 | 4 | 58,527 |
+
+GROBID 0.9.1, CRF image, CPU only, sequential requests, on the developer's laptop (AMD Ryzen AI 9 365, 20 threads available to Docker). Container memory rose from about 3.2 GB at idle to about 3.95 GB after the run.
+
+### 4.2 Observations
+
+- **All five papers parsed** (HTTP 200); page counts match the PDFs.
+- **First request is slower.** p1 took 11.0 s on the first run and 2.4 s on the second; the first request after start-up includes warm-up. Steady-state times were 1.4–2.9 s for 4–30 pages. The 120 s placeholder `GROBID_TIMEOUT_SECONDS` is far above anything observed; it stays a placeholder until larger papers are tried (`NFR-PRF-001`).
+- **Output is repeatable except for IDs and a timestamp.** Two runs produced different bytes (68–211 changed lines per file), but after removing `xml:id`/`ref` values of the form `_XXXXXXX` and the `when` timestamp, all five outputs were identical, body included. `generateIDs=1` creates **random IDs on every run**, so they must never be used as stable identifiers for passages or evidence (passage IDs come from PaperPilot's own database, `DR-003`).
+- **No consolidation happened.** The TEI contains no `status="consolidated"` or `source="crossref"`/`"glutton"` markers, and the GROBID container log has no line mentioning CrossRef or consolidation.
+
+## 5. Still to do
 
 | Task | What |
 |---|---|
-| P1-T3 | Script under `scripts/` sends each paper with `consolidateHeader=0` and the coordinates above; saves raw TEI under `data/`; records status and time. |
 | P1-T4 | Inspect each TEI against the checklist in the roadmap; fill §2.4 and §2.5 with observations. |
 | P1-T5 | Failure inputs; record actual codes against §2.2. |
 | P1-T6 | Answers or deferrals for the open questions. |
