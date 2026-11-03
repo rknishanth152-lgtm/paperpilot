@@ -104,11 +104,18 @@ All text fields are `None` when absent, never `""` (`FR-ING-006`, `DR-007`).
 
 A document ends `parsed` only when `parse_tei` returns at least one `body` passage. Otherwise it ends `failed` with one `failure_reason` and a short message without paper text. "Observed" refers to the experiment (§6).
 
+**Upload rejections (no document is created).** Corrected 2026-11-03 in P2-T1: `FR-ING-001` says invalid uploads are *rejected*, so these are structured API error codes returned by the upload endpoint, not stored `failure_reason` values.
+
+| Check (before storing) | Error code | Observed? |
+|---|---|---|
+| Does not start with `%PDF-` | `not_pdf` | GROBID gave `BAD_INPUT_DATA` for this; caught earlier by us |
+| 0 bytes | `empty_file` | as above |
+| Larger than `MAX_UPLOAD_MB` | `file_too_large` | GROBID has no limit (§6.3) |
+
+**Document failures (stored as `failure_reason`, see `docs/design/schema.md` §6).**
+
 | Stage | Condition | `failure_reason` | Observed? |
 |---|---|---|---|
-| Validation (before GROBID) | Does not start with `%PDF-` | `not_pdf` | GROBID gave `BAD_INPUT_DATA` for this; caught earlier by us |
-| Validation | 0 bytes | `empty_file` | as above |
-| Validation | Larger than `MAX_UPLOAD_MB` | `file_too_large` | GROBID has no limit (§6.3) |
 | GROBID call | Connection refused | `parser_unreachable` | Yes (`ConnectError`) |
 | GROBID call | Connection dropped mid-request | `parser_disconnected` | Yes (`RemoteProtocolError`) |
 | GROBID call | No response within `GROBID_TIMEOUT_SECONDS` | `parser_timeout` | No |
@@ -121,6 +128,7 @@ A document ends `parsed` only when `parse_tei` returns at least one `body` passa
 | GROBID response | 204 | `empty_parse` | No |
 | Parsing | TEI is not well-formed XML | `malformed_tei` | No |
 | Parsing | No `body` passage after R1 and R2 | `empty_parse` | Yes (200 with empty body, §6.3) |
+| Storage | The TEI artifact cannot be stored (`FR-ING-005`) | `storage_error` | No |
 | Restart | Left `processing` when the server stopped | `interrupted` | `FR-ING-010` |
 
 Every failed document keeps its stored file, has no passages, and may be retried (PRD §8.3). Reason codes are lowercase snake_case (`CLAUDE.md` §11).

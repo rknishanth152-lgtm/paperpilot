@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phase 0 complete. Local services, Python tooling, configuration module, backend skeleton (health endpoint) and test conventions exist; no feature code. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M4: Database schema and migrations (`not_started`). M1, M2 and M3 `completed` 2026-11-03. |
+| Current milestone | M4: Database schema and migrations (`in_progress`: P2-T1 done). M1, M2 and M3 `completed` 2026-11-03. |
 | Current phase | Phase 2, core persistence and provenance (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -25,7 +25,7 @@ Milestones are proposals from the roadmap, not claims of completion. Statuses: `
 | M1 | Requirements and architecture documentation (0) | `completed` | Agreed PRD, rules, roadmap, status file | Developer has reviewed the four documents; `OQ-` triage recorded (roadmap P0-T1) | 2026-11-03: developer approved the architecture and incremental strategy; requested corrections applied and verified (§6.7 rows 8–9, §7); developer delegated the remaining Phase 0 decisions (§6.8); `OQ-` triage in §6.7 | None |
 | M2 | Repository and development environment setup (0) | `completed` | Repo, Compose with PostgreSQL + GROBID, tooling, test conventions | A fresh clone plus README reproduces running services and a passing smoke test | 2026-11-03: fresh clone from GitHub plus README reproduced running services, passing unit and integration tests and the backend health check (§7); tooling decisions recorded with dates (§6.8) | None |
 | M3 | GROBID parsing experiment (1) | `completed` | Learn real GROBID behaviour on 3–5 permitted papers | `docs/experiments/grobid-feasibility.md` with observations, failures, go/no-go | 2026-11-03: 5 papers processed and inspected; failure inputs attempted (real scanned paper impossible, reason recorded); answers in §7, limitations §8, representation `docs/design/parser-output.md`, decision go with limits (§9); PRD updated | M2 (minimal subset: P0-T2, P0-T3, Python environment) |
-| M4 | Database schema and migrations (2) | `not_started` | `papers`, `documents`, `passages` with constraints | Migration applies to an empty DB; constraint tests pass | None | M3 |
+| M4 | Database schema and migrations (2) | `in_progress` | `papers`, `documents`, `passages` with constraints | Migration applies to an empty DB; constraint tests pass | None | M3 |
 | M5 | Paper ingestion and passage persistence (3) | `not_started` | Upload → GROBID → passages, honest statuses | `AC-VS-01`..`AC-VS-04` evidenced | None | M4 |
 | M6 | Keyword retrieval (4) | `not_started` | PostgreSQL full-text retrieval; evaluation set; Recall@5 baseline | `AC-VS-05`; baseline file recorded | None | M5 |
 | M7 | Evidence-backed question answering (5) | `not_started` | Retrieval → structured answer → citation validation | `AC-VS-06`..`AC-VS-08` | None | M6; `OQ-011` |
@@ -58,6 +58,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Test conventions: `tests/conftest.py` (markers by folder), `tests/integration/` (GROBID fixture with loud failure, 2 tests), `tests/evaluation/README.md`; pytest `addopts` excludes `integration` and `evaluation` by default | Selection, failure-path and typo checks (see §7) | 2026-11-03 |
 | `docs/experiments/grobid-feasibility.md` (P1-T1 to P1-T5); throwaway `scripts/grobid_experiment.py`, `scripts/inspect_tei.py`, `scripts/quote_match.py`, `scripts/grobid_failures.py`; TEI, pdfalto text, generated failure inputs and measurements in git-ignored `data/` | See §7 | 2026-11-03 |
 | `docs/design/parser-output.md`: parser output contract (`ParsedDocument`, `ParsedPassage`), passage regions and rules, page rules, failure-reason mapping. Design only, not implemented | Rules checked against the five TEI outputs (see §7) | 2026-11-03 |
+| `docs/design/schema.md`: `papers`, `documents`, `passages` columns, constraints, failure reasons, indexes, immutability trigger. Design only, not implemented | Key PostgreSQL features checked live (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -96,9 +97,9 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 2 (M4): core persistence and provenance. First task **P2-T1**, the schema design note. |
+| Task | Phase 2 (M4): core persistence and provenance. P2-T1 (schema design note) `completed`; next **P2-T2**, database access layer and migrations. |
 | Inputs | `docs/design/parser-output.md` (fields to store, passage regions, failure reasons), PRD §8, `DR-001`..`DR-009`, `FR-ING-008` |
-| Status | `not_started`. Phase 0 and Phase 1 are `completed` (M1, M2, M3). |
+| Status | `in_progress`. Phase 0 and Phase 1 are `completed` (M1, M2, M3). |
 
 Summary of what is done (details in §3, §6 and §7): planning documents reviewed and approved (P0-T1); repository on E:, private on GitHub (P0-T2); PostgreSQL 18 and GROBID 0.9.1 via Compose (P0-T3); Python 3.14 with uv, pytest, ruff, mypy (P0-T4); settings module (P0-T5); FastAPI skeleton with `/health` (P0-T6); test conventions (P0-T7); GROBID experiment with decision **go with limits** (P1-T1..T8, `docs/experiments/grobid-feasibility.md`). Standing rule: every GROBID request sends `consolidateHeader=0`.
 
@@ -106,7 +107,7 @@ Summary of what is done (details in §3, §6 and §7): planning documents review
 
 In dependency order.
 
-1. **P2-T1:** schema design note for `papers`, `documents`, `passages` (columns, nullability, constraints, status and failure-reason values from `docs/design/parser-output.md`).
+1. ~~P2-T1~~ `completed`: `docs/design/schema.md`.
 2. **P2-T2:** database access layer and migrations. Adds SQLAlchemy, Alembic and psycopg (decided in §6.8; the developer approves each dependency when added).
 3. **P2-T3 to P2-T6:** first migration, DOI normalisation, constraint tests against PostgreSQL, schema documentation.
 4. Deferred from Phase 0: P0-T8 (frontend toolchain check, before Phase 3) and P0-T9 (CI).
@@ -309,5 +310,8 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P1-T7: `docs/design/parser-output.md` written; PRD v0.6 (`FR-ING-007`, §8.2) | Developer chose the regions. **P1-T7 `completed`** |
 
 | 2026-11-03 | P1-T8: Phase 1 acceptance criteria checked against the report; developer chose **go with limits**; recorded in the report §9, PRD v0.7 (`AD-003`, `FR-ING-003`) | All four criteria met; **P1-T8 `completed`, M3 `completed`** |
+
+| 2026-11-03 | P2-T1: PostgreSQL 18.6 feature checks in rolled-back transactions (`uuidv7()`, `UNIQUE` with several `NULL`s, generated `section_path`, `BEFORE UPDATE` trigger, page `CHECK`s) | All behaved as designed: `uuidv7()` time-ordered; many `NULL` DOIs allowed and a duplicate DOI rejected; `section_path` "3.1 Methods" / "Intro"; update blocked with "passages are immutable"; page 0 rejected. Nothing kept |
+| 2026-11-03 | P2-T1: `docs/design/schema.md` written; `docs/design/parser-output.md` §7 corrected (`not_pdf`, `empty_file`, `file_too_large` are upload rejections, not stored reasons, per `FR-ING-001`; `storage_error` added) | **P2-T1 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
