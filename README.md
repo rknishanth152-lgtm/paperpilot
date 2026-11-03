@@ -103,9 +103,23 @@ Stop the services (database data is kept in the `paperpilot_postgres-data` volum
 docker compose down
 ```
 
-## Running the application
+## Running the backend
 
-Not available yet. Commands for installing dependencies, running tests and running the application are added here when each one has been run and verified. Do not use commands that are not listed here.
+The backend is a minimal skeleton: one health endpoint, no features yet. It reads `.env` at startup and refuses to start if a setting is missing or invalid. Run from the repository folder (verified 2026-11-03):
+
+```bash
+uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+```
+
+Check it in another terminal; it prints `{"status":"ok"}`:
+
+```bash
+curl.exe http://127.0.0.1:8000/health
+```
+
+The health endpoint only says the API process is running. It does not check PostgreSQL or GROBID. Always keep `--host 127.0.0.1` (`NFR-SEC-006`). Stop the server with Ctrl+C.
+
+The frontend does not exist yet (P0-T8/P3). Commands are added here only after they have been run and verified.
 
 ## Important limits
 

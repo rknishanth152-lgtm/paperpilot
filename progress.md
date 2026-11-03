@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Environment setup. Documentation reviewed and approved; no application code written. |
 | Overall status | `in_progress` (documentation only) |
 | Last updated | 2026-11-03 |
-| Current milestone | M2: Repository and development environment setup (`in_progress`: P0-T2 to P0-T5 completed; next P0-T6). M1 `completed` 2026-11-03. |
+| Current milestone | M2: Repository and development environment setup (`in_progress`: P0-T2 to P0-T6 completed; next P0-T7). M1 `completed` 2026-11-03. |
 | Current phase | Phase 0 (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -54,6 +54,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Local services: `compose.yaml` (PostgreSQL 18 with pgvector available, GROBID 0.9.1 CRF), `.env.example` (compose settings only), local `.env` with a generated password (not committed); README commands | Started, queried and restarted (see §7) | 2026-11-03 |
 | Python environment: uv 0.13.7, Python 3.14.10 on E: (`.python-version`), `pyproject.toml` with pytest/ruff/mypy, `uv.lock`; README and `CLAUDE.md` commands | Installed and run (see §7) | 2026-11-03 |
 | Configuration: `backend/app/config.py` (`Settings`, `get_settings()`), complete `.env.example`, `tests/unit/test_config.py` (15 tests); dependencies pydantic and pydantic-settings | Tests, mutation check, lint and type check (see §7) | 2026-11-03 |
+| Backend skeleton: `backend/app/main.py` (`create_app`, startup settings check), `api/health.py`, `schemas/health.py`; `tests/unit/test_health.py` (2 tests); dependencies fastapi, uvicorn; dev httpx | Tests, mutation check, real server run (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -94,7 +95,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). Next Phase 0 task: **P0-T6**. |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). P0-T4 `completed`. Phase 1 prerequisites (P0-T2, P0-T3, Python environment) are all met. P0-T5 `completed` (configuration module). P0-T6 `completed` (backend skeleton). Next Phase 0 task: **P0-T7**. |
 
 ## 5. Next actions
 
@@ -102,7 +103,7 @@ In dependency order. The first technical task after documentation is the GROBID 
 
 1. ~~P0-T2~~ `completed` 2026-11-03 (commit `e860441`). Pushed to a private GitHub repository on 2026-11-03 (§3.1).
 2. ~~P0-T3~~ `completed` 2026-11-03: PostgreSQL and GROBID run with Compose; commands in `README.md`.
-3. ~~P0-T4~~ and ~~P0-T5~~ `completed` 2026-11-03. Remaining Phase 0 tasks: P0-T6 (backend skeleton with health endpoint and smoke test; reuses `backend/app/config.py`), P0-T7 (test conventions; `tests/unit` already exists); P0-T8 and P0-T9 may wait.
+3. ~~P0-T4~~, ~~P0-T5~~ and ~~P0-T6~~ `completed` 2026-11-03. Remaining Phase 0: **P0-T7** (test conventions: `tests/integration`, `tests/evaluation`, a marker separating tests that need PostgreSQL/GROBID); P0-T8 (frontend toolchain check) and P0-T9 (CI) may wait.
 4. **Phase 1 GROBID experiment** on 3–5 permitted papers, then inspection of the returned structure and failure behaviour, written up in `docs/experiments/grobid-feasibility.md` (P1-T1..T8).
 
 ## 6. Decisions and blockers
@@ -243,5 +244,11 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P0-T5: loaded the developer's real `.env` through `get_settings()`, printing only non-secret facts | Loaded; password present; GROBID URL default; storage `data/storage`; no LLM configured. **P0-T5 `completed`** |
 
 | 2026-11-03 | GitHub: installed GitHub CLI 2.103.3 (`winget install --id GitHub.cli -e --scope user`); developer ran `gh auth login`; scanned all commits for `.env`, PDFs, transcripts and local settings; `gh repo create paperpilot --private --source . --remote origin --push`; `gh repo view` | Logged in as `rknishanth152-lgtm`. History clean (5 commits). Repository `rknishanth152-lgtm/paperpilot` created, visibility `PRIVATE`, default branch `main`; remote `main` = local `62b1233`. Developer asked for commits to be pushed after each verified step |
+
+| 2026-11-03 | P0-T6: `uv add fastapi uvicorn`; `uv add --dev httpx` (FastAPI test client) | fastapi 0.162.0 (MIT), starlette 1.10.0, uvicorn 0.54.0, httpx 0.28.1 (BSD-3-Clause); FastAPI also pulls in `opentelemetry-api` 1.45.2 |
+| 2026-11-03 | P0-T6: `uv run pytest` (config and health tests) | 17 passed. Warning: Starlette deprecates `httpx` for its test client and suggests `httpx2`; not acted on (provenance unchecked; httpx is also the chosen GROBID client). Revisit at P3-T3 |
+| 2026-11-03 | P0-T6: mutation check: health route made to raise, smoke tests run, file restored (hash identical) | `test_health_returns_ok` failed as expected; all pass after restore |
+| 2026-11-03 | P0-T6: `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy .` | All passed; mypy: no issues in 9 source files |
+| 2026-11-03 | P0-T6: started `uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000` with the real `.env`; `GET /health`, `GET /does-not-exist`; listener and Wi-Fi checks; stopped | Startup complete; `/health` 200 `{"status":"ok"}`; unknown route 404 `{"detail":"Not Found"}`; listening on 127.0.0.1 only; refused on the Wi-Fi address; port free after stop. **P0-T6 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

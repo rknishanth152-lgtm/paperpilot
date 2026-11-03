@@ -59,7 +59,7 @@ At the end of meaningful work, update `progress.md` (inventory, task status, ver
 
 Commands for running services, tests, migrations and linting live in `README.md` once Phase 0 records them. **Do not invent commands.** If a command is missing or fails, say so and ask or investigate; never report a check as run if it was not.
 
-Recorded so far (details in `README.md`): `docker compose up -d --wait`, `docker compose down`, `uv sync`, `uv run ruff check .`, `uv run ruff format --check .`, `uv run pytest`, `uv run mypy .`.
+Recorded so far (details in `README.md`): `docker compose up -d --wait`, `docker compose down`, `uv sync`, `uv run ruff check .`, `uv run ruff format --check .`, `uv run pytest`, `uv run mypy .`, `uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000`.
 
 **Claude desktop sessions on Windows:** the app redirects writes under `%APPDATA%`, so uv must keep Python and its cache on E: via `UV_PYTHON_INSTALL_DIR=E:\uv\python` and `UV_CACHE_DIR=E:\uv\cache` (set as user environment variables). If a session started before they were set, pass them on the command. Never install Python or tools into AppData from a session.
 
