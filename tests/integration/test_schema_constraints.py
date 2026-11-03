@@ -143,6 +143,20 @@ def test_duplicate_file_hash_is_rejected(conn: Connection) -> None:
     rejected_by(conn, "uq_documents_sha256", lambda: add_document(conn, sha256=sha))
 
 
+@pytest.mark.parametrize(
+    ("column", "constraint"),
+    [
+        ("storage_key", "uq_documents_storage_key"),
+        ("tei_storage_key", "uq_documents_tei_storage_key"),
+    ],
+)
+def test_duplicate_storage_keys_are_rejected(
+    conn: Connection, column: str, constraint: str
+) -> None:
+    add_document(conn, **{column: "same/key"})
+    rejected_by(conn, constraint, lambda: add_document(conn, **{column: "same/key"}))
+
+
 def test_two_documents_share_one_paper(conn: Connection) -> None:
     """Different files with the same DOI belong to one paper (PRD §8.3)."""
     paper_id = add_paper(conn, doi="10.1/x", doi_normalized="10.1/x")
@@ -182,6 +196,16 @@ def test_document_for_unknown_paper_is_rejected(conn: Connection) -> None:
         ({"original_filename": ""}, "ck_documents_original_filename_length"),
         ({"page_count": 0}, "ck_documents_page_count_positive"),
         ({"skipped_paragraphs": -1}, "ck_documents_skipped_not_negative"),
+        ({"joined_paragraphs": -1}, "ck_documents_joined_not_negative"),
+        ({"tei_storage_key": ""}, "ck_documents_tei_storage_key_not_empty"),
+        (
+            {
+                "status": "failed",
+                "failure_reason": "parser_error",
+                "failure_message": "x" * 1001,
+            },
+            "ck_documents_failure_message_length",
+        ),
     ],
 )
 def test_invalid_document_rows_are_rejected(

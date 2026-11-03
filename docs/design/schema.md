@@ -156,3 +156,23 @@ Nothing else until a query needs it.
 ## 9. Tests this design requires (P2-T5)
 
 Migration applies to an empty database; duplicate `sha256` rejected; two documents under one paper allowed; duplicate `doi_normalized` rejected while several `NULL` DOIs are accepted; foreign-key violation rejected; invalid `status`, `region` and `failure_reason` rejected; `failed` without reason and reason without `failed` rejected; `parsed` without paper or TEI key rejected; duplicate passage ordinal rejected; page 0 and `page_end < page_start` rejected; null page stored and read back as `NULL`; empty strings rejected; passage update rejected by the trigger; `section_path` generated correctly.
+
+## 10. As implemented (reference)
+
+Read from the development database on 2026-11-03 after migration `d2ea199dd3d3`, so the names below are the real ones. Every check, unique and foreign-key constraint has a failing-case test that asserts its name (`tests/integration/test_schema_constraints.py`; 38 of 38).
+
+| Table | Primary key | Unique | Foreign keys | Checks |
+|---|---|---|---|---|
+| `papers` | `pk_papers` | `uq_papers_doi_normalized` | — | 6: `ck_papers_abstract_not_empty`, `ck_papers_doi_normalized_format`, `ck_papers_doi_not_empty`, `ck_papers_doi_pair`, `ck_papers_metadata_source_valid`, `ck_papers_title_not_empty` |
+| `documents` | `pk_documents` | `uq_documents_sha256`, `uq_documents_storage_key`, `uq_documents_tei_storage_key` | `fk_documents_paper_id_papers` | 15: `ck_documents_failure_message_length`, `ck_documents_failure_message_only_when_failed`, `ck_documents_failure_reason_iff_failed`, `ck_documents_failure_reason_valid`, `ck_documents_joined_not_negative`, `ck_documents_original_filename_length`, `ck_documents_page_count_positive`, `ck_documents_parsed_is_complete`, `ck_documents_processing_has_start`, `ck_documents_sha256_format`, `ck_documents_size_positive`, `ck_documents_skipped_not_negative`, `ck_documents_status_valid`, `ck_documents_storage_key_not_empty`, `ck_documents_tei_storage_key_not_empty` |
+| `passages` | `pk_passages` | `uq_passages_document_id_ordinal` | `fk_passages_document_id_documents` | 10: `ck_passages_back_type_not_empty`, `ck_passages_back_type_only_for_back`, `ck_passages_ordinal_not_negative`, `ck_passages_page_order`, `ck_passages_page_start_positive`, `ck_passages_pages_both_or_neither`, `ck_passages_region_valid`, `ck_passages_section_number_not_empty`, `ck_passages_section_title_not_empty`, `ck_passages_text_not_empty` |
+
+Other objects: indexes `ix_documents_paper_id` and `ix_documents_processing` (partial, `status = 'processing'`); trigger `passages_immutable` with function `passages_forbid_update()`; Alembic's own `alembic_version` table. PostgreSQL 18 also records each `NOT NULL` column as a constraint; those follow the column tables above.
+
+**Where things live:** models `backend/app/models/` (allowed values in `constraints.py`); migration `backend/migrations/versions/d2ea199dd3d3_create_papers_documents_passages.py`; tests `tests/integration/test_schema_migration.py`, `tests/integration/test_schema_constraints.py`.
+
+**Inspect it yourself** (with the services running; verified in Windows PowerShell; uses the default user and database name `paperpilot` from `.env.example`, so change them if you changed those settings):
+
+```bash
+docker compose exec -T postgres psql -U paperpilot -d paperpilot -c '\d passages'
+```
