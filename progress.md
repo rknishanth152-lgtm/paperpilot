@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1, P3-T2 done). M1–M4 `completed` 2026-11-03. |
+| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T3 done). M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -65,6 +65,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Schema tests: `tests/integration/test_schema_migration.py` (2) and `test_schema_constraints.py` (51), on a throwaway database | Run and mutation-checked (see §7) | 2026-11-03 |
 | File storage: `backend/app/storage.py` (save/read/delete by generated key, local folder `data/storage`), 28 unit tests | Tests, mutation check, probe (see §7) | 2026-11-03 |
 | Upload validation: `backend/app/services/ingestion/validation.py` (empty, size, `%PDF-` signature by content; display-only filename), 34 unit tests | Tests, real-file run, mutation check (see §7) | 2026-11-03 |
+| GROBID client: `backend/app/services/ingestion/grobid.py` (fixed privacy-safe request, timeout and 503 retries from settings, failure-reason mapping), 30 unit and 4 integration tests | Stub server, real GROBID, mutation check (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -103,7 +104,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage) and P3-T2 (upload validation) `completed`; next **P3-T3**, the GROBID client. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation) and P3-T3 (GROBID client) `completed`; next **P3-T4**, TEI parsing (`parse_tei`). |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
 | Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
 
@@ -115,7 +116,7 @@ In dependency order (roadmap Phase 3).
 
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. Carried to P3-T8: the upload endpoint must read the request in bounded chunks and stop above `MAX_UPLOAD_MB`, so a huge upload is never held in memory.
-3. **P3-T3 to P3-T8:** GROBID client, TEI parsing (`parse_tei`), ingestion orchestration, duplicates and retries, startup recovery, HTTP API.
+3. ~~P3-T3~~ `completed`: `backend/app/services/ingestion/grobid.py`. Next **P3-T4** TEI parsing (`parse_tei`), then P3-T5 to P3-T8: ingestion orchestration, duplicates and retries, startup recovery, HTTP API.
 4. **P3-T9:** first frontend pages. Before it: P0-T8 (frontend toolchain check), and the colour theme is explained to the developer and agreed (`docs/design-system.md` §1).
 5. P0-T9 (CI) remains deferred.
 
@@ -350,5 +351,11 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P3-T2: real PDF headers checked (`%PDF-1.3`/`%PDF-1.4` for the 5 papers); `tests/unit/test_upload_validation.py` written first (collection error before the module existed), then `backend/app/services/ingestion/validation.py` (`validate_upload`, `display_filename`) | 34 passed |
 | 2026-11-03 | P3-T2: validator run on the 5 papers and the 11 Phase 1 failure inputs with the real 50 MB limit | Papers accepted with correct SHA-256. Rejected: text renamed `.pdf` (`not_pdf`), empty (`empty_file`), 64 MB (`file_too_large`). Accepted as designed, for GROBID to judge: corrupt, truncated, image-only, blank, long synthetic PDFs |
 | 2026-11-03 | P3-T2: mutation check, one at a time: trust filename instead of content; `>=` limit; keep path parts; keep control characters | 10, 1, 4 and 1 tests failed respectively; file restored; ruff, mypy (38 files) clean; all tests 174 passed. **P3-T2 `completed`** |
+
+| 2026-11-03 | P3-T3: `httpx` moved from dev to main dependencies (decided in §6.8 for the GROBID client); settings `GROBID_BUSY_RETRIES` (2) and `GROBID_BUSY_RETRY_SECONDS` (5) added with `.env.example` placeholders. The Starlette deprecation warning noted at P0-T6 concerns only the test client's use of httpx; httpx stays the GROBID client | Resolved; open note closed |
+| 2026-11-03 | P3-T3: `tests/unit/test_grobid_client.py` written first (collection error before the module existed), then `backend/app/services/ingestion/grobid.py` (`GrobidClient`, `ParserFailure`, fixed form fields) | 30 stub-server tests passed (request shape, consolidation off, 204/empty 200, each 500 code, other statuses, 503 retry and give-up, six transport errors, message without body) |
+| 2026-11-03 | P3-T3: `tests/integration/test_grobid_client.py` against the running GROBID (synthetic PDFs) | 4 passed: text page returns TEI; text bytes `unreadable_pdf`; blank page `no_text_layer`; closed port `parser_unreachable` |
+| 2026-11-03 | P3-T3: one-off run on the five papers through `GrobidClient.from_settings` | All returned TEI (57–297 KB, 1.8–13.6 s; first includes warm-up), no consolidation markers |
+| 2026-11-03 | P3-T3: mutation check, one at a time: consolidation on; no 503 retry; `NO_BLOCKS` unmapped; empty 200 accepted; disconnect mapped as unreachable; file restored (hash identical) | 2, 2, 1, 1, 2 tests failed respectively. ruff, mypy (41 files) clean; all tests 208 passed. **P3-T3 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

@@ -35,10 +35,14 @@ class Settings(BaseSettings):
     postgres_user: str = Field(default="paperpilot", min_length=1)
     postgres_password: SecretStr
 
-    # GROBID (NFR-REL-003). The timeout is a placeholder until parse times
-    # are measured in Phase 1.
+    # GROBID (NFR-REL-003). Phase 1 measured 1.4-11 s per paper; the timeout
+    # stays generous until larger papers are tried.
     grobid_url: HttpUrl = HttpUrl("http://127.0.0.1:8070")
     grobid_timeout_seconds: float = Field(default=120.0, gt=0)
+    # GROBID answers 503 when all its threads are busy; its docs advise
+    # retrying after 5-10 s (docs/experiments/grobid-feasibility.md §6).
+    grobid_busy_retries: int = Field(default=2, ge=0)
+    grobid_busy_retry_seconds: float = Field(default=5.0, ge=0)
 
     # Local file storage (AD-002). Relative paths are resolved against the
     # repository root; the default lives in the git-ignored data/ folder.
