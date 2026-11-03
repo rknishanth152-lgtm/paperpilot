@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Proposed 2026-11-03. Implemented by the first migration (P2-T3); not implemented yet. |
+| Status | Implemented 2026-11-03 by migration `d2ea199dd3d3` (P2-T3); models in `backend/app/models/`. Constraint tests follow in P2-T5. |
 | Tables | `papers`, `documents`, `passages` only (Phase 2 definition of done) |
 | Requirements | `DR-001`..`DR-009`, `FR-ING-001`..`FR-ING-010`, PRD §8.2 and §8.3, `NFR-MNT-002` |
 | Inputs | `docs/design/parser-output.md` (fields, regions, failure reasons) |
@@ -95,7 +95,7 @@ Immutable source text (`DR-002`, `DR-004`), one row per passage from `docs/desig
 |---|---|---|---|
 | `id` | `uuid` | no | PK, default `uuidv7()`; the identity used by citations and evidence |
 | `document_id` | `uuid` | no | FK → `documents.id`, `ON DELETE RESTRICT` |
-| `ordinal` | `integer` | no | `CHECK (ordinal >= 0)`; **unique per document** (`uq_passages_document_ordinal`) |
+| `ordinal` | `integer` | no | `CHECK (ordinal >= 0)`; **unique per document** (`uq_passages_document_id_ordinal`) |
 | `region` | `text` | no | `CHECK (region IN ('abstract','body','caption','back'))` |
 | `back_type` | `text` | yes | `CHECK (back_type IS NULL OR region = 'back')`; GROBID's type, stored as given |
 | `section_number` | `text` | yes | `CHECK (section_number <> '')` |

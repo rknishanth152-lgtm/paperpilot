@@ -79,7 +79,7 @@ Recorded so far (details in `README.md`): `docker compose up -d --wait`, `docker
 ## 7. Database and provenance rules
 
 - UUID primary keys; foreign keys everywhere a relationship exists; constraints that make repeat ingestion safe (unique file hash, unique normalised DOI when present, unique passage ordinal per document).
-- Passages are immutable once stored. Page and section are nullable; unknown is `null`, never `0` or an empty string (`DR-007`).
+- Passages are immutable once stored; a database trigger rejects any `UPDATE` on `passages` (migration `d2ea199dd3d3`, `docs/design/schema.md` §5). Page and section are nullable; unknown is `null`, never `0` or an empty string (`DR-007`).
 - Repeated ingestion follows PRD §8.3: identical file returns the existing document, no duplicate passages.
 - **Never silently destroy source documents or overwrite human corrections** (`DR-008`). A machine re-run must not remove confirmed or corrected data.
 - A schema change requires a migration **and** tests (constraint violations, repeat ingestion, rollback of failed work).

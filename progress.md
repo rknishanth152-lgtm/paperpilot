@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phase 0 complete. Local services, Python tooling, configuration module, backend skeleton (health endpoint) and test conventions exist; no feature code. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M4: Database schema and migrations (`in_progress`: P2-T1, P2-T2 done). M1, M2 and M3 `completed` 2026-11-03. |
+| Current milestone | M4: Database schema and migrations (`in_progress`: P2-T1 to P2-T3 done). M1, M2 and M3 `completed` 2026-11-03. |
 | Current phase | Phase 2, core persistence and provenance (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -60,6 +60,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | `docs/design/parser-output.md`: parser output contract (`ParsedDocument`, `ParsedPassage`), passage regions and rules, page rules, failure-reason mapping. Design only, not implemented | Rules checked against the five TEI outputs (see §7) | 2026-11-03 |
 | `docs/design/schema.md`: `papers`, `documents`, `passages` columns, constraints, failure reasons, indexes, immutability trigger. Design only, not implemented | Key PostgreSQL features checked live (see §7) | 2026-11-03 |
 | Database layer: `backend/app/database/` (engine, sessions), `backend/app/models/base.py` (naming convention), Alembic environment in `backend/migrations/` with settings in `pyproject.toml`; no tables yet; dependencies SQLAlchemy, Alembic, psycopg | Tests and Alembic commands (see §7) | 2026-11-03 |
+| Core schema in PostgreSQL: `papers`, `documents`, `passages` (migration `d2ea199dd3d3`, models in `backend/app/models/`), immutability trigger on `passages` | Applied, inspected, downgraded and re-applied (see §7) | 2026-11-03 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -98,7 +99,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 2 (M4): core persistence and provenance. P2-T1 (schema design note) and P2-T2 (database layer, Alembic) `completed`; next **P2-T3**, the first migration. |
+| Task | Phase 2 (M4): core persistence and provenance. P2-T1 (schema design note), P2-T2 (database layer, Alembic) and P2-T3 (first migration) `completed`; next **P2-T4**, DOI normalisation. |
 | Inputs | `docs/design/parser-output.md` (fields to store, passage regions, failure reasons), PRD §8, `DR-001`..`DR-009`, `FR-ING-008` |
 | Status | `in_progress`. Phase 0 and Phase 1 are `completed` (M1, M2, M3). |
 
@@ -110,7 +111,7 @@ In dependency order.
 
 1. ~~P2-T1~~ `completed`: `docs/design/schema.md`.
 2. ~~P2-T2~~ `completed`: database layer and Alembic environment.
-3. **P2-T3 to P2-T6:** first migration, DOI normalisation, constraint tests against PostgreSQL, schema documentation.
+3. ~~P2-T3~~ `completed` (migration `d2ea199dd3d3`). Next: **P2-T4** DOI normalisation, **P2-T5** constraint tests against PostgreSQL, **P2-T6** schema documentation.
 4. Deferred from Phase 0: P0-T8 (frontend toolchain check, before Phase 3) and P0-T9 (CI).
 
 ## 6. Decisions and blockers
@@ -319,5 +320,10 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P2-T2: `alembic init --template pyproject backend/migrations`; `env.py` takes the URL from the settings module (not `alembic.ini`); models `Base` with a constraint naming convention; `app/database` engine (lazy, `pool_pre_ping`) and `session_scope`/`get_session` | ruff and mypy (23 files) clean |
 | 2026-11-03 | P2-T2: tests: unit (naming convention; importing the app creates no engine, in a fresh interpreter); integration (psycopg 3 to PostgreSQL 18; a failed `session_scope` rolls back) | Default run 19 passed; `-m integration` 4 passed; combined 23 passed |
 | 2026-11-03 | P2-T2: `uv run alembic current`, `heads`, `check`, `upgrade head`, `upgrade head --sql` from the repository folder | All exit 0; `check`: "No new upgrade operations detected"; `upgrade head` created only the `alembic_version` table. From another folder Alembic cannot find its `pyproject.toml` settings (an Alembic limitation), so commands are documented as run from the repository folder. **P2-T2 `completed`** |
+
+| 2026-11-03 | P2-T3: ORM models `Paper`, `Document`, `Passage` (allowed values in `app/models/constraints.py`, used for the CHECK constraints); `alembic revision --autogenerate`, reviewed by hand against `docs/design/schema.md`; added the `passages_immutable` trigger; fixed the DOI check that the draft had written as `'10.%%'`; migration template updated to the project's ruff style | Migration `d2ea199dd3d3`; ruff and mypy clean (28 files) |
+| 2026-11-03 | P2-T3: `uv run alembic upgrade head`; `\d` on the three tables; `alembic check` | Applied. Tables, 31 CHECK constraints (6/15/10), unique constraints, indexes (including the partial `ix_documents_processing`), generated `section_path` and trigger as designed; DOI check stored as `LIKE '10.%'`; `check`: no differences between models and database |
+| 2026-11-03 | P2-T3: `alembic downgrade base`, then `upgrade head` and `check` again | Downgrade left only `alembic_version` and removed the trigger function; re-upgrade recreated everything; no differences |
+| 2026-11-03 | P2-T3: smoke test in a rolled-back transaction: insert paper, parsed document, passage; then an update, a duplicate hash, a failed document without reason | Valid chain inserted (`section_path` "3.1 Methods"); the three bad cases rejected by the trigger, `uq_documents_sha256` and `ck_documents_failure_reason_iff_failed`; nothing kept. All tests 23 passed. **P2-T3 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

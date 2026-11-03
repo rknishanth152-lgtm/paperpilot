@@ -1,5 +1,8 @@
-"""SQLAlchemy ORM models. Tables are added by migrations (P2-T3 onwards)."""
+"""SQLAlchemy ORM models. The schema itself is created by Alembic migrations."""
 
 from app.models.base import Base
+from app.models.document import Document
+from app.models.paper import Paper
+from app.models.passage import Passage
 
-__all__ = ["Base"]
+__all__ = ["Base", "Document", "Paper", "Passage"]
