@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Environment setup. Documentation reviewed and approved; no application code written. |
 | Overall status | `in_progress` (documentation only) |
 | Last updated | 2026-11-03 |
-| Current milestone | M2: Repository and development environment setup (`in_progress`: Docker verified, P0-T2 completed; next P0-T3). M1 `completed` 2026-11-03. |
+| Current milestone | M2: Repository and development environment setup (`in_progress`: P0-T2 and P0-T3 completed; next P0-T4). M1 `completed` 2026-11-03. |
 | Current phase | Phase 0 (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -51,6 +51,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Source transcripts: `transcripts/fullstack-rag.txt`, `transcripts/claude-code-rag.txt` | Same listing | 2026-11-03 |
 | Planning documents: `PRD.md`, `CLAUDE.md`, `progress.md`, `docs/implementation-roadmap.md` | Created in this session; consistency scripts run on drafts (see §7) | 2026-11-03 |
 | Git repository at `E:\dev\paperpilot` (branch `main`, first commit `e860441`), `.gitignore`, `.gitattributes`, `README.md` stub | `git check-ignore` tests and staged-content scan (see §7) | 2026-11-03 |
+| Local services: `compose.yaml` (PostgreSQL 18 with pgvector available, GROBID 0.9.1 CRF), `.env.example` (compose settings only), local `.env` with a generated password (not committed); README commands | Started, queried and restarted (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
 
@@ -90,14 +91,14 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Developer review of the four planning documents (roadmap P0-T1) |
 | Expected output | Review notes; `OQ-` triage (which questions block Phase 0/1); corrections to the PRD where the developer disagrees; decision on where the repository lives |
-| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). Next task: **P0-T3** (PostgreSQL and GROBID with Compose). |
+| Status | P0-T1 `completed` 2026-11-03. The developer reviewed the documents, approved the overall architecture and strategy, asked for two corrections (applied and checked, §6.7 rows 8–9), then asked Claude to settle the remaining open Phase 0 questions (§6.8). Docker Desktop and WSL2 were installed by the developer and verified the same day (§7). P0-T2 `completed` (commit `e860441`). P0-T3 `completed` (services verified). Next task: **P0-T4** (install uv and Python 3.14; record commands). |
 
 ## 5. Next actions
 
 In dependency order. The first technical task after documentation is the GROBID experiment; it is **not yet done**.
 
 1. ~~P0-T2~~ `completed` 2026-11-03 (commit `e860441`). Remote hosting (for example GitHub) is not set up and not required yet.
-2. **Bring up PostgreSQL and GROBID locally** with Compose using the images in §6.8, ports bound to 127.0.0.1; record the commands in `README.md` (P0-T3, `OQ-015`, `OQ-017`).
+2. ~~P0-T3~~ `completed` 2026-11-03: PostgreSQL and GROBID run with Compose; commands in `README.md`.
 3. **Install the chosen Python tooling** (P0-T4, decided in §6.8): uv, then a uv-managed Python 3.14 pinned in `.python-version`; confirm FastAPI and pydantic install on 3.14 (not yet verified) and record commands in `README.md`.
 4. **Phase 1 GROBID experiment** on 3–5 permitted papers, then inspection of the returned structure and failure behaviour, written up in `docs/experiments/grobid-feasibility.md` (P1-T1..T8).
 
@@ -113,7 +114,7 @@ In dependency order. The first technical task after documentation is the GROBID 
 |---|---|---|
 | OQ-017 | Resolved 2026-11-03 | Docker Desktop and WSL2 installed and verified (§7) | No Docker or WSL2; about 18 GB free on C: (checked 2026-11-03). Developer cannot free space on C: now; the repository moved to E:. Docker's data location still to be checked |
 | OQ-014 | Decided (§6.8) | Installation and FastAPI/pydantic 3.14 check pending (P0-T4) |
-| OQ-015 | Decided (§6.8) | Images confirmed from current docs 2026-11-03; first pull pending (P0-T3) |
+| OQ-015 | Resolved | Images pulled and running (§7) |
 | OQ-001, OQ-002, OQ-003, OQ-005, OQ-013, OQ-016 | Answered by Phase 1 | Do not decide earlier |
 | Others (`OQ-004`, `OQ-006`..`OQ-012`) | Later phases | See the PRD register |
 
@@ -216,5 +217,13 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P0-T2: `git add -A` (staged, **not committed**); staged-file summary; `git grep --cached` for API-key, token, private-key and database-URL patterns | 116 files staged; no PDF, `.env` or transcript staged. One match: `token: 'mock-token'` in a Playwright skill documentation example (not a secret). No credentials found |
 
 | 2026-11-03 | P0-T2 first commit: identity re-checked, staged set and secret scan re-run, `git commit`, then `git log` and `git ls-tree` | Commit `e860441` on `main`, author `rknishanth152-lgtm <rknishanth.152@gmail.com>`, 116 files; no PDF, `.env` or transcript in the commit. Secret-pattern hits were false positives ("task-based" in two documentation URLs). **P0-T2 `completed`** |
+
+| 2026-11-03 | P0-T3: pulled `pgvector/pgvector:0.8.7-pg18-trixie` and `grobid/grobid:0.9.1-crf`; inspected image config | Size on disk 652 MB and 1.72 GB (larger than the compressed sizes in the docs). PostgreSQL image: `PGDATA=/var/lib/postgresql/18/docker`, volume `/var/lib/postgresql`. GROBID image includes `curl`; no built-in health check |
+| 2026-11-03 | P0-T3: `docker compose config --quiet` (values not printed), then `docker compose up -d --wait` | Config valid (Compose v5.6.1). Both containers healthy after 22 s; ports `127.0.0.1:5432` and `127.0.0.1:8070` |
+| 2026-11-03 | P0-T3: GROBID `GET /api/isalive`, `/api/version`, `/api/health` from the host | `true` (200); version 0.9.1; ready, 12 CRF (wapiti) models loaded, 0 failed |
+| 2026-11-03 | P0-T3: PostgreSQL queries via `docker compose exec` | PostgreSQL 18.6; database and user `paperpilot`; `vector` 0.8.7 available, not installed; data directory `/var/lib/postgresql/18/docker` |
+| 2026-11-03 | P0-T3: exposure checks (`NFR-SEC-004`) | Listeners only on `127.0.0.1` for 5432 and 8070; admin port 8071 not published; connections to 5432 and 8070 on the Wi-Fi address refused |
+| 2026-11-03 | P0-T3: persistence check: created a marker table, `docker compose down`, `docker compose up -d --wait`, read it back, dropped it | Row present after restart; table dropped; both services healthy again |
+| 2026-11-03 | P0-T3: `docker stats --no-stream` at idle | GROBID about 3.16 GiB, PostgreSQL about 73 MiB, of 11.24 GiB available to Docker. **P0-T3 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

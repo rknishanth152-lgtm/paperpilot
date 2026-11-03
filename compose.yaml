@@ -1,0 +1,44 @@
+# Local development services for PaperPilot (AD-015).
+# The backend and frontend run on the host; only PostgreSQL and GROBID run here.
+# Ports are published on 127.0.0.1 only, never on the network (NFR-SEC-004, NFR-SEC-006).
+# Image choices and reasons: progress.md §6.8.
+
+name: paperpilot
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg18-trixie
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-paperpilot}
+      POSTGRES_USER: ${POSTGRES_USER:-paperpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (see .env.example)}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # PostgreSQL 18 images store data under /var/lib/postgresql/18/docker.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  grobid:
+    # CPU-only CRF image; the full deep-learning image is a Phase 1 option only.
+    image: grobid/grobid:0.9.1-crf
+    init: true
+    ulimits:
+      core: 0
+    ports:
+      - "127.0.0.1:${GROBID_PORT:-8070}:8070"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8070/api/isalive"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

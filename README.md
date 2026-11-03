@@ -2,7 +2,7 @@
 
 An evidence-first research intelligence and scientific-reproducibility platform. It turns academic papers into structured, searchable knowledge in which every derived statement links to a stored source passage.
 
-**Status:** Phase 0 (environment setup). No application code exists yet. What is actually done and verified is recorded in [`progress.md`](progress.md).
+**Status:** Phase 0 (environment setup); local services run. No application code exists yet. What is actually done and verified is recorded in [`progress.md`](progress.md).
 
 ## Documents
 
@@ -26,9 +26,44 @@ Verified on the developer's machine on 2026-11-03 (see `progress.md` §7):
 
 Python tooling (uv, Python 3.14) is decided but not yet installed (P0-T4).
 
-## Running the project
+## Local services (PostgreSQL and GROBID)
 
-Not available yet. Commands for starting PostgreSQL and GROBID (P0-T3), installing dependencies, running tests and running the application are added here when each one has been run and verified. Do not use commands that are not listed here.
+Defined in [`compose.yaml`](compose.yaml). Both are reachable from this computer only (`127.0.0.1`).
+
+| Service | Image | Address |
+|---|---|---|
+| PostgreSQL 18 (pgvector available, not enabled) | `pgvector/pgvector:0.8.7-pg18-trixie` | `127.0.0.1:5432` |
+| GROBID 0.9.1 (CPU, CRF models) | `grobid/grobid:0.9.1-crf` | `http://127.0.0.1:8070` |
+
+GROBID uses about 3 GB of memory while running.
+
+**First time:** create `.env` from `.env.example` and set `POSTGRES_PASSWORD` to a value of your own. `.env` is never committed.
+
+Run from the repository folder (verified 2026-11-03, see `progress.md` §7):
+
+```bash
+docker compose up -d --wait
+```
+
+```bash
+docker compose ps
+```
+
+```bash
+curl.exe http://127.0.0.1:8070/api/isalive
+```
+
+The last command prints `true` when GROBID is ready. In Windows PowerShell, type `curl.exe`, not `curl` (which is a different PowerShell command).
+
+Stop the services (database data is kept in the `paperpilot_postgres-data` volume):
+
+```bash
+docker compose down
+```
+
+## Running the application
+
+Not available yet. Commands for installing dependencies, running tests and running the application are added here when each one has been run and verified. Do not use commands that are not listed here.
 
 ## Important limits
 
