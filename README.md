@@ -137,6 +137,8 @@ The backend is a minimal skeleton: one health endpoint, no features yet. It read
 uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
+Run **one** server process (uvicorn's default; do not pass `--workers`). At startup the server marks every document still `processing` as `failed` with reason `interrupted`, because only a crash can leave one there; this assumes no other process is ingesting (`AD-010`). If PostgreSQL is unreachable, startup fails.
+
 Check it in another terminal; it prints `{"status":"ok"}`:
 
 ```bash

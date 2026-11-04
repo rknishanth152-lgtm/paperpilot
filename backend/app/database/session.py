@@ -26,14 +26,15 @@ def get_engine() -> Engine:
 
 
 @lru_cache
-def _session_factory() -> sessionmaker[Session]:
+def get_sessionmaker() -> sessionmaker[Session]:
+    """The application's session factory (services take it as a dependency)."""
     return sessionmaker(bind=get_engine(), expire_on_commit=False)
 
 
 @contextmanager
 def session_scope() -> Iterator[Session]:
     """One unit of work: commit on success, roll back on any error."""
-    session = _session_factory()()
+    session = get_sessionmaker()()
     try:
         yield session
         session.commit()

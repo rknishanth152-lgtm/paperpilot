@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T6 done). M1–M4 `completed` 2026-11-03. |
+| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T7 done). M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -68,6 +68,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | GROBID client: `backend/app/services/ingestion/grobid.py` (fixed privacy-safe request, timeout and 503 retries from settings, failure-reason mapping), 30 unit and 4 integration tests | Stub server, real GROBID, mutation check (see §7) | 2026-11-03 |
 | TEI parsing: `backend/app/services/ingestion/tei.py` (`parse_tei`: metadata, four passage regions, pages from coordinates, rules R1/R2, `malformed_tei`/`empty_parse`), 38 unit tests | Tests, real-paper counts, mutation check (see §7) | 2026-11-03 |
 | Ingestion pipeline: `backend/app/services/ingestion/pipeline.py` (register: store then create `pending`, cleanup on failure; process: `processing`, GROBID, store TEI, parse, one transaction for paper + passages + `parsed`; every expected failure `failed` with its reason; identical files return the existing document, also under concurrent uploads; `failed` documents can be retried; one `process` per document at a time), 24 integration tests | Tests, mutation check, real end-to-end run (see §7) | 2026-11-04 |
+| Startup recovery: `backend/app/services/ingestion/recovery.py` (`recover_interrupted`: every `processing` document becomes `failed`/`interrupted`, start time kept; run from the app lifespan; startup fails if the database is unreachable), 6 integration and 4 unit tests | Tests, real server run, mutation check (see §7) | 2026-11-04 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -106,7 +107,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline) and P3-T6 (duplicates, retries) `completed`; next **P3-T7**, startup recovery. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries) and P3-T7 (startup recovery) `completed`; next **P3-T8**, the HTTP API. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
 | Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
 
@@ -118,7 +119,7 @@ In dependency order (roadmap Phase 3).
 
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. Carried to P3-T8: the upload endpoint must read the request in bounded chunks and stop above `MAX_UPLOAD_MB`, so a huge upload is never held in memory.
-3. ~~P3-T3~~ to ~~P3-T6~~ `completed`. Next **P3-T7** startup recovery, then P3-T8 HTTP API (`register` tells it whether a document is new). TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). Known limit carried to P3-T7: a database failure in the final ingestion transaction leaves the document `processing` until recovery marks it `interrupted`.
+3. ~~P3-T3~~ to ~~P3-T7~~ `completed`. Next **P3-T8** HTTP API: upload (read in bounded chunks, stop above `MAX_UPLOAD_MB`; `register` tells it whether a document is new), status, structure view, structured errors. TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). A database failure in the final ingestion transaction leaves the document `processing` until the next startup marks it `interrupted` (P3-T7). Recovery assumes one server process; FR-ING-010's timeout alternative is not built (it needs a periodic job). Only WARNING-level log lines are visible under uvicorn's default logging (the per-document `interrupted` line shows; the `recovered=N` INFO summary does not); logging configuration is not yet set up.
 4. **P3-T9:** first frontend pages. Before it: P0-T8 (frontend toolchain check), and the colour theme is explained to the developer and agreed (`docs/design-system.md` §1).
 5. P0-T9 (CI) remains deferred.
 
@@ -376,5 +377,9 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-04 | P3-T6: mutation check, round 1 (five changes) | Caught: no retries, failure kept on retry, no row lock (5/5 runs). **Survived:** removing the race fallback (0/5 runs: the concurrent test never actually raced) and removing the up-front hash lookup (the fallback still gave the right result) |
 | 2026-11-04 | P3-T6: tests strengthened: a storage wrapper holds every upload at a barrier between the hash lookup and the insert, forcing the race; PDF saves are counted so a duplicate is proven to store nothing | Round 2: both previously surviving changes caught in 5/5 runs; file restored (hash identical) |
 | 2026-11-04 | P3-T6: concurrency and duplicate tests run 10 times; ruff, mypy (46 files), all tests | 10/10 passed; clean; 270 passed. **P3-T6 `completed`** |
+| 2026-11-04 | P3-T7: tests written first: `processing` becomes `failed`/`interrupted` with message, start time kept; other statuses untouched; several documents; idempotent; nothing to recover; a recovered document can be retried to `parsed`. Startup tests: recovery runs once; startup fails if recovery raises | 12 passed after one test-helper bug was fixed (duplicate `storage_key` keyword) |
+| 2026-11-04 | P3-T7: real server on a throwaway database (`paperpilot_recovery_check`) with one stale `processing` row and one `pending` row; `uvicorn` started, `/health` checked, stopped; database dropped | Health 200; log line `ingestion document_id=... status=failed reason=interrupted`; stale row `failed`/`interrupted` with message and start time; `pending` row unchanged |
+| 2026-11-04 | P3-T7: mutation check (recover every non-parsed status; drop the reason; set `pending`; remove the startup call) | All four caught (2, 5, 5, 2 failures); files restored |
+| 2026-11-04 | P3-T7: ruff check, ruff format --check, mypy (48 files), all tests | Clean; 278 passed. **P3-T7 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
