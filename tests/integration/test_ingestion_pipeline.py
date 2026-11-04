@@ -6,8 +6,10 @@ FR-ING-002, FR-ING-003, FR-ING-005, FR-ING-006, FR-ING-007, PRD §8.3.
 """
 
 import hashlib
+import threading
 import uuid
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +26,7 @@ from app.services.ingestion.pipeline import (
     Ingestion,
 )
 from app.services.ingestion.tei import ParsedDocument, ParsedPassage
-from app.services.ingestion.validation import validate_upload
+from app.services.ingestion.validation import ValidatedUpload, validate_upload
 from app.storage import LocalStorage, StorageError
 
 PDF = b"%PDF-1.4 synthetic test document"
@@ -55,6 +57,29 @@ class TeiStorageFails(LocalStorage):
     def save(self, data: bytes, *, kind: str) -> str:
         if kind == "tei":
             raise StorageError("file could not be stored (OSError)")
+        return super().save(data, kind=kind)
+
+
+class CountingStorage(LocalStorage):
+    """Counts PDF saves; optionally holds every saver at a barrier.
+
+    The barrier sits between the hash lookup and the insert in `register`, so
+    all concurrent uploads have looked up and found nothing before any of them
+    inserts: the race is forced instead of left to timing.
+    """
+
+    def __init__(self, root: Path, barrier: threading.Barrier | None = None) -> None:
+        super().__init__(root)
+        self.pdf_saves = 0
+        self._barrier = barrier
+        self._lock = threading.Lock()
+
+    def save(self, data: bytes, *, kind: str) -> str:
+        if kind == "pdf":
+            with self._lock:
+                self.pdf_saves += 1
+            if self._barrier is not None:
+                self._barrier.wait()
         return super().save(data, kind=kind)
 
 
@@ -121,8 +146,10 @@ GOOD_TEI = tei(
 def test_register_stores_the_file_and_creates_a_pending_document(
     sessions: sessionmaker[Session], storage: LocalStorage
 ) -> None:
-    document_id = ingestion(sessions, storage, FakeParser()).register(
-        upload(name="My Paper.pdf")
+    document_id = (
+        ingestion(sessions, storage, FakeParser())
+        .register(upload(name="My Paper.pdf"))
+        .document_id
     )
 
     document = get_document(sessions, document_id)
@@ -137,15 +164,19 @@ def test_register_stores_the_file_and_creates_a_pending_document(
 def test_failed_register_leaves_no_stored_file(
     sessions: sessionmaker[Session], storage: LocalStorage, tmp_path: Path
 ) -> None:
-    pipeline = ingestion(sessions, storage, FakeParser())
-    pipeline.register(upload())
-    files_before = sorted((tmp_path / "storage").rglob("*.pdf"))
+    """If the document row cannot be created, the stored file is removed."""
+    invalid = ValidatedUpload(
+        content=PDF,
+        sha256=hashlib.sha256(PDF).hexdigest(),
+        size_bytes=0,
+        original_filename=None,
+    )  # size 0 violates ck_documents_size_positive
 
-    with pytest.raises(IntegrityError):  # same hash; duplicate handling is P3-T6
-        pipeline.register(upload())
+    with pytest.raises(IntegrityError):
+        ingestion(sessions, storage, FakeParser()).register(invalid)
 
-    assert sorted((tmp_path / "storage").rglob("*.pdf")) == files_before
-    assert count(sessions, Document) == 1
+    assert list((tmp_path / "storage").rglob("*.pdf")) == []
+    assert count(sessions, Document) == 0
 
 
 # --- process: success ------------------------------------------------------------------
@@ -156,7 +187,7 @@ def test_process_parses_and_stores_paper_passages_and_provenance(
 ) -> None:
     parser = FakeParser(GOOD_TEI)
     pipeline = ingestion(sessions, storage, parser)
-    document_id = pipeline.register(upload())
+    document_id = pipeline.register(upload()).document_id
 
     assert pipeline.process(document_id) == "parsed"
 
@@ -201,12 +232,12 @@ def test_same_doi_attaches_to_the_existing_paper_without_overwriting(
     sessions: sessionmaker[Session], storage: LocalStorage
 ) -> None:
     first = ingestion(sessions, storage, FakeParser(GOOD_TEI))
-    first_id = first.register(upload(PDF + b" v1"))
+    first_id = first.register(upload(PDF + b" v1")).document_id
     first.process(first_id)
 
     renamed = GOOD_TEI.replace(b"A Synthetic Paper", b"A Different Title")
     second = ingestion(sessions, storage, FakeParser(renamed))
-    second_id = second.register(upload(PDF + b" v2"))
+    second_id = second.register(upload(PDF + b" v2")).document_id
     second.process(second_id)
 
     assert (
@@ -224,7 +255,7 @@ def test_documents_without_doi_get_separate_papers(
     no_doi = tei(body=BODY)
     for content in (PDF + b" a", PDF + b" b"):
         pipeline = ingestion(sessions, storage, FakeParser(no_doi))
-        pipeline.process(pipeline.register(upload(content)))
+        pipeline.process(pipeline.register(upload(content)).document_id)
 
     assert count(sessions, Paper) == 2
     with sessions() as session:
@@ -239,7 +270,7 @@ def test_value_that_is_not_a_doi_is_stored_as_no_doi(
         storage,
         FakeParser(tei(header='<idno type="DOI">not a doi</idno>', body=BODY)),
     )
-    document_id = pipeline.register(upload())
+    document_id = pipeline.register(upload()).document_id
 
     assert pipeline.process(document_id) == "parsed"
     with sessions() as session:
@@ -267,7 +298,7 @@ def test_parser_failure_marks_the_document_failed(
     pipeline = ingestion(
         sessions, storage, FakeParser(failure=ParserFailure(reason, "msg"))
     )
-    document_id = pipeline.register(upload())
+    document_id = pipeline.register(upload()).document_id
 
     assert pipeline.process(document_id) == "failed"
 
@@ -297,7 +328,7 @@ def test_unusable_tei_marks_the_document_failed_and_keeps_the_tei(
     reason: str,
 ) -> None:
     pipeline = ingestion(sessions, storage, FakeParser(tei_bytes))
-    document_id = pipeline.register(upload())
+    document_id = pipeline.register(upload()).document_id
 
     assert pipeline.process(document_id) == "failed"
 
@@ -314,7 +345,7 @@ def test_tei_that_cannot_be_stored_is_a_storage_error(
 ) -> None:
     storage = TeiStorageFails(tmp_path / "storage")
     pipeline = ingestion(sessions, storage, FakeParser(GOOD_TEI))
-    document_id = pipeline.register(upload())
+    document_id = pipeline.register(upload()).document_id
 
     assert pipeline.process(document_id) == "failed"
     assert get_document(sessions, document_id).failure_reason == "storage_error"
@@ -337,7 +368,7 @@ def test_failure_in_the_final_transaction_stores_nothing(
     pipeline = ingestion(
         sessions, storage, FakeParser(GOOD_TEI), parse_with_an_invalid_passage
     )
-    document_id = pipeline.register(upload())
+    document_id = pipeline.register(upload()).document_id
 
     with pytest.raises(IntegrityError):
         pipeline.process(document_id)
@@ -355,7 +386,7 @@ def test_only_a_pending_document_can_be_processed(
     sessions: sessionmaker[Session], storage: LocalStorage
 ) -> None:
     pipeline = ingestion(sessions, storage, FakeParser(GOOD_TEI))
-    document_id = pipeline.register(upload())
+    document_id = pipeline.register(upload()).document_id
     pipeline.process(document_id)
 
     with pytest.raises(DocumentStateError):
@@ -367,3 +398,136 @@ def test_unknown_document_is_an_error(
 ) -> None:
     with pytest.raises(DocumentStateError):
         ingestion(sessions, storage, FakeParser()).process(uuid.uuid4())
+
+
+# --- duplicates (P3-T6, FR-ING-008, AC-VS-04) ------------------------------------------
+
+
+def stored_pdfs(tmp_path: Path) -> list[Path]:
+    return sorted((tmp_path / "storage").rglob("*.pdf"))
+
+
+def test_identical_file_returns_the_existing_document_without_a_second_copy(
+    sessions: sessionmaker[Session], tmp_path: Path
+) -> None:
+    storage = CountingStorage(tmp_path / "storage")
+    pipeline = ingestion(sessions, storage, FakeParser())
+
+    first = pipeline.register(upload(name="a.pdf"))
+    second = pipeline.register(upload(name="renamed copy.pdf"))
+
+    assert first.created is True
+    assert second.created is False
+    assert second.document_id == first.document_id
+    assert count(sessions, Document) == 1
+    assert len(stored_pdfs(tmp_path)) == 1
+    assert storage.pdf_saves == 1  # the duplicate was recognised before storing
+    assert get_document(sessions, first.document_id).original_filename == "a.pdf"
+
+
+def test_same_file_twice_gives_one_document_and_one_passage_set(
+    sessions: sessionmaker[Session], storage: LocalStorage
+) -> None:
+    """AC-VS-04."""
+    pipeline = ingestion(sessions, storage, FakeParser(GOOD_TEI))
+    first = pipeline.register(upload())
+    pipeline.process(first.document_id)
+
+    again = pipeline.register(upload())
+
+    assert again.document_id == first.document_id
+    assert again.created is False
+    assert count(sessions, Document) == 1
+    assert len(passages_of(sessions, first.document_id)) == 5
+    assert count(sessions, Passage) == 5
+
+
+def test_concurrent_identical_uploads_create_one_document(
+    sessions: sessionmaker[Session], tmp_path: Path
+) -> None:
+    uploads = 6
+    storage = CountingStorage(tmp_path / "storage", barrier=threading.Barrier(uploads))
+    pipeline = ingestion(sessions, storage, FakeParser())
+
+    with ThreadPoolExecutor(max_workers=uploads) as pool:
+        results = list(pool.map(lambda _: pipeline.register(upload()), range(uploads)))
+
+    assert storage.pdf_saves == uploads  # every upload really raced to the insert
+    assert len({r.document_id for r in results}) == 1
+    assert sum(r.created for r in results) == 1
+    assert count(sessions, Document) == 1
+    assert len(stored_pdfs(tmp_path)) == 1  # losers removed their copies
+
+
+# --- retries (P3-T6) ---------------------------------------------------------------------
+
+
+def test_failed_document_can_be_retried_and_then_parses(
+    sessions: sessionmaker[Session], storage: LocalStorage
+) -> None:
+    parser = FakeParser(failure=ParserFailure("parser_unreachable", "refused"))
+    pipeline = ingestion(sessions, storage, parser)
+    document_id = pipeline.register(upload()).document_id
+    assert pipeline.process(document_id) == "failed"
+
+    parser.failure = None
+    parser.tei_bytes = GOOD_TEI
+    assert pipeline.process(document_id) == "parsed"
+
+    document = get_document(sessions, document_id)
+    assert (document.failure_reason, document.failure_message) == (None, None)
+    assert len(passages_of(sessions, document_id)) == 5
+    assert parser.received == [PDF, PDF]
+
+
+def test_retry_after_malformed_tei_replaces_the_tei_key(
+    sessions: sessionmaker[Session], storage: LocalStorage
+) -> None:
+    parser = FakeParser(b"<not xml")
+    pipeline = ingestion(sessions, storage, parser)
+    document_id = pipeline.register(upload()).document_id
+    pipeline.process(document_id)
+    failed_key = get_document(sessions, document_id).tei_storage_key
+
+    parser.tei_bytes = GOOD_TEI
+    pipeline.process(document_id)
+
+    new_key = get_document(sessions, document_id).tei_storage_key
+    assert new_key is not None and new_key != failed_key
+    assert storage.read(new_key) == GOOD_TEI
+
+
+@pytest.mark.parametrize("final_status", ["parsed"])
+def test_parsed_document_cannot_be_processed_again(
+    sessions: sessionmaker[Session], storage: LocalStorage, final_status: str
+) -> None:
+    pipeline = ingestion(sessions, storage, FakeParser(GOOD_TEI))
+    document_id = pipeline.register(upload()).document_id
+    assert pipeline.process(document_id) == final_status
+
+    with pytest.raises(DocumentStateError):
+        pipeline.process(document_id)
+    assert len(passages_of(sessions, document_id)) == 5
+
+
+def test_concurrent_processing_of_one_document_runs_once(
+    sessions: sessionmaker[Session], storage: LocalStorage
+) -> None:
+    parser = FakeParser(GOOD_TEI)
+    pipeline = ingestion(sessions, storage, parser)
+    document_id = pipeline.register(upload()).document_id
+    start = threading.Barrier(4)
+
+    def process_at_once() -> str:
+        start.wait()
+        try:
+            return pipeline.process(document_id)
+        except DocumentStateError:
+            return "refused"
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        outcomes = sorted(pool.map(lambda _: process_at_once(), range(4)))
+
+    assert outcomes == ["parsed", "refused", "refused", "refused"]
+    assert len(parser.received) == 1
+    assert len(passages_of(sessions, document_id)) == 5
