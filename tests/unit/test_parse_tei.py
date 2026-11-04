@@ -5,54 +5,9 @@ Fixtures are small synthetic TEI documents shaped like GROBID 0.9.1 output
 """
 
 import pytest
+from tests.synthetic import BODY, p, section, tei
 
 from app.services.ingestion.tei import ParsedDocument, ParseError, parse_tei
-
-NS = "http://www.tei-c.org/ns/1.0"
-
-
-def tei(
-    *,
-    header: str = "",
-    abstract: str = "",
-    body: str = "",
-    back: str = "",
-    pages: int = 2,
-    version: str = "0.9.1",
-) -> bytes:
-    surfaces = "".join(
-        f'<surface n="{n}" ulx="0" uly="0" lrx="612" lry="792"/>'
-        for n in range(1, pages + 1)
-    )
-    return f"""<?xml version="1.0" encoding="UTF-8"?>
-<TEI xmlns="{NS}">
-  <teiHeader>
-    <fileDesc>
-      <titleStmt><title level="a" type="main">A Synthetic Paper</title></titleStmt>
-      <sourceDesc><biblStruct><analytic>
-        <author><persName><forename type="first">Ada</forename><forename type="middle">B</forename><surname>Example</surname></persName></author>
-        <author><persName><forename type="first">Ben</forename><surname>Sample</surname></persName></author>
-      </analytic>{header}</biblStruct></sourceDesc>
-    </fileDesc>
-    <encodingDesc><appInfo><application version="{version}" ident="GROBID"/></appInfo></encodingDesc>
-    <profileDesc><abstract>{abstract}</abstract></profileDesc>
-  </teiHeader>
-  <facsimile>{surfaces}</facsimile>
-  <text><body>{body}</body><back>{back}</back></text>
-</TEI>""".encode()
-
-
-def p(text: str, coords: str | None = "1,10,10,100,10") -> str:
-    attr = f' coords="{coords}"' if coords else ""
-    return f"<p{attr}>{text}</p>"
-
-
-def section(title: str, *paragraphs: str, n: str | None = None) -> str:
-    number = f' n="{n}"' if n else ""
-    return f"<div><head{number}>{title}</head>{''.join(paragraphs)}</div>"
-
-
-BODY = section("Introduction", p("A synthetic sentence."), n="1")
 
 
 def parse(**kwargs: object) -> ParsedDocument:

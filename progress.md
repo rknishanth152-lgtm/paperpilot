@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T4 done). M1–M4 `completed` 2026-11-03. |
+| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T5 done). M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -67,6 +67,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Upload validation: `backend/app/services/ingestion/validation.py` (empty, size, `%PDF-` signature by content; display-only filename), 34 unit tests | Tests, real-file run, mutation check (see §7) | 2026-11-03 |
 | GROBID client: `backend/app/services/ingestion/grobid.py` (fixed privacy-safe request, timeout and 503 retries from settings, failure-reason mapping), 30 unit and 4 integration tests | Stub server, real GROBID, mutation check (see §7) | 2026-11-03 |
 | TEI parsing: `backend/app/services/ingestion/tei.py` (`parse_tei`: metadata, four passage regions, pages from coordinates, rules R1/R2, `malformed_tei`/`empty_parse`), 38 unit tests | Tests, real-paper counts, mutation check (see §7) | 2026-11-03 |
+| Ingestion pipeline: `backend/app/services/ingestion/pipeline.py` (register: store then create `pending`, cleanup on failure; process: `processing`, GROBID, store TEI, parse, one transaction for paper + passages + `parsed`; every expected failure `failed` with its reason), 17 integration tests | Tests, mutation check, real end-to-end run (see §7) | 2026-11-04 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -105,7 +106,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client) and P3-T4 (TEI parsing) `completed`; next **P3-T5**, ingestion orchestration. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing) and P3-T5 (ingestion pipeline) `completed`; next **P3-T6**, duplicates and retries. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
 | Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
 
@@ -117,7 +118,7 @@ In dependency order (roadmap Phase 3).
 
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. Carried to P3-T8: the upload endpoint must read the request in bounded chunks and stop above `MAX_UPLOAD_MB`, so a huge upload is never held in memory.
-3. ~~P3-T3~~ and ~~P3-T4~~ `completed`. Next **P3-T5** ingestion orchestration, then P3-T6 to P3-T8: duplicates and retries, startup recovery, HTTP API.
+3. ~~P3-T3~~ to ~~P3-T5~~ `completed`. Next **P3-T6** duplicates and retries (identical file returns the existing document; failed documents can be retried), then P3-T7 startup recovery and P3-T8 HTTP API. Known limit carried to P3-T7: a database failure in the final ingestion transaction leaves the document `processing` until recovery marks it `interrupted`.
 4. **P3-T9:** first frontend pages. Before it: P0-T8 (frontend toolchain check), and the colour theme is explained to the developer and agreed (`docs/design-system.md` §1).
 5. P0-T9 (CI) remains deferred.
 
@@ -363,5 +364,12 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-03 | P3-T4: `tests/unit/test_parse_tei.py` written first (collection error before the module existed), then `backend/app/services/ingestion/tei.py` (`parse_tei`) | 33 of 34 passed; the failure was a test that could not fail (its text had letters); test corrected; 34 passed |
 | 2026-11-03 | P3-T4: `parse_tei` on the five papers, from the Phase 1 TEI and from fresh client TEI | Both: 324 passages (abstract 9, body 239, caption 37, back 39), 1 join, 2 skipped, none without pages: exactly the P1-T7 counts. Passages and metadata identical between the two TEI sources; DOIs normalise to the verified values |
 | 2026-11-03 | P3-T4: mutation check, seven changes one at a time | First round: four caught, three survived (R1 not reset after a figure; references section not excluded; DOCTYPE guard), showing test gaps. Added three tests; each surviving change is now caught. 38 parser tests; ruff, mypy (43 files) clean; all tests 246 passed. **P3-T4 `completed`** |
+
+| 2026-11-04 | P3-T5: Docker Desktop was not running (after a restart); integration fixtures failed loudly as designed; Docker Desktop started, services healthy | 246 tests passed again |
+| 2026-11-04 | P3-T5: synthetic builders moved to `tests/synthetic.py` (TEI, tiny PDFs) and reused | All tests still passed |
+| 2026-11-04 | P3-T5: `tests/integration/test_ingestion_pipeline.py` written first (collection error before the module existed), then `backend/app/services/ingestion/pipeline.py` (`Ingestion.register`, `Ingestion.process`) | 15 of 17 passed; both failures traced to an invalid synthetic DOI in the test (`10.1/ABC`, correctly treated as no DOI); fixture corrected to `10.1234/ABC`; 17 passed |
+| 2026-11-04 | P3-T5: mutation check, one at a time: no file cleanup on failed register; no same-DOI lookup; TEI key dropped on failure; non-pending allowed | 1, 1, 2, 1 tests failed respectively; file restored |
+| 2026-11-04 | P3-T5: end-to-end on the five papers: validation, storage, real GROBID, `parse_tei`, PostgreSQL, in a throwaway database (dropped afterwards) | 5 parsed, 5 papers, 324 passages (abstract 9, body 239, caption 37, back 39), none without pages, 2 skipped, 1 joined, parser `grobid 0.9.1`, stored hash = recorded hash = file hash. Development database untouched (0 documents) |
+| 2026-11-04 | P3-T5: ruff, mypy (46 files), all tests | Clean; 263 passed. **P3-T5 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

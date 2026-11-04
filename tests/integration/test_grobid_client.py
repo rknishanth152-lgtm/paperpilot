@@ -1,49 +1,16 @@
 """The GROBID client against the real local GROBID (P3-T3).
 
-Inputs are tiny synthetic PDFs built here; no paper content is used.
+Inputs are tiny synthetic PDFs (tests/synthetic.py); no paper content is used.
 """
 
 import pytest
+from tests.synthetic import BLANK_PAGE_PDF as BLANK_PAGE
+from tests.synthetic import TEXT_PAGE_PDF as TEXT_PAGE
 
 from app.config import Settings
 from app.services.ingestion.grobid import GrobidClient, ParserFailure
 
 TEI_NAMESPACE = b"http://www.tei-c.org/ns/1.0"
-
-
-def tiny_pdf(page_content: bytes) -> bytes:
-    """A valid one-page PDF with Helvetica and the given content stream."""
-    objects = [
-        b"<< /Type /Catalog /Pages 2 0 R >>",
-        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        (
-            b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
-            b"/Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>"
-        ),
-        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-        b"<< /Length %d >>\nstream\n" % len(page_content)
-        + page_content
-        + b"\nendstream",
-    ]
-    out = bytearray(b"%PDF-1.4\n")
-    offsets = []
-    for number, body in enumerate(objects, start=1):
-        offsets.append(len(out))
-        out += b"%d 0 obj\n" % number + body + b"\nendobj\n"
-    xref = len(out)
-    out += b"xref\n0 %d\n0000000000 65535 f \n" % (len(objects) + 1)
-    out += b"".join(b"%010d 00000 n \n" % o for o in offsets)
-    out += b"trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n" % (
-        len(objects) + 1,
-        xref,
-    )
-    return bytes(out)
-
-
-TEXT_PAGE = tiny_pdf(
-    b"BT /F1 12 Tf 72 720 Td (A synthetic sentence for the parser test.) Tj ET"
-)
-BLANK_PAGE = tiny_pdf(b"")
 
 
 @pytest.fixture

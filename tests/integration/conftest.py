@@ -16,6 +16,7 @@ from alembic import command
 from alembic.config import Config
 from sqlalchemy import Connection, Engine, create_engine, text
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import REPO_ROOT, Settings, get_settings
 from app.database import get_engine
@@ -119,3 +120,15 @@ def conn(schema_engine: Engine) -> Iterator[Connection]:
             yield connection
         finally:
             transaction.rollback()
+
+
+@pytest.fixture
+def sessions(schema_engine: Engine) -> Iterator[sessionmaker[Session]]:
+    """Sessions on the throwaway database for code that commits its own work.
+
+    Tables are emptied after each test. TRUNCATE does not fire the passage
+    UPDATE trigger, so immutability is unaffected.
+    """
+    yield sessionmaker(bind=schema_engine, expire_on_commit=False)
+    with schema_engine.begin() as connection:
+        connection.execute(text("TRUNCATE passages, documents, papers"))
