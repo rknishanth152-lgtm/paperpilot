@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.7 (Phase 1 decision on GROBID, 2026-11-03; see `progress.md` §6.9) |
+| Version | 0.8 (P3-T8 upload format, 2026-11-04; see `progress.md` §6.10) |
 | Date | 2026-11-03 |
 | Status | Planning. No application code exists yet (see `progress.md`). |
 | Companion documents | `CLAUDE.md` (development rules), `progress.md` (actual state), `docs/implementation-roadmap.md` (sequence and exit criteria) |
@@ -185,7 +185,7 @@ Basis column: **[P]** project direction, **[E]** engineering recommendation, **[
 
 | ID | Requirement (what / why) | Input → Output | Failure cases | Acceptance criteria | Scope · Phase · Depends |
 |---|---|---|---|---|---|
-| FR-ING-001 | Accept one PDF upload and validate it before storing, to avoid processing non-PDFs or oversized files. | multipart file → `document_id` and `pending` status | Not a PDF; wrong magic bytes; empty file; over size limit; filename with path characters | A text file renamed `.pdf` is rejected. A file over the limit is rejected. Valid PDF returns a `document_id`. The client filename is never used as a path. | VS-1 · P3 · FR-ING-002 |
+| FR-ING-001 | Accept one PDF upload and validate it before storing, to avoid processing non-PDFs or oversized files. | PDF bytes as the request body (decided P3-T8) → `document_id` and `pending` status | Not a PDF; wrong magic bytes; empty file; over size limit; filename with path characters | A text file renamed `.pdf` is rejected. A file over the limit is rejected. Valid PDF returns a `document_id`. The client filename is never used as a path. | VS-1 · P3 · FR-ING-002 |
 | FR-ING-002 | Store the original file unmodified through the storage interface under a generated key, and record its SHA-256, to allow duplicate detection and re-processing. | validated bytes → `storage_key`, `sha256`, `size_bytes` | Disk write failure; storage key collision | Stored bytes hash equals recorded hash. A write failure leaves no `document` row claiming success. | VS-1 · P3 |
 | FR-ING-003 | Track processing status with explicit values `pending`, `processing`, `parsed`, `failed` and a `failure_reason` code, so failures are never shown as success. | document → status (reason codes: `docs/design/parser-output.md` §7) | Parser unreachable; parser timeout; HTTP 204 (no content) or 503 from GROBID; empty or unusable parse (no body passages); likely scanned PDF; malformed TEI | Each failure above produces `failed` with a distinct reason code, no passages, and a retrievable error message. A `parsed` document has at least one passage. | VS-1 · P3 · FR-ING-004 |
 | FR-ING-004 | Send the PDF to GROBID's full-text processing endpoint and record parser name and version/configuration with the document. Endpoint and options to be verified against current GROBID docs (`OQ-015`). | stored PDF → TEI/XML | Connection refused; timeout; non-200 status; invalid XML | Integration test against a running GROBID returns parseable TEI for a sample paper. Simulated GROBID failures map to documented reason codes. | VS-1 · P3 · P1 findings |

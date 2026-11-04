@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T7 done). M1–M4 `completed` 2026-11-03. |
+| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T8 done). M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -69,6 +69,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | TEI parsing: `backend/app/services/ingestion/tei.py` (`parse_tei`: metadata, four passage regions, pages from coordinates, rules R1/R2, `malformed_tei`/`empty_parse`), 38 unit tests | Tests, real-paper counts, mutation check (see §7) | 2026-11-03 |
 | Ingestion pipeline: `backend/app/services/ingestion/pipeline.py` (register: store then create `pending`, cleanup on failure; process: `processing`, GROBID, store TEI, parse, one transaction for paper + passages + `parsed`; every expected failure `failed` with its reason; identical files return the existing document, also under concurrent uploads; `failed` documents can be retried; one `process` per document at a time), 24 integration tests | Tests, mutation check, real end-to-end run (see §7) | 2026-11-04 |
 | Startup recovery: `backend/app/services/ingestion/recovery.py` (`recover_interrupted`: every `processing` document becomes `failed`/`interrupted`, start time kept; run from the app lifespan; startup fails if the database is unreachable), 6 integration and 4 unit tests | Tests, real server run, mutation check (see §7) | 2026-11-04 |
+| Document API: `backend/app/api/documents.py` (upload as raw body with bounded reading, status, structure, retry; processing as a background task), `api/errors.py` (one error envelope, no internals), `schemas/documents.py`, read service `services/ingestion/documents.py`, `explanations.py`; 27 integration and 5 unit tests | Tests, mutation check, real server with GROBID (see §7) | 2026-11-04 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -107,7 +108,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries) and P3-T7 (startup recovery) `completed`; next **P3-T8**, the HTTP API. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery) and P3-T8 (HTTP API) `completed`; next **P3-T9**, the first frontend pages. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
 | Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
 
@@ -118,8 +119,8 @@ Summary of what is done (details in §3, §6 and §7): planning documents review
 In dependency order (roadmap Phase 3).
 
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
-2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. Carried to P3-T8: the upload endpoint must read the request in bounded chunks and stop above `MAX_UPLOAD_MB`, so a huge upload is never held in memory.
-3. ~~P3-T3~~ to ~~P3-T7~~ `completed`. Next **P3-T8** HTTP API: upload (read in bounded chunks, stop above `MAX_UPLOAD_MB`; `register` tells it whether a document is new), status, structure view, structured errors. TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). A database failure in the final ingestion transaction leaves the document `processing` until the next startup marks it `interrupted` (P3-T7). Recovery assumes one server process; FR-ING-010's timeout alternative is not built (it needs a periodic job). Only WARNING-level log lines are visible under uvicorn's default logging (the per-document `interrupted` line shows; the `recovered=N` INFO summary does not); logging configuration is not yet set up.
+2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. The bounded reading carried from here was done in P3-T8.
+3. ~~P3-T3~~ to ~~P3-T8~~ `completed`. TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). A database failure in the final ingestion transaction leaves the document `processing` until the next startup marks it `interrupted` (P3-T7). Recovery assumes one server process; FR-ING-010's timeout alternative is not built (it needs a periodic job). Only WARNING-level log lines are visible under uvicorn's default logging (the per-document `interrupted` line shows; the `recovered=N` INFO summary does not); logging configuration is not yet set up.
 4. **P3-T9:** first frontend pages. Before it: P0-T8 (frontend toolchain check), and the colour theme is explained to the developer and agreed (`docs/design-system.md` §1).
 5. P0-T9 (CI) remains deferred.
 
@@ -175,7 +176,7 @@ Findings were prepared by Claude, and the developer chose each resolution.
 | 3 | `FR-CIT-004` checked citations per answer, so uncited statements could pass | Every statement in a `sufficient`/`partial` answer needs ≥1 valid citation; `insufficient` answers have no statements | PRD `FR-CIT-004`, §9.1, `AC-VS-08`; roadmap P5-T10; skill |
 | 4 | Answer persistence inconsistent (CLAUDE.md implied an answers table; PRD §8.2 had none) | Answers not persisted in VS-1; harness saves run artifacts | PRD §8.2, `DR-001` note; CLAUDE.md §4; skill |
 | 5 | Wording: `FR-QA-001` cited §10.1 instead of §9.1; roadmap §2 listed P0-T1 as a Phase 1 prerequisite; `passages_dropped` missing from §9.1 | Fixed | PRD, roadmap |
-| 6 | How a failed document is retried (re-upload vs explicit retry) is unspecified | Decide in the P3-T6 design note; no PRD change now | — |
+| 6 | How a failed document is retried (re-upload vs explicit retry) is unspecified | Decided at P3-T8 (developer): explicit `POST /documents/{id}/retry`; re-uploading an identical file returns the document unchanged | §6.10 |
 | 7 | UI-quality wording (§6.5a) | Resolved by row 9 | — |
 | 8 | Second review: roadmap §2 diagram and Phase 0 row still listed P0-T1 as a Phase 1 prerequisite (header was already v0.2; Phase 1 row was already fixed) | Diagram and Phase 0 row corrected: Phase 1 needs P0-T2, P0-T3 and the Python environment; P0-T1 completes M1 only | Roadmap §2 |
 | 9 | PRD did not state the expected UI quality; §5.10 says "minimal" | Added `NFR-UX-001` (interface quality). §5.10 notes that "minimal" means feature scope. No features added, no animation library mandated, no numerical targets. Reason: the developer explicitly wants a distinctive, high-quality frontend with polished, accessible motion, and a requirement makes that reviewable | PRD §5.10, §6, version 0.3; roadmap P3-T9, P5-T11, M14-T5; `docs/design-system.md`; skill |
@@ -215,6 +216,16 @@ Developer approved recording the P1-T6 answers in the PRD (now v0.5). Reason: th
 | Appendix A.3 | Page/section assumption marked as checked; upload limit no longer a placeholder |
 | `AD-003`, `FR-ING-003` (v0.7, P1-T8) | GROBID decision: go with limits, limits listed in `AD-003`; `FR-ING-003` points to the reason codes in the design note. Developer decided |
 | `FR-ING-007`, §8.2 Passage (v0.6, P1-T7) | Passages come from abstract, body, captions and back matter (not references, footnotes or table cells), each with a region; a document is `parsed` only with at least one body passage. Developer chose the regions |
+
+### 6.10 P3-T8 decisions (2026-11-04)
+
+Developer chose both recommended options.
+
+| Decision | Reason | Changed |
+|---|---|---|
+| Upload body is the raw PDF bytes, not multipart; optional `X-Filename` header (percent-encoded, display only) | No new dependency (`python-multipart`); the server stops reading once the body passes `MAX_UPLOAD_MB`, while multipart would spool the whole file first | PRD `FR-ING-001` input wording (v0.8) |
+| Retry is explicit: `POST /documents/{id}/retry` for `failed` documents, and also `pending` ones (a stopped server can leave one `pending` before processing began; startup recovery only handles `processing`) | No hidden side effect on upload; the UI gets a Retry button | Closes §6.7 row 6 |
+| Users see a plain-language `failure_explanation` per reason code, never the stored `failure_message` | `failure_message` is for developers (`NFR-SEC-005`, `FR-UI-001`) | `services/ingestion/explanations.py` |
 
 ## 7. Verification log
 
@@ -381,5 +392,11 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-04 | P3-T7: real server on a throwaway database (`paperpilot_recovery_check`) with one stale `processing` row and one `pending` row; `uvicorn` started, `/health` checked, stopped; database dropped | Health 200; log line `ingestion document_id=... status=failed reason=interrupted`; stale row `failed`/`interrupted` with message and start time; `pending` row unchanged |
 | 2026-11-04 | P3-T7: mutation check (recover every non-parsed status; drop the reason; set `pending`; remove the startup call) | All four caught (2, 5, 5, 2 failures); files restored |
 | 2026-11-04 | P3-T7: ruff check, ruff format --check, mypy (48 files), all tests | Clean; 278 passed. **P3-T7 `completed`** |
+| 2026-11-04 | P3-T8: developer decisions: raw-body upload (no `python-multipart`), explicit retry endpoint (§6.10). PRD `FR-ING-001` wording updated, v0.8 | Recorded |
+| 2026-11-04 | P3-T8: `tests/integration/test_documents_api.py` written first (collection error before the API existed), then the routes, error handlers, schemas and read service | 26 passed |
+| 2026-11-04 | P3-T8: mutation check, round 1 (12 changes: declared-length check, stream limit, off-by-one limit, background processing, duplicate status code, filename decoding, retry status check, exposed `failure_message`, passage order, catch-all handler, 422 echoing input, missing 409 details) | 11 caught. **Survived:** removing the stream limit (validation still rejected the file, but only after reading all of it) |
+| 2026-11-04 | P3-T8: unit tests for `read_limited` with a counting stream (stops at the first chunk over the limit); a chunked upload test without `Content-Length` | Round 2: the surviving change is caught; files restored |
+| 2026-11-04 | P3-T8: real server (uvicorn, real GROBID, throwaway database `paperpilot_api_check`, storage in a temporary folder) with failure inputs f01-f08 and paper p3 | f01 `415 not_pdf`; f02 `400 empty_file`; f03, f04, f05 `failed`/`unreadable_pdf`; f06 `failed`/`empty_parse`; f07, f08 `failed`/`no_text_layer`; each failed structure `409 document_not_parsed` with status and reason. p3 `parsed` in 10.5 s (upload to final poll), 32 passages, all with a page, title correct. Re-upload of p3: `200`, `created: false`. Retry of parsed: `409`. Unknown id `404`, malformed id `422`. 7 PDFs stored (f03-f08, p3; the duplicate stored nothing); p3's stored hash equals the original. Database dropped, temporary storage removed |
+| 2026-11-04 | P3-T8: ruff check, ruff format --check, mypy (56 files), all tests | Clean; 310 passed. **P3-T8 `completed`** |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

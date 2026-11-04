@@ -131,7 +131,7 @@ docker compose down
 
 ## Running the backend
 
-The backend is a minimal skeleton: one health endpoint, no features yet. It reads `.env` at startup and refuses to start if a setting is missing or invalid. Run from the repository folder (verified 2026-11-03):
+The backend has a health endpoint and the document API (upload, status, structure, retry). It reads `.env` at startup and refuses to start if a setting is missing or invalid. Run from the repository folder (verified 2026-11-03):
 
 ```bash
 uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
@@ -146,6 +146,23 @@ curl.exe http://127.0.0.1:8000/health
 ```
 
 The health endpoint only says the API process is running. It does not check PostgreSQL or GROBID. Always keep `--host 127.0.0.1` (`NFR-SEC-006`). Stop the server with Ctrl+C.
+
+### Document API (verified 2026-11-04)
+
+PostgreSQL and GROBID must be running. Upload sends the PDF bytes as the request body (not a form); the optional `X-Filename` header carries the file name, percent-encoded, for display only. Processing runs after the response; poll the status until it is `parsed` or `failed`.
+
+```bash
+curl.exe -X POST http://127.0.0.1:8000/documents --data-binary "@paper.pdf" -H "Content-Type: application/pdf" -H "X-Filename: paper.pdf"
+```
+
+| Method and path | Result |
+|---|---|
+| `POST /documents` | `202` and a new `pending` document, or `200` and the existing document for an identical file (`created: false`; it is not processed again) |
+| `GET /documents/{id}` | Status, `failure_reason` and a plain-language `failure_explanation` |
+| `GET /documents/{id}/structure` | Metadata and passages in order with section and page (`null` = unknown); `409 document_not_parsed` with status and reason otherwise |
+| `POST /documents/{id}/retry` | `202` and processing again for a `failed` (or stuck `pending`) document; `409 document_not_retryable` otherwise |
+
+Every error is `{"error": {"code", "message", "details"?}}` with no internal details. Upload rejections create nothing: `empty_file` (400), `file_too_large` (413, reading stops at `MAX_UPLOAD_MB`), `not_pdf` (415, decided by content). The interactive API docs are at `http://127.0.0.1:8000/docs`.
 
 The frontend does not exist yet (P0-T8/P3). Commands are added here only after they have been run and verified.
 
