@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–3 complete. PDFs can be uploaded through the UI, parsed by GROBID and inspected as stored passages. No retrieval, question answering or LLM integration yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-08 |
-| Current milestone | M7: Evidence-backed question answering (`not_started`). M5 and M6 `completed` 2026-11-08; M1–M4 `completed` 2026-11-03. |
+| Current milestone | M7: Evidence-backed question answering (`in_progress`: P5-T1 done). M5 and M6 `completed` 2026-11-08; M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 5, evidence-backed question answering (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -28,7 +28,7 @@ Milestones are proposals from the roadmap, not claims of completion. Statuses: `
 | M4 | Database schema and migrations (2) | `completed` | `papers`, `documents`, `passages` with constraints | Migration applies to an empty DB; constraint tests pass | 2026-11-03: migration `d2ea199dd3d3` applies to an empty database and reverses; all 38 named check/unique/foreign-key constraints have passing failing-case tests (62 integration tests); repeat-ingestion rules tested; immutability documented in `CLAUDE.md` and enforced by a trigger; only the three tables (plus `alembic_version`); `docs/design/schema.md` §10 | M3 |
 | M5 | Paper ingestion and passage persistence (3) | `completed` | Upload → GROBID → passages, honest statuses | `AC-VS-01`..`AC-VS-04` evidenced | None | M4 |
 | M6 | Keyword retrieval (4) | `completed` | PostgreSQL full-text retrieval; evaluation set; Recall@5 baseline | `AC-VS-05`; baseline file recorded | None | M5 |
-| M7 | Evidence-backed question answering (5) | `not_started` | Retrieval → structured answer → citation validation | `AC-VS-06`..`AC-VS-08` | None | M6; `OQ-011` |
+| M7 | Evidence-backed question answering (5) | `in_progress` | Retrieval → structured answer → citation validation | `AC-VS-06`..`AC-VS-08` | None | M6; `OQ-011` |
 | M8 | Evaluation harness (6) | `not_started` | Repeatable evaluation; VS-1 acceptance | `AC-VS-09`, `AC-VS-10` | None | M7 |
 | M9 | Structured extraction (7) | `not_started` | Datasets, metrics, limitations with evidence | `FR-EXT-*` criteria; baseline P/R/F1 | None | M7, M8; `OQ-006`, `OQ-009` |
 | M10 | Semantic and hybrid retrieval (8) | `not_started` | Compare keyword/semantic/hybrid on the same set | `FR-RET-005..007`; recorded comparison | None | M6, M8; `OQ-012` |
@@ -111,7 +111,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 |---|---|
 | Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`. **P3-T10** (manual run on real papers, §6.12) `completed`. Phase 3 is complete. Phase 4 `completed`: baseline in `docs/experiments/retrieval-baseline.md`. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
-| Status | Phase 4 `completed`; Phase 5 `not_started`. Phases 0 to 4 are `completed` (M1 to M6). |
+| Status | Phase 5 `in_progress`: P5-T1 `completed`; next **P5-T2**. Phases 0 to 4 are `completed` (M1 to M6). |
 
 Summary of what is done (details in §3, §6 and §7): planning documents reviewed and approved (P0-T1); repository on E:, private on GitHub (P0-T2); PostgreSQL 18 and GROBID 0.9.1 via Compose (P0-T3); Python 3.14 with uv, pytest, ruff, mypy (P0-T4); settings module (P0-T5); FastAPI skeleton with `/health` (P0-T6); test conventions (P0-T7); GROBID experiment, decision **go with limits** (Phase 1); parser-output contract and schema design notes; database layer and Alembic; tables `papers`, `documents`, `passages` with an immutability trigger; DOI normalisation; 112 tests (Phase 2). Standing rule: every GROBID request sends `consolidateHeader=0`.
 
@@ -122,7 +122,7 @@ In dependency order (roadmap Phase 3).
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. The bounded reading carried from here was done in P3-T8.
 3. ~~P3-T3~~ to ~~P3-T8~~ `completed`. TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). A database failure in the final ingestion transaction leaves the document `processing` until the next startup marks it `interrupted` (P3-T7). Recovery assumes one server process; FR-ING-010's timeout alternative is not built (it needs a periodic job). Only WARNING-level log lines are visible under uvicorn's default logging (the per-document `interrupted` line shows; the `recovered=N` INFO summary does not); logging configuration is not yet set up.
-4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. ~~P3-T10~~ `completed`, M5 `completed`. ~~P4-T1~~ `completed`: interim full-text configuration in `docs/design/retrieval.md` (`OQ-004` stays open until P4-T7). ~~P4-T2~~ `completed`: `passages.search_vector` and its GIN index (migration `e3ab5ad233d7`). ~~P4-T3~~ `completed`: `search_passages` in `backend/app/services/retrieval/keyword.py`, setting `MAX_QUERY_CHARS`. ~~P4-T4~~ `completed`. ~~P4-T5~~ and ~~P4-T6~~ `completed`: reviewed set `benchmarks/retrieval_eval_v1.json`, harness `tests/evaluation/`. ~~P4-T7~~ `completed`: baseline Recall@5 8/16 across all papers, 9/16 within the question's paper, all 8 misses vocabulary mismatches (`docs/experiments/retrieval-baseline.md`). `OQ-004` stays interim; `OQ-002` rules stand, not proven by 16 questions. Before Phase 5: a retrieval score cannot decide "not enough evidence" (`FR-QA-004`). Carried to P4-T5: do not use the six probe queries listed in `retrieval.md` §5. Broken ligatures and leaked figure text: baseline first, then a before/after in P4-T7 in the search representation only, never in `passages`.
+4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. ~~P3-T10~~ `completed`, M5 `completed`. ~~P4-T1~~ `completed`: interim full-text configuration in `docs/design/retrieval.md` (`OQ-004` stays open until P4-T7). ~~P4-T2~~ `completed`: `passages.search_vector` and its GIN index (migration `e3ab5ad233d7`). ~~P4-T3~~ `completed`: `search_passages` in `backend/app/services/retrieval/keyword.py`, setting `MAX_QUERY_CHARS`. ~~P4-T4~~ `completed`. ~~P4-T5~~ and ~~P4-T6~~ `completed`: reviewed set `benchmarks/retrieval_eval_v1.json`, harness `tests/evaluation/`. ~~P4-T7~~ `completed`: baseline Recall@5 8/16 across all papers, 9/16 within the question's paper, all 8 misses vocabulary mismatches (`docs/experiments/retrieval-baseline.md`). `OQ-004` stays interim; `OQ-002` rules stand, not proven by 16 questions. A retrieval score cannot decide "not enough evidence" (`FR-QA-004`). ~~P5-T1~~ `completed`: interim model Claude Haiku 5.5 (§6.13). Next **P5-T2:** the model interface and fake. The `anthropic` package and an API key are needed only from the real-model step; no paper text is sent before P5-T12, and that first send needs the developer's go-ahead then. Carried to P4-T5: do not use the six probe queries listed in `retrieval.md` §5. Broken ligatures and leaked figure text: baseline first, then a before/after in P4-T7 in the search representation only, never in `passages`.
 5. P0-T9 (CI) remains deferred.
 
 ## 6. Decisions and blockers
@@ -265,6 +265,23 @@ Observations by Claude Code, from the development database and the running UI. T
 | Text that is not a heading used as a section title | p3: `P` (a drop cap), two pull-quote sentences. p2: `Table 1 continued on next page`, `Papers Experiments Effects All outcomes`. p1: a sentence beginning `QNLI Question Natural...` | Section labels shown and later cited can be wrong; following passages inherit them |
 
 None of these is a pipeline defect, and none is hidden: passages keep the parser's text unmodified (`DR-002`). Passages are immutable, so any correction is a decision about the parse step or the search index, not an edit.
+
+### 6.13 P5-T1: model for answers (2026-11-08)
+
+Developer's priority: a GitHub showcase, rarely used, free or minimal cost, with strong answers. **Decision (developer): Claude Haiku 5.5 (`claude-haiku-5-5`) as the interim default, plus one comparison run on the evaluation set against a stronger model at P5-T12.** The default changes if Haiku does clearly worse. The comparison model is confirmed at P5-T12; Claude Opus 5.5 is proposed. `OQ-011` stays interim until then. Claude Code is made by Anthropic and said so when presenting this.
+
+Facts read from the providers' official pages on 2026-11-08. Costs per answer are **estimates** assuming 4,000 input and 1,500 output tokens; P5-T12 measures them.
+
+| Model | $ per million tokens, input / output | Est. per answer | Answer format | Data use |
+|---|---|---|---|---|
+| Claude Opus 5.5 | 4 / 20 | $0.046 | Schema-enforced, except refusals, `max_tokens` and enum capitalisation | API inputs and outputs not used for training by default; deleted within 30 days, with exceptions |
+| Claude Sonnet 5.5 | 2 / 10 | $0.023 | Same | Same |
+| **Claude Haiku 5.5** | 0.10 / 0.50 (prompts up to 100,000 tokens) | $0.001 | Same | Same |
+| GPT-6.1 Sol | 2 / 10 | $0.023 | Strict JSON schema | Not used for training by default; abuse logs up to 30 days |
+| Gemini 3.8 Flash, paid | 0.75 / 3.75 until 2026-12-31, then 1.50 / 7.50 | $0.009 | JSON schema subset; docs advise checking values | Not used to improve products |
+| Gemini, free tier | 0 | $0 | Same | Used to improve products; human reviewers may read it |
+
+How paper text is shared (`NFR-PRI-001`): the question and the retrieved passages go to Anthropic's API; PDFs and full papers do not. Recorded in `README.md`. Not checked: Anthropic's minimum credit purchase, Gemini free-tier rate limits. Model quality on this task is unmeasured until P5-T12.
 
 ## 7. Verification log
 
@@ -477,6 +494,7 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-08 | P4-T7: every miss analysed with rank and matching words (`docs/experiments/retrieval-baseline.md` §2) | 8 of 8 vocabulary mismatches; none from passage boundaries or labels. The questions were deliberately paraphrased, which makes the test hard. The evaluation set was not edited |
 | 2026-11-08 | P4-T7: `scripts/retrieval_variants.py`, read-only, exploratory, **logged as tried after seeing the baseline** (`CLAUDE.md` §6.9) | Reproduced 8 and 9. ANDed words 0; `ts_rank_cd` 9 and 10 (one question net); others no better. **No configuration change.** Figures are not reported as metrics |
 | 2026-11-08 | P4-T7: `AC-VS-05` evidenced by P4-T3 and P4-T4; `FR-EVL-001` met by the reviewed set; baseline recorded; every miss has a cause; `OQ-004` documented as interim. ruff, mypy (70 files) clean; 449 tests passed | **P4-T7 `completed`; Phase 4 and M6 `completed`** |
+| 2026-11-08 | P5-T1: provider pages read (pricing, data use, structured output) for Anthropic, OpenAI and Google; developer chose Haiku 5.5 plus a comparison run (§6.13). No code, dependency or API call; nothing sent to any provider | **P5-T1 `completed`** (`OQ-011` interim) |
 | 2026-11-08 | **Not verified for P3-T9:** `prefers-reduced-motion` in a browser (the pane cannot emulate it; only confirmed the CSS rule is loaded); screen reader use; drag and drop with a real file; file picker dialog (file set from script in the browser check) | Open |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

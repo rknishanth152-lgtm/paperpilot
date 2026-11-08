@@ -222,4 +222,5 @@ Parser limits you will see in the structure view are recorded in `progress.md` Â
 
 - **Local, single-user only.** There is no authentication. Do not expose PaperPilot to a shared or public network (`NFR-SEC-006`).
 - **Only upload papers you are allowed to use**, including sending their text to the configured AI provider (`NFR-PRI-001`, `RISK-13`). Papers are never committed to this repository.
+- **Question answering sends text to an outside service (Phase 5).** With an API key configured, your question and the retrieved passages are sent to Anthropic's API (`NFR-PRI-001`). Nothing is sent without a key, and uploading and parsing stay on your machine. Anthropic's pages, read 2026-11-08, say commercial API inputs and outputs are not used for training by default and are deleted within 30 days, with exceptions such as legal requirements and Usage Policy enforcement. Check the current terms before using papers that are not open access.
 - **Never commit secrets.** Settings go in `.env`, which is ignored; `.env.example` lists placeholders only (`NFR-SEC-001`).
