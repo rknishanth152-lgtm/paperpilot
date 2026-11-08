@@ -19,7 +19,7 @@ from typing import BinaryIO, Protocol
 from app.config import get_settings
 
 _SUFFIXES = {"pdf": ".pdf", "tei": ".tei.xml"}
-_KEY = re.compile(r"^(?:pdf/[0-9a-f]{32}\.pdf|tei/[0-9a-f]{32}\.tei\.xml)$")
+_KEY = re.compile(r"pdf/[0-9a-f]{32}\.pdf|tei/[0-9a-f]{32}\.tei\.xml")
 
 
 class StorageError(Exception):
@@ -109,14 +109,12 @@ class LocalStorage:
 
     def _path(self, key: str) -> Path:
         """Path for a generated key; anything else is refused."""
-        if not _KEY.match(key):
+        if not _KEY.fullmatch(key):
             raise InvalidStorageKeyError("not a storage key")
-        path = (self._root / key).resolve()
-        if not path.is_relative_to(
-            self._root
-        ):  # second guard; the pattern already forbids it
-            raise InvalidStorageKeyError("not a storage key")
-        return path
+        # The whole key matched a fixed shape, so it cannot leave the root. Not
+        # resolved here: on Windows the result can change form while the folder
+        # is being created, which rejected valid keys.
+        return self._root / key
 
 
 @lru_cache

@@ -6,6 +6,8 @@ client filenames as paths), AD-002 (save/read/delete by key).
 
 import hashlib
 import re
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -111,6 +113,7 @@ def test_empty_content_is_rejected(store: LocalStorage, tmp_path: Path) -> None:
         "pdf/0123456789abcdef0123456789abcdef.pdf/../x",
         "pdf/paper title from the client.pdf",
         " pdf/0123456789abcdef0123456789abcdef.pdf",
+        "pdf/0123456789abcdef0123456789abcdef.pdf\n",
     ],
 )
 def test_read_and_delete_refuse_anything_but_a_generated_key(
@@ -125,6 +128,34 @@ def test_read_and_delete_refuse_anything_but_a_generated_key(
         store.delete(key)
 
     assert outside.read_bytes() == b"must not be touched"
+
+
+def test_a_valid_key_does_not_depend_on_how_the_system_resolves_paths(
+    store: LocalStorage, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Windows can return a `\\\\?\\` form of a path while its folder is being created."""
+    monkeypatch.setattr(Path, "resolve", lambda self, strict=False: Path("elsewhere"))
+
+    key = store.save(PDF_BYTES, kind="pdf")
+
+    assert store.read(key) == PDF_BYTES
+
+
+def test_concurrent_saves_into_a_new_folder_all_succeed(tmp_path: Path) -> None:
+    """Regression test: this failed for 1 to 3% of saves on Windows."""
+    workers = 12
+
+    def save_all(store: LocalStorage, barrier: threading.Barrier) -> str:
+        barrier.wait()
+        return store.save(PDF_BYTES, kind="pdf")
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for attempt in range(60):
+            store = LocalStorage(tmp_path / f"attempt-{attempt}" / "storage")
+            barrier = threading.Barrier(workers)
+            futures = [pool.submit(save_all, store, barrier) for _ in range(workers)]
+            keys = {future.result() for future in futures}
+            assert len(keys) == workers
 
 
 def test_reading_a_missing_key_is_an_explicit_error(store: LocalStorage) -> None:
