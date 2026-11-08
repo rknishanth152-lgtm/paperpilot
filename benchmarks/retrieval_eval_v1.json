@@ -1,0 +1,313 @@
+{
+  "name": "PaperPilot retrieval evaluation set",
+  "version": 1,
+  "status": "draft",
+  "created": "2026-11-08",
+  "drafted_by": "Claude Code, from the PDF text, without running retrieval for these questions",
+  "reviewer": null,
+  "review_date": null,
+  "limits": "Small set (20 questions, 5 open-access papers, 3 fields). Any Recall@5 from it is a coarse baseline, not a general accuracy figure (RISK-15). Fixed before the first harness run: changes after results are seen must be logged in progress.md.",
+  "corpus": [
+    {
+      "key": "p1",
+      "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+      "doi": "10.18653/v1/N19-1423",
+      "licence": "CC BY 4.0",
+      "sha256": "987545ffb087f1ece898142c403a516baeabeb70ce19089397fac6f7db12c3d4"
+    },
+    {
+      "key": "p2",
+      "title": "Investigating the replicability of preclinical cancer biology",
+      "doi": "10.7554/eLife.71601",
+      "licence": "CC BY 4.0",
+      "sha256": "dc1f6a4c3d4824d70855cd7316c75f8d1783349d37b822a9cdb1b665fb609fad"
+    },
+    {
+      "key": "p3",
+      "title": "Why Most Published Research Findings Are False",
+      "doi": "10.1371/journal.pmed.0020124",
+      "licence": "CC BY",
+      "sha256": "ffc1005680cb620eec4c913437dfabbf311b535cfe16cbaeb2faec1f92afc362"
+    },
+    {
+      "key": "p4",
+      "title": "Sharing Detailed Research Data Is Associated with Increased Citation Rate",
+      "doi": "10.1371/journal.pone.0000308",
+      "licence": "CC BY",
+      "sha256": "b52ca44dfd09d240543b80315f0cd43fe9ba7946f2b5650d5580213ed5d9186c"
+    },
+    {
+      "key": "p5",
+      "title": "Public Availability of Published Research Data in High-Impact Journals",
+      "doi": "10.1371/journal.pone.0024357",
+      "licence": "CC BY",
+      "sha256": "2090a6ed5d95f5f2af6349170c739e80c9362271d66a6f952e315c803290a0cb"
+    }
+  ],
+  "excluded_probe_queries": [
+    "What pre-training tasks does the model use?",
+    "How many experiments were replicated?",
+    "Does sharing data increase the citation rate?",
+    "What proportion of journals require data availability?",
+    "positive predictive value of research findings",
+    "statistical significance and p-values"
+  ],
+  "questions": [
+    {
+      "id": "q01",
+      "question": "Which optimizer and learning rate were used to pre-train the BERT model?",
+      "answerable": true,
+      "papers": [
+        "p1"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p1",
+          "quote": "Adam with learning rate of 1e-4"
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "question": "Does making the network bigger help accuracy on the GLUE benchmark?",
+      "answerable": true,
+      "papers": [
+        "p1"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p1",
+          "quote": "larger models lead to a strict accuracy improvement across all four datasets"
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "question": "What share of input words gets hidden at random during the masked-word objective?",
+      "answerable": true,
+      "papers": [
+        "p1"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p1",
+          "quote": "we mask 15% of all WordPiece tokens in each sequence at random"
+        }
+      ]
+    },
+    {
+      "id": "q04",
+      "question": "How much did effect sizes shrink when preclinical cancer studies were repeated?",
+      "answerable": true,
+      "papers": [
+        "p2"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p2",
+          "quote": "the median effect size in the replications was 85% smaller than the median effect size in the original experiments"
+        }
+      ]
+    },
+    {
+      "id": "q05",
+      "question": "Does one unsuccessful repeat of a study prove that the original result was wrong?",
+      "answerable": true,
+      "papers": [
+        "p2"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p2",
+          "quote": "a failure to replicate does not disconfirm a finding"
+        },
+        {
+          "paper": "p2",
+          "quote": "A single failure to replicate a finding does not render a verdict on its replicability or credibility"
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "question": "How often did repeat studies succeed for results that originally showed no effect?",
+      "answerable": true,
+      "papers": [
+        "p2"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p2",
+          "quote": "for null effects 80% of replications (12/15) were successful on this basis"
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "question": "Did studies in living animals reproduce as well as studies without animals?",
+      "answerable": true,
+      "papers": [
+        "p2"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p2",
+          "quote": "animal experiments with positive effects were less likely to replicate"
+        }
+      ]
+    },
+    {
+      "id": "q08",
+      "question": "Why are results from underpowered, small studies less trustworthy?",
+      "answerable": true,
+      "papers": [
+        "p3"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p3",
+          "quote": "The smaller the studies conducted in a scientific field, the less likely the research findings are to be true"
+        }
+      ]
+    },
+    {
+      "id": "q09",
+      "question": "What happens to reliability when many groups compete on a fashionable topic?",
+      "answerable": true,
+      "papers": [
+        "p3"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p3",
+          "quote": "The hotter a scientific field (with more scientific teams involved), the less likely the research findings are to be true"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "question": "Is it realistic to run very large studies for every question scientists ask?",
+      "answerable": true,
+      "papers": [
+        "p3"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p3",
+          "quote": "large-scale evidence is impossible to obtain for all of the millions and trillions of research questions posed in current research"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "question": "Where online were most of the shared gene expression datasets hosted?",
+      "answerable": true,
+      "papers": [
+        "p4"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p4",
+          "quote": "Most data sets were located on lab websites"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "question": "Among trials with public data, which properties went along with being cited more?",
+      "answerable": true,
+      "papers": [
+        "p4"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p4",
+          "quote": "only trial design features such as size and clinical endpoint showed a significant association with citation rate"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "question": "What caveat do the authors give about concluding that publishing data causes more citations?",
+      "answerable": true,
+      "papers": [
+        "p4"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p4",
+          "quote": "the demonstrated association does not imply causation"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "question": "How many people extracted the information from the sampled articles?",
+      "answerable": true,
+      "papers": [
+        "p5"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p5",
+          "quote": "Data extraction from the 500 papers was done by a single investigator"
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "question": "Did having US federal grants make authors more likely to post their complete raw data?",
+      "answerable": true,
+      "papers": [
+        "p5"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p5",
+          "quote": "the proportion depositing full primary data online was not different when US government funding"
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "question": "What was the usual way that articles broke their journal's rules on data?",
+      "answerable": true,
+      "papers": [
+        "p5"
+      ],
+      "expected_quotes": [
+        {
+          "paper": "p5",
+          "quote": "most commonly (73%) by not publicly depositing microarray data"
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "question": "How much electricity or carbon did training the language model consume?",
+      "answerable": false,
+      "papers": [],
+      "expected_quotes": []
+    },
+    {
+      "id": "q18",
+      "question": "Did rates of posting research data differ between male and female lead authors?",
+      "answerable": false,
+      "papers": [],
+      "expected_quotes": []
+    },
+    {
+      "id": "q19",
+      "question": "How does publishing raw data affect citation counts in astronomy?",
+      "answerable": false,
+      "papers": [],
+      "expected_quotes": []
+    },
+    {
+      "id": "q20",
+      "question": "What was the total budget in dollars of the cancer biology replication project?",
+      "answerable": false,
+      "papers": [],
+      "expected_quotes": []
+    }
+  ]
+}
