@@ -7,11 +7,11 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Field | Value |
 |---|---|
 | Project | PaperPilot |
-| Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
+| Current stage | Phases 0–3 complete. PDFs can be uploaded through the UI, parsed by GROBID and inspected as stored passages. No retrieval, question answering or LLM integration yet. |
 | Overall status | `in_progress` |
-| Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T9 done; P3-T10 run done, developer review pending). M1–M4 `completed` 2026-11-03. |
-| Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
+| Last updated | 2026-11-08 |
+| Current milestone | M6: Keyword retrieval (`not_started`). M5 `completed` 2026-11-08; M1–M4 `completed` 2026-11-03. |
+| Current phase | Phase 4, keyword retrieval (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
 Generated documents and transcript analysis are **planning artefacts**. They are not implementation.
@@ -26,7 +26,7 @@ Milestones are proposals from the roadmap, not claims of completion. Statuses: `
 | M2 | Repository and development environment setup (0) | `completed` | Repo, Compose with PostgreSQL + GROBID, tooling, test conventions | A fresh clone plus README reproduces running services and a passing smoke test | 2026-11-03: fresh clone from GitHub plus README reproduced running services, passing unit and integration tests and the backend health check (§7); tooling decisions recorded with dates (§6.8) | None |
 | M3 | GROBID parsing experiment (1) | `completed` | Learn real GROBID behaviour on 3–5 permitted papers | `docs/experiments/grobid-feasibility.md` with observations, failures, go/no-go | 2026-11-03: 5 papers processed and inspected; failure inputs attempted (real scanned paper impossible, reason recorded); answers in §7, limitations §8, representation `docs/design/parser-output.md`, decision go with limits (§9); PRD updated | M2 (minimal subset: P0-T2, P0-T3, Python environment) |
 | M4 | Database schema and migrations (2) | `completed` | `papers`, `documents`, `passages` with constraints | Migration applies to an empty DB; constraint tests pass | 2026-11-03: migration `d2ea199dd3d3` applies to an empty database and reverses; all 38 named check/unique/foreign-key constraints have passing failing-case tests (62 integration tests); repeat-ingestion rules tested; immutability documented in `CLAUDE.md` and enforced by a trigger; only the three tables (plus `alembic_version`); `docs/design/schema.md` §10 | M3 |
-| M5 | Paper ingestion and passage persistence (3) | `in_progress` | Upload → GROBID → passages, honest statuses | `AC-VS-01`..`AC-VS-04` evidenced | None | M4 |
+| M5 | Paper ingestion and passage persistence (3) | `completed` | Upload → GROBID → passages, honest statuses | `AC-VS-01`..`AC-VS-04` evidenced | None | M4 |
 | M6 | Keyword retrieval (4) | `not_started` | PostgreSQL full-text retrieval; evaluation set; Recall@5 baseline | `AC-VS-05`; baseline file recorded | None | M5 |
 | M7 | Evidence-backed question answering (5) | `not_started` | Retrieval → structured answer → citation validation | `AC-VS-06`..`AC-VS-08` | None | M6; `OQ-011` |
 | M8 | Evaluation harness (6) | `not_started` | Repeatable evaluation; VS-1 acceptance | `AC-VS-09`, `AC-VS-10` | None | M7 |
@@ -109,9 +109,9 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`. **P3-T10** `in_progress`: the run on five real papers is done and recorded (§6.12); the developer's own review is pending. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`. **P3-T10** (manual run on real papers, §6.12) `completed`. Phase 3 is complete; next **P4-T1**. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
-| Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
+| Status | Phase 3 `completed`; Phase 4 `not_started`. Phases 0 to 3 are `completed` (M1 to M5). |
 
 Summary of what is done (details in §3, §6 and §7): planning documents reviewed and approved (P0-T1); repository on E:, private on GitHub (P0-T2); PostgreSQL 18 and GROBID 0.9.1 via Compose (P0-T3); Python 3.14 with uv, pytest, ruff, mypy (P0-T4); settings module (P0-T5); FastAPI skeleton with `/health` (P0-T6); test conventions (P0-T7); GROBID experiment, decision **go with limits** (Phase 1); parser-output contract and schema design notes; database layer and Alembic; tables `papers`, `documents`, `passages` with an immutability trigger; DOI normalisation; 112 tests (Phase 2). Standing rule: every GROBID request sends `consolidateHeader=0`.
 
@@ -122,7 +122,7 @@ In dependency order (roadmap Phase 3).
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. The bounded reading carried from here was done in P3-T8.
 3. ~~P3-T3~~ to ~~P3-T8~~ `completed`. TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). A database failure in the final ingestion transaction leaves the document `processing` until the next startup marks it `interrupted` (P3-T7). Recovery assumes one server process; FR-ING-010's timeout alternative is not built (it needs a periodic job). Only WARNING-level log lines are visible under uvicorn's default logging (the per-document `interrupted` line shows; the `recovered=N` INFO summary does not); logging configuration is not yet set up.
-4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. **P3-T10:** the developer opens the papers in the UI, including one upload with the real file picker, and adds or confirms observations (§6.12); then P3-T10 and M5 can be `completed`. **Before Phase 4, decide** how to handle broken ligatures (p3: 202 matches) and leaked figure text: at parse time, in the search index, or accepted as a limit. Not decided; the Recall@5 baseline will show the effect.
+4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. ~~P3-T10~~ `completed`, M5 `completed`. Next **P4-T1:** check the PostgreSQL full-text documentation and record the configuration (`OQ-004`). **Before the Recall@5 baseline is treated as final, decide** how to handle broken ligatures (p3: 202 matches) and leaked figure text: at parse time, in the search index, or accepted as a limit. Not decided; the Recall@5 baseline will show the effect.
 5. P0-T9 (CI) remains deferred.
 
 ## 6. Decisions and blockers
@@ -241,7 +241,7 @@ Developer decided each of these.
 
 ### 6.12 P3-T10 manual run observations (2026-11-08)
 
-Observations by Claude Code, from the development database and the running UI. **The developer has not yet reviewed these or looked at the papers in the UI** (`AC-VS-02` asks for the author's observations), so P3-T10 and M5 stay `in_progress` until they have. Real papers: the Phase 1 set (CC BY), not committed. The GROBID model in use is the CRF image (`AD-003`).
+Observations by Claude Code, from the development database and the running UI. The developer opened the app afterwards and reported on 2026-11-08: "everything is fine". No further detail was given, so the findings below are Claude Code's. Real papers: the Phase 1 set (CC BY), not committed. The GROBID model in use is the CRF image (`AD-003`).
 
 | Paper | Upload to final status | Passages (abstract / body / caption / back) | Pages | Metadata |
 |---|---|---|---|---|
@@ -452,6 +452,7 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-08 | P3-T10: database checks | 5 documents, 5 papers, 324 passages; all `parsed`; 0 parsed with zero passages; 0 page 0 or empty section; stored hash equals recorded hash 5/5; 5 TEI files present |
 | 2026-11-08 | P3-T10: re-upload of all five (`AC-VS-04`) | `200`, `created: false` each; counts unchanged (5, 5, 324); 5 PDFs on disk |
 | 2026-11-08 | P3-T10: real GROBID outage on a throwaway database (container stopped, file uploaded, container restarted, Retry; `AC-VS-03`) | `failed`/`parser_unreachable` with no structure; after Retry the document was processed again and ended `failed`/`unreadable_pdf`, the correct result for that damaged test file. Database dropped, storage removed |
+| 2026-11-08 | P3-T10: developer opened the running app and reviewed it: "everything is fine". `AC-VS-01` to `AC-VS-04` evidenced above. Whether the real file picker was used was not stated, so it stays unconfirmed | **P3-T10 `completed`; Phase 3 and M5 `completed`** |
 | 2026-11-08 | **Not verified for P3-T9:** `prefers-reduced-motion` in a browser (the pane cannot emulate it; only confirmed the CSS rule is loaded); screen reader use; drag and drop with a real file; file picker dialog (file set from script in the browser check) | Open |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
