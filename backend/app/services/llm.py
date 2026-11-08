@@ -104,11 +104,6 @@ class LanguageModel(Protocol):
         ...
 
 
-def build_language_model() -> LanguageModel:
-    """The configured model. No provider adapter exists yet (P5-T12)."""
-    raise ModelNotConfiguredError()
-
-
 class FakeModel:
     """Plays back scripted outputs and errors, and records every request.
 

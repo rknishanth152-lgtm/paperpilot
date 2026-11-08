@@ -161,7 +161,7 @@ curl.exe -X POST http://127.0.0.1:8000/documents --data-binary "@paper.pdf" -H "
 | `GET /documents/{id}` | Status, `failure_reason` and a plain-language `failure_explanation` |
 | `GET /documents/{id}/structure` | Metadata and passages in order with section and page (`null` = unknown); `409 document_not_parsed` with status and reason otherwise |
 | `POST /documents/{id}/retry` | `202` and processing again for a `failed` (or stuck `pending`) document; `409 document_not_retryable` otherwise |
-| `POST /answers` | Body: `question` and `document_ids` and/or `paper_ids`. A checked answer with `validation_status`, per-citation validity and evidence passages. Until a real model is connected (P5-T12) this returns `503 model_not_configured` |
+| `POST /answers` | Body: `question` and `document_ids` and/or `paper_ids`. A checked answer with `validation_status`, per-citation validity and evidence passages. Without a configured model this returns `503 model_not_configured` |
 
 Every error is `{"error": {"code", "message", "details"?}}` with no internal details. Upload rejections create nothing: `empty_file` (400), `file_too_large` (413, reading stops at `MAX_UPLOAD_MB`), `not_pdf` (415, decided by content). The interactive API docs are at `http://127.0.0.1:8000/docs`.
 
@@ -218,6 +218,18 @@ npm --prefix frontend run dev
 Open `http://127.0.0.1:5173`, upload a PDF, and wait for it to reach `Parsed` or `Failed`. There is no list of uploaded documents yet: to get back to one, keep its address, or upload the same file again, which opens the existing document without processing it again.
 
 Parser limits you will see in the structure view are recorded in `progress.md` §6.12. Passages are shown exactly as stored, including the parser's mistakes.
+
+## Connecting an AI model
+
+Uploading, parsing and search need no AI model; answering questions does. Create an API key at <https://platform.claude.com/settings/keys>, then set these in `.env` (never commit it):
+
+```text
+LLM_PROVIDER=anthropic
+LLM_MODEL=claude-haiku-5-5
+LLM_API_KEY=your-key-here
+```
+
+Restart the backend afterwards. Using the API costs money, billed to your Anthropic account.
 
 ## Important limits
 
