@@ -2,7 +2,12 @@
 // stable code and a plain-language message; raw response bodies and exception
 // text are never shown to the user (NFR-SEC-005).
 
-import type { DocumentResponse, StructureResponse, UploadResponse } from "./types";
+import type {
+  AnswerResponse,
+  DocumentResponse,
+  StructureResponse,
+  UploadResponse,
+} from "./types";
 
 // Same-origin path; the Vite dev server forwards it to the backend.
 const BASE = "/api/documents";
@@ -98,5 +103,13 @@ export function getStructure(documentId: string): Promise<StructureResponse> {
 export function retryDocument(documentId: string): Promise<DocumentResponse> {
   return request<DocumentResponse>(`${BASE}/${encodeURIComponent(documentId)}/retry`, {
     method: "POST",
+  });
+}
+
+export function askQuestion(documentId: string, question: string): Promise<AnswerResponse> {
+  return request<AnswerResponse>("/api/answers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question, document_ids: [documentId] }),
   });
 }

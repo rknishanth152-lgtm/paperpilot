@@ -14,6 +14,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.schemas.answer import MalformedAnswerError
 from app.schemas.documents import ErrorBody, ErrorResponse
 from app.services.ingestion.documents import (
     DocumentNotFoundError,
@@ -21,9 +22,16 @@ from app.services.ingestion.documents import (
     DocumentNotRetryableError,
 )
 from app.services.ingestion.validation import UploadRejectedError
+from app.services.llm import ModelError
+from app.services.retrieval.keyword import QueryTooLongError
 from app.storage import StorageError
 
 UPLOAD_REJECTION_STATUS = {"empty_file": 400, "file_too_large": 413, "not_pdf": 415}
+MODEL_ERROR_STATUS = {
+    "model_timeout": 504,
+    "model_rate_limited": 429,
+    "model_not_configured": 503,
+}
 
 
 def error_response(
@@ -39,6 +47,22 @@ def install_error_handlers(app: FastAPI) -> None:
         request: Request, exc: UploadRejectedError
     ) -> JSONResponse:
         return error_response(UPLOAD_REJECTION_STATUS[exc.code], exc.code, exc.message)
+
+    @app.exception_handler(ModelError)
+    async def model_failed(request: Request, exc: ModelError) -> JSONResponse:
+        return error_response(
+            MODEL_ERROR_STATUS.get(exc.code, 502), exc.code, exc.message
+        )
+
+    @app.exception_handler(MalformedAnswerError)
+    async def malformed_answer(
+        request: Request, exc: MalformedAnswerError
+    ) -> JSONResponse:
+        return error_response(502, exc.code, exc.message)
+
+    @app.exception_handler(QueryTooLongError)
+    async def query_too_long(request: Request, exc: QueryTooLongError) -> JSONResponse:
+        return error_response(422, exc.code, exc.message)
 
     @app.exception_handler(StorageError)
     async def storage_failed(request: Request, exc: StorageError) -> JSONResponse:

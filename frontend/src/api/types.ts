@@ -48,3 +48,51 @@ export interface StructureResponse {
   };
   passages: Passage[];
 }
+
+// Answering: backend/app/schemas/answer_response.py.
+
+export type CitationFailure =
+  | "passage_not_found"
+  | "not_in_context"
+  | "wrong_paper"
+  | "quote_mismatch";
+
+export interface CitationResponse {
+  alias: string;
+  quote: string | null;
+  valid: boolean;
+  reason: CitationFailure | null;
+  passage_id: string | null;
+}
+
+export interface StatementResponse {
+  text: string;
+  citations: CitationResponse[];
+  has_valid_citation: boolean;
+}
+
+export interface EvidencePassage {
+  alias: string;
+  passage_id: string;
+  document_id: string;
+  paper_id: string;
+  paper_title: string | null;
+  section: string | null;
+  page_start: number | null;
+  page_end: number | null;
+  text: string;
+}
+
+export interface AnswerResponse {
+  statements: StatementResponse[];
+  evidence: EvidencePassage[];
+  evidence_sufficiency: "sufficient" | "partial" | "insufficient";
+  limitations: string | null;
+  validation_status: "validated" | "failed";
+  claim_support: "not_evaluated";
+  retrieved_passage_ids: string[];
+  passages_dropped: number;
+  retrieval_method: string;
+  model: string | null;
+  prompt_version: string | null;
+}

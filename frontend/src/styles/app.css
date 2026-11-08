@@ -476,6 +476,188 @@ code {
   font-size: var(--text-sm);
 }
 
+/* Asking a question */
+
+.question-panel {
+  margin-bottom: var(--space-5);
+}
+
+.question-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.question-form {
+  margin-top: var(--space-3);
+}
+
+.question-label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.question-input {
+  display: block;
+  width: 100%;
+  min-height: 5rem;
+  margin-top: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-sheet);
+  border: 1px solid var(--color-slate-text);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  font: inherit;
+  resize: vertical;
+}
+
+.question-hint {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.waiting-answer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.answer {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-rule);
+}
+
+.answer-status {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+}
+
+.answer-status-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+
+.answer-status-validated {
+  background: var(--color-parsed-bg);
+  color: var(--color-parsed-text);
+}
+
+.answer-status-failed {
+  background: var(--color-failed-bg);
+  border-color: var(--color-failed-text);
+  color: var(--color-failed-text);
+}
+
+.answer-status-insufficient {
+  background: var(--color-pending-bg);
+  color: var(--color-pending-text);
+}
+
+.answer-status-note {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.answer-heading {
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.statements {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.statement-text {
+  overflow-wrap: anywhere;
+}
+
+.statement-unverified .statement-text {
+  color: var(--color-slate-text);
+}
+
+.citations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.citation {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.0625rem var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.citation-valid {
+  background: var(--color-parsed-bg);
+  color: var(--color-parsed-text);
+}
+
+.citation-invalid {
+  background: var(--color-failed-bg);
+  color: var(--color-failed-text);
+}
+
+.citation-quote {
+  margin-top: var(--space-1);
+  color: var(--color-slate-text);
+  font-family: var(--font-reading);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.evidence-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.evidence-item {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-frost);
+  border-radius: var(--radius-sm);
+  scroll-margin-top: var(--space-4);
+}
+
+/* The one signature motion: this passage is what the citation pointed to. */
+.evidence-item:target {
+  animation: evidence-highlight var(--motion-duration-highlight) var(--motion-ease-out);
+}
+
+@keyframes evidence-highlight {
+  from {
+    background: var(--color-marker);
+  }
+}
+
+.evidence-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin-bottom: var(--space-2);
+  color: var(--color-slate-text);
+  font-size: var(--text-sm);
+}
+
+.answer-details {
+  margin-top: var(--space-4);
+  color: var(--color-slate-text);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
 @media (min-width: 64rem) {
   .reader {
     grid-template-columns: 16rem minmax(0, 1fr);
@@ -525,5 +707,11 @@ code {
 
   .spin {
     animation: none;
+  }
+
+  /* The highlight stays visible instead of fading (design system 3.5). */
+  .evidence-item:target {
+    animation: none;
+    background: var(--color-marker);
   }
 }

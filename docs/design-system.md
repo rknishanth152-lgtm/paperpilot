@@ -34,7 +34,7 @@ Agreed with the developer at P3-T9. The CSS custom properties in `frontend/src/s
 | Ink blue | `#1F4F82` | Primary button, links, focus ring (7.83:1 on Mist; white text on it 8.40:1) |
 | Ink blue hover | `#183F69` | Primary button hover |
 | Blue wash | `#E6EEF7` | Hover, selected (Ink blue on it 7.18:1) |
-| Marker | `#FFF1B8` | Reserved for highlighting cited text; not used yet and not yet a token |
+| Marker | `#FFF1B8` | The evidence passage a citation points to (Ink on it 15.42:1, Slate text 6.06:1) |
 
 | Status | Text on background | Contrast | Icon |
 |---|---|---|---|
@@ -105,7 +105,7 @@ Values are starting points to verify in a browser at P3-T9, not measured results
 
 ### 3.4 Signature interactions (at most two)
 
-1. **Citation → evidence.** Selecting a citation scrolls the evidence passage into view and briefly highlights the cited span (background tint that fades out). This shows causality: "this statement came from here".
+1. **Citation → evidence.** Selecting a citation scrolls the evidence passage into view and briefly highlights it (background tint that fades out, `--motion-duration-highlight`, 1600ms). This shows causality: "this statement came from here". Implemented at P5-T11 for the whole passage, not the quoted span.
 2. **Comparison context reveal.** Opening a comparison cell reveals its dataset, split, conditions and evidence in place, so context is never hidden behind a number.
 
 Both are candidates. Each must prove it helps in a browser test before it stays.

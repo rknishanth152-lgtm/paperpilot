@@ -17,6 +17,7 @@
   --color-accent-hover: #183f69;
   --color-accent-wash: #e6eef7; /* hover, selected */
   --color-on-accent: #ffffff;
+  --color-marker: #fff1b8; /* the evidence a citation points to */
 
   /* Status pairs: always shown with a word (NFR-ACC-001) */
   --color-pending-bg: #eef0f2;
@@ -54,5 +55,6 @@
   /* Motion (docs/design-system.md §3.2) */
   --motion-duration-fast: 120ms;
   --motion-duration-base: 180ms;
+  --motion-duration-highlight: 1600ms; /* the evidence highlight fading out */
   --motion-ease-out: cubic-bezier(0.2, 0, 0, 1);
 }

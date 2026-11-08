@@ -53,6 +53,11 @@ class ModelTruncatedError(ModelError):
     message = "The AI model's response was cut off before it finished."
 
 
+class ModelNotConfiguredError(ModelError):
+    code = "model_not_configured"
+    message = "No AI model is configured, so questions cannot be answered yet."
+
+
 class FakeModelExhaustedError(RuntimeError):
     """A test asked the fake for more outputs than it scripted."""
 
@@ -97,6 +102,11 @@ class LanguageModel(Protocol):
     def generate(self, request: ModelRequest) -> ModelResponse:
         """Return the raw output, or raise a `ModelError`."""
         ...
+
+
+def build_language_model() -> LanguageModel:
+    """The configured model. No provider adapter exists yet (P5-T12)."""
+    raise ModelNotConfiguredError()
 
 
 class FakeModel:

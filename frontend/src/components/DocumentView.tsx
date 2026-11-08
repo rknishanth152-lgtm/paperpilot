@@ -8,6 +8,7 @@ import { ApiError, getDocument, getStructure, retryDocument } from "../api/clien
 import type { DocumentResponse, StructureResponse } from "../api/types";
 import { formatBytes } from "../lib/format";
 import { Icon } from "./Icon";
+import { QuestionPanel } from "./QuestionPanel";
 import { StatusBadge } from "./StatusBadge";
 import { StructureView } from "./StructureView";
 
@@ -178,7 +179,10 @@ export function DocumentView({ documentId, pollIntervalMs, onHome }: Props) {
 
       {document.status === "parsed" &&
         (structure ? (
-          <StructureView structure={structure} />
+          <>
+            <QuestionPanel documentId={documentId} />
+            <StructureView structure={structure} />
+          </>
         ) : (
           <p className="panel muted" role="status">
             Loading the parsed structure…

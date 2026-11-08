@@ -6,13 +6,27 @@ establishes that a passage supports a statement (FR-CIT-005, AD-008).
 """
 
 import uuid
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class _Response(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+class QuestionRequest(_Response):
+    """A question about selected papers (FR-QA-001): at least one id is required."""
+
+    question: str
+    document_ids: tuple[uuid.UUID, ...] | None = None
+    paper_ids: tuple[uuid.UUID, ...] | None = None
+
+    @model_validator(mode="after")
+    def scope_given(self) -> Self:
+        if not self.document_ids and not self.paper_ids:
+            raise ValueError("a scope is required")
+        return self
 
 
 class CitationResponse(_Response):
