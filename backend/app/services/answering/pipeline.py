@@ -9,7 +9,8 @@ If there is nothing to show the model, it is not called, and the answer is
 `insufficient` (FR-QA-004). An `insufficient` answer from the model is kept as
 it is.
 
-Citations are not checked here; that is the validator's job (P5-T7).
+`ask` returns the model's schema-valid answer; `answer` also validates its
+citations (P5-T7) and assembles the final response (P5-T9).
 
 Logs carry counts only, never the question or paper text (NFR-PRI-002).
 """
@@ -29,8 +30,11 @@ from app.schemas.answer import (
     answer_json_schema,
     parse_answer,
 )
+from app.schemas.answer_response import AnswerResponse
+from app.services.answering.citations import AnswerScope, validate_answer
 from app.services.answering.context import AnswerContext, build_context
 from app.services.answering.prompt import PROMPT_VERSION, SYSTEM_PROMPT
+from app.services.answering.response import assemble_response
 from app.services.ingestion.documents import get_paper_titles
 from app.services.llm import LanguageModel, ModelRequest, ModelUsage
 from app.services.retrieval.keyword import search_passages
@@ -137,6 +141,30 @@ class Answering:
         self._sessions = sessions
         self._model = model
         self._limits = limits
+
+    def answer(
+        self,
+        question: str,
+        *,
+        document_ids: Collection[uuid.UUID] | None = None,
+        paper_ids: Collection[uuid.UUID] | None = None,
+    ) -> AnswerResponse:
+        """The final response: retrieve, ask once, validate, assemble."""
+        run = self.ask(question, document_ids=document_ids, paper_ids=paper_ids)
+        scope = AnswerScope(
+            document_ids=None if document_ids is None else frozenset(document_ids),
+            paper_ids=None if paper_ids is None else frozenset(paper_ids),
+        )
+        return assemble_response(
+            validate_answer(run.answer, run.context, scope),
+            context=run.context,
+            model=run.model,
+            prompt_version=run.prompt_version,
+            paper_titles=get_paper_titles(
+                self._sessions,
+                {passage.paper_id for passage in run.context.aliases.values()},
+            ),
+        )
 
     def ask(
         self,

@@ -234,3 +234,117 @@ def test_an_insufficient_answer_with_statements_is_not_accepted(
 
     with pytest.raises(MalformedAnswerError):
         Answering(sessions, FakeModel([reply, reply]), limits()).ask("glacier")
+
+
+# --- The full chain with the fake model (P5-T9) -------------------------------
+
+
+def stored_answer(
+    *citations: dict[str, object], sufficiency: str = "sufficient"
+) -> str:
+    return json.dumps(
+        {
+            "statements": [{"text": "Ice retreated.", "citations": list(citations)}],
+            "evidence_sufficiency": sufficiency,
+            "limitations": None,
+        }
+    )
+
+
+def test_full_chain_returns_validated_evidence_from_the_database(
+    sessions: sessionmaker[Session],
+) -> None:
+    document_id = add_document(
+        sessions,
+        {
+            "text": "Glaciers retreated quickly.",
+            "section_title": "Results",
+            "page_start": 7,
+            "page_end": 7,
+        },
+    )
+    reply = stored_answer({"alias": "P1", "quote": "retreated quickly"})
+
+    result = Answering(
+        sessions, FakeModel([reply], model_name="fake-z"), limits()
+    ).answer("glacier", document_ids=[document_id])
+
+    assert result.validation_status == "validated"
+    assert result.model == "fake-z"
+    assert result.claim_support == "not_evaluated"
+    [evidence] = result.evidence
+    assert (evidence.section, evidence.page_start) == ("Results", 7)
+    assert evidence.document_id == document_id
+    assert len(result.retrieved_passage_ids) == 1
+
+
+def test_full_chain_marks_an_invalid_citation_as_failed(
+    sessions: sessionmaker[Session],
+) -> None:
+    add_document(sessions, "Glaciers retreated quickly.")
+    reply = stored_answer({"alias": "P9", "quote": None})
+
+    result = Answering(sessions, FakeModel([reply]), limits()).answer("glacier")
+
+    assert result.validation_status == "failed"
+    assert result.evidence == ()
+    assert result.statements[0].citations[0].reason == "passage_not_found"
+
+
+def test_full_chain_applies_the_scope_to_citations(
+    sessions: sessionmaker[Session],
+) -> None:
+    paper = add_paper(sessions)
+    add_document(sessions, "Glaciers inside.", paper_id=paper)
+    reply = stored_answer({"alias": "P1", "quote": None})
+
+    result = Answering(sessions, FakeModel([reply]), limits()).answer(
+        "glacier", paper_ids=[paper]
+    )
+
+    assert result.validation_status == "validated"
+    assert result.evidence[0].paper_id == paper
+
+
+def test_full_chain_with_nothing_retrieved_is_insufficient_and_validated(
+    sessions: sessionmaker[Session],
+) -> None:
+    add_document(sessions, "Glaciers retreated.")
+    model = FakeModel([])
+
+    result = Answering(sessions, model, limits()).answer("volcano")
+
+    assert model.requests == []
+    assert result.evidence_sufficiency == "insufficient"
+    assert result.limitations == NOTHING_RETRIEVED
+    assert result.validation_status == "validated"
+    assert result.model is None
+    assert result.evidence == ()
+
+
+@pytest.mark.parametrize("scope_by", ["document_ids", "paper_ids"])
+def test_scope_is_checked_again_even_if_retrieval_leaks(
+    sessions: sessionmaker[Session],
+    monkeypatch: pytest.MonkeyPatch,
+    scope_by: str,
+) -> None:
+    """A retrieval bug must surface as a failed citation, not as evidence."""
+    wanted = add_paper(sessions)
+    wanted_document = add_document(sessions, "Rocks only.", paper_id=wanted)
+    add_document(sessions, "Glaciers elsewhere.")
+
+    def leaky(*args: Any, **kwargs: Any) -> Any:
+        kwargs.update(document_ids=None, paper_ids=None)
+        return search_passages(*args, **kwargs)
+
+    monkeypatch.setattr("app.services.answering.pipeline.search_passages", leaky)
+    scope = {"document_ids": [wanted_document], "paper_ids": [wanted]}[scope_by]
+    reply = stored_answer({"alias": "P1", "quote": None})
+
+    result = Answering(sessions, FakeModel([reply]), limits()).answer(
+        "glacier", **{scope_by: scope}
+    )
+
+    assert result.validation_status == "failed"
+    assert result.statements[0].citations[0].reason == "wrong_paper"
+    assert result.evidence == ()
