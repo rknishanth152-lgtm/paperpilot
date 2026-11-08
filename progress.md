@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–3 complete. PDFs can be uploaded through the UI, parsed by GROBID and inspected as stored passages. No retrieval, question answering or LLM integration yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-08 |
-| Current milestone | M6: Keyword retrieval (`not_started`). M5 `completed` 2026-11-08; M1–M4 `completed` 2026-11-03. |
+| Current milestone | M6: Keyword retrieval (`in_progress`: P4-T1 done). M5 `completed` 2026-11-08; M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 4, keyword retrieval (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -27,7 +27,7 @@ Milestones are proposals from the roadmap, not claims of completion. Statuses: `
 | M3 | GROBID parsing experiment (1) | `completed` | Learn real GROBID behaviour on 3–5 permitted papers | `docs/experiments/grobid-feasibility.md` with observations, failures, go/no-go | 2026-11-03: 5 papers processed and inspected; failure inputs attempted (real scanned paper impossible, reason recorded); answers in §7, limitations §8, representation `docs/design/parser-output.md`, decision go with limits (§9); PRD updated | M2 (minimal subset: P0-T2, P0-T3, Python environment) |
 | M4 | Database schema and migrations (2) | `completed` | `papers`, `documents`, `passages` with constraints | Migration applies to an empty DB; constraint tests pass | 2026-11-03: migration `d2ea199dd3d3` applies to an empty database and reverses; all 38 named check/unique/foreign-key constraints have passing failing-case tests (62 integration tests); repeat-ingestion rules tested; immutability documented in `CLAUDE.md` and enforced by a trigger; only the three tables (plus `alembic_version`); `docs/design/schema.md` §10 | M3 |
 | M5 | Paper ingestion and passage persistence (3) | `completed` | Upload → GROBID → passages, honest statuses | `AC-VS-01`..`AC-VS-04` evidenced | None | M4 |
-| M6 | Keyword retrieval (4) | `not_started` | PostgreSQL full-text retrieval; evaluation set; Recall@5 baseline | `AC-VS-05`; baseline file recorded | None | M5 |
+| M6 | Keyword retrieval (4) | `in_progress` | PostgreSQL full-text retrieval; evaluation set; Recall@5 baseline | `AC-VS-05`; baseline file recorded | None | M5 |
 | M7 | Evidence-backed question answering (5) | `not_started` | Retrieval → structured answer → citation validation | `AC-VS-06`..`AC-VS-08` | None | M6; `OQ-011` |
 | M8 | Evaluation harness (6) | `not_started` | Repeatable evaluation; VS-1 acceptance | `AC-VS-09`, `AC-VS-10` | None | M7 |
 | M9 | Structured extraction (7) | `not_started` | Datasets, metrics, limitations with evidence | `FR-EXT-*` criteria; baseline P/R/F1 | None | M7, M8; `OQ-006`, `OQ-009` |
@@ -109,9 +109,9 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`. **P3-T10** (manual run on real papers, §6.12) `completed`. Phase 3 is complete; next **P4-T1**. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`. **P3-T10** (manual run on real papers, §6.12) `completed`. Phase 3 is complete. Phase 4: P4-T1 `completed` (`docs/design/retrieval.md`); next **P4-T2**. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
-| Status | Phase 3 `completed`; Phase 4 `not_started`. Phases 0 to 3 are `completed` (M1 to M5). |
+| Status | Phase 4 `in_progress`: P4-T1 `completed`; next **P4-T2**. Phases 0 to 3 are `completed` (M1 to M5). |
 
 Summary of what is done (details in §3, §6 and §7): planning documents reviewed and approved (P0-T1); repository on E:, private on GitHub (P0-T2); PostgreSQL 18 and GROBID 0.9.1 via Compose (P0-T3); Python 3.14 with uv, pytest, ruff, mypy (P0-T4); settings module (P0-T5); FastAPI skeleton with `/health` (P0-T6); test conventions (P0-T7); GROBID experiment, decision **go with limits** (Phase 1); parser-output contract and schema design notes; database layer and Alembic; tables `papers`, `documents`, `passages` with an immutability trigger; DOI normalisation; 112 tests (Phase 2). Standing rule: every GROBID request sends `consolidateHeader=0`.
 
@@ -122,7 +122,7 @@ In dependency order (roadmap Phase 3).
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. The bounded reading carried from here was done in P3-T8.
 3. ~~P3-T3~~ to ~~P3-T8~~ `completed`. TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). A database failure in the final ingestion transaction leaves the document `processing` until the next startup marks it `interrupted` (P3-T7). Recovery assumes one server process; FR-ING-010's timeout alternative is not built (it needs a periodic job). Only WARNING-level log lines are visible under uvicorn's default logging (the per-document `interrupted` line shows; the `recovered=N` INFO summary does not); logging configuration is not yet set up.
-4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. ~~P3-T10~~ `completed`, M5 `completed`. Next **P4-T1:** check the PostgreSQL full-text documentation and record the configuration (`OQ-004`). **Before the Recall@5 baseline is treated as final, decide** how to handle broken ligatures (p3: 202 matches) and leaked figure text: at parse time, in the search index, or accepted as a limit. Not decided; the Recall@5 baseline will show the effect.
+4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. ~~P3-T10~~ `completed`, M5 `completed`. ~~P4-T1~~ `completed`: interim full-text configuration in `docs/design/retrieval.md` (`OQ-004` stays open until P4-T7). Next **P4-T2:** migration for the search column and GIN index; passages are protected by the immutability trigger, so check the migration against it. Carried to P4-T3: limit query length and handle NUL characters, which raise errors with every parser. Carried to P4-T5: do not use the six probe queries listed in `retrieval.md` §5. Broken ligatures and leaked figure text: baseline first, then a before/after in P4-T7 in the search representation only, never in `passages`.
 5. P0-T9 (CI) remains deferred.
 
 ## 6. Decisions and blockers
@@ -453,6 +453,8 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-08 | P3-T10: re-upload of all five (`AC-VS-04`) | `200`, `created: false` each; counts unchanged (5, 5, 324); 5 PDFs on disk |
 | 2026-11-08 | P3-T10: real GROBID outage on a throwaway database (container stopped, file uploaded, container restarted, Retry; `AC-VS-03`) | `failed`/`parser_unreachable` with no structure; after Retry the document was processed again and ended `failed`/`unreadable_pdf`, the correct result for that damaged test file. Database dropped, storage removed |
 | 2026-11-08 | P3-T10: developer opened the running app and reviewed it: "everything is fine". `AC-VS-01` to `AC-VS-04` evidenced above. Whether the real file picker was used was not stated, so it stays unconfirmed | **P3-T10 `completed`; Phase 3 and M5 `completed`** |
+| 2026-11-08 | P4-T1: PostgreSQL 18 documentation read (12.1, 12.2, 12.3, 12.11); GIN versus GiST page not read | Facts recorded in `docs/design/retrieval.md` §2 |
+| 2026-11-08 | P4-T1: read-only probes on the development database (324 passages, 6 probe queries): `english` and `simple`; `websearch_to_tsquery`, `plainto_tsquery`, OR form; four rankers; 14 hostile inputs. No rows written | AND matched 1-13 passages per probe, OR 80-167. Normalisation 2 ranked a passage under 100 characters first in 5 of 6 probes, normalisation 1 in 3 of 6. 12 hostile inputs raised no error. 40,000 words and a NUL character raised errors with every parser. Interim choice recorded; these probes are a sanity check, not an evaluation. **P4-T1 `completed`** (`OQ-004` open until P4-T7) |
 | 2026-11-08 | **Not verified for P3-T9:** `prefers-reduced-motion` in a browser (the pane cannot emulate it; only confirmed the CSS rule is loaded); screen reader use; drag and drop with a real file; file picker dialog (file set from script in the browser check) | Open |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.
