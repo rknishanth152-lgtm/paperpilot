@@ -59,6 +59,8 @@ class Settings(BaseSettings):
     llm_provider: str | None = None
     llm_model: str | None = None
     llm_api_key: SecretStr | None = None
+    # How long one model call may take before it fails with `model_timeout`.
+    llm_timeout_seconds: float = Field(default=60.0, gt=0)
 
     @field_validator("postgres_password")
     @classmethod
