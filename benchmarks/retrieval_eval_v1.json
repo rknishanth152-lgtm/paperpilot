@@ -1,11 +1,11 @@
 {
   "name": "PaperPilot retrieval evaluation set",
   "version": 1,
-  "status": "draft",
+  "status": "reviewed",
   "created": "2026-11-08",
   "drafted_by": "Claude Code, from the PDF text, without running retrieval for these questions",
-  "reviewer": null,
-  "review_date": null,
+  "reviewer": "rknishanth152-lgtm",
+  "review_date": "2026-11-08",
   "limits": "Small set (20 questions, 5 open-access papers, 3 fields). Any Recall@5 from it is a coarse baseline, not a general accuracy figure (RISK-15). Fixed before the first harness run: changes after results are seen must be logged in progress.md.",
   "corpus": [
     {
