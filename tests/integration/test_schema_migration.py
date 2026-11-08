@@ -4,12 +4,14 @@ from collections.abc import Iterator
 
 import pytest
 from sqlalchemy import Engine, inspect, text
+from sqlalchemy.exc import DBAPIError
 from tests.integration.conftest import create_database, drop_database, run_alembic
 
 from app.config import Settings
 
 CORE_TABLES = {"papers", "documents", "passages"}
-HEAD = "d2ea199dd3d3"
+BEFORE_SEARCH = "d2ea199dd3d3"
+HEAD = "e3ab5ad233d7"
 
 
 @pytest.fixture
@@ -56,3 +58,61 @@ def test_downgrade_removes_everything_and_upgrade_restores_it(
 
     run_alembic(empty_engine, "upgrade", "head")
     assert CORE_TABLES <= tables(empty_engine)
+
+
+def passage_columns(engine: Engine) -> set[str]:
+    return {column["name"] for column in inspect(engine).get_columns("passages")}
+
+
+def passage_indexes(engine: Engine) -> set[str]:
+    return {str(index["name"]) for index in inspect(engine).get_indexes("passages")}
+
+
+def test_search_migration_covers_existing_passages_and_reverses(
+    empty_engine: Engine,
+) -> None:
+    """P4-T2: passages stored before the column exists become searchable."""
+    run_alembic(empty_engine, "upgrade", BEFORE_SEARCH)
+    body = "The experiments replicated earlier studies."
+    with empty_engine.begin() as connection:
+        document_id = connection.execute(
+            text(
+                "INSERT INTO documents (sha256, size_bytes, storage_key) "
+                "VALUES (repeat('a', 64), 10, 'pdf/a') RETURNING id"
+            )
+        ).scalar_one()
+        passage_id = connection.execute(
+            text(
+                "INSERT INTO passages (document_id, ordinal, region, text) "
+                "VALUES (:d, 0, 'body', :t) RETURNING id"
+            ),
+            {"d": document_id, "t": body},
+        ).scalar_one()
+
+    run_alembic(empty_engine, "upgrade", "head")
+
+    with empty_engine.connect() as connection:
+        row = connection.execute(
+            text(
+                "SELECT text, search_vector @@ plainto_tsquery('english', 'replication') "
+                "FROM passages WHERE id = :id"
+            ),
+            {"id": passage_id},
+        ).one()
+    assert tuple(row) == (body, True)
+    with (
+        pytest.raises(DBAPIError, match="immutable"),
+        empty_engine.begin() as connection,
+    ):
+        connection.execute(text("UPDATE passages SET ordinal = 1"))
+
+    run_alembic(empty_engine, "downgrade", "-1")
+
+    assert "search_vector" not in passage_columns(empty_engine)
+    assert "ix_passages_search_vector" not in passage_indexes(empty_engine)
+    with empty_engine.connect() as connection:
+        kept = connection.execute(text("SELECT text FROM passages")).scalar_one()
+        version = connection.execute(
+            text("SELECT version_num FROM alembic_version")
+        ).scalar_one()
+    assert (kept, version) == (body, BEFORE_SEARCH)

@@ -138,6 +138,7 @@ No full-text column yet: it arrives with keyword retrieval in Phase 4 (`FR-RET-0
 | Unique: `documents.sha256`, `documents.storage_key`, `documents.tei_storage_key`, `papers.doi_normalized`, `passages (document_id, ordinal)` | Constraints above; also serve look-ups by hash, DOI and passage order |
 | `ix_documents_paper_id` on `documents (paper_id)` | Documents of a paper |
 | `ix_documents_processing` on `documents (processing_started_at) WHERE status = 'processing'` | Startup recovery scan (`FR-ING-010`) |
+| `ix_passages_search_vector`, GIN on `passages (search_vector)` | Keyword retrieval (`FR-RET-001`, added in migration `e3ab5ad233d7`, `docs/design/retrieval.md`) |
 
 Nothing else until a query needs it.
 
@@ -166,6 +167,8 @@ Read from the development database on 2026-11-03 after migration `d2ea199dd3d3`,
 | `papers` | `pk_papers` | `uq_papers_doi_normalized` | — | 6: `ck_papers_abstract_not_empty`, `ck_papers_doi_normalized_format`, `ck_papers_doi_not_empty`, `ck_papers_doi_pair`, `ck_papers_metadata_source_valid`, `ck_papers_title_not_empty` |
 | `documents` | `pk_documents` | `uq_documents_sha256`, `uq_documents_storage_key`, `uq_documents_tei_storage_key` | `fk_documents_paper_id_papers` | 15: `ck_documents_failure_message_length`, `ck_documents_failure_message_only_when_failed`, `ck_documents_failure_reason_iff_failed`, `ck_documents_failure_reason_valid`, `ck_documents_joined_not_negative`, `ck_documents_original_filename_length`, `ck_documents_page_count_positive`, `ck_documents_parsed_is_complete`, `ck_documents_processing_has_start`, `ck_documents_sha256_format`, `ck_documents_size_positive`, `ck_documents_skipped_not_negative`, `ck_documents_status_valid`, `ck_documents_storage_key_not_empty`, `ck_documents_tei_storage_key_not_empty` |
 | `passages` | `pk_passages` | `uq_passages_document_id_ordinal` | `fk_passages_document_id_documents` | 10: `ck_passages_back_type_not_empty`, `ck_passages_back_type_only_for_back`, `ck_passages_ordinal_not_negative`, `ck_passages_page_order`, `ck_passages_page_start_positive`, `ck_passages_pages_both_or_neither`, `ck_passages_region_valid`, `ck_passages_section_number_not_empty`, `ck_passages_section_title_not_empty`, `ck_passages_text_not_empty` |
+
+Added after that reading, by migration `e3ab5ad233d7` (P4-T2): the stored generated column `passages.search_vector` and the GIN index `ix_passages_search_vector`.
 
 Other objects: indexes `ix_documents_paper_id` and `ix_documents_processing` (partial, `status = 'processing'`); trigger `passages_immutable` with function `passages_forbid_update()`; Alembic's own `alembic_version` table. PostgreSQL 18 also records each `NOT NULL` column as a constraint; those follow the column tables above.
 

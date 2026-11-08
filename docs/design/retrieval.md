@@ -16,6 +16,8 @@
 | Ranking | `ts_rank(vector, query)`, normalisation 0 | Length normalisation favours fragments. `ts_rank_cd`: no evidence either way (§3) |
 | Tie-break | Passage id, so equal scores have a fixed order (`FR-RET-002`) | — |
 
+**Implemented so far:** the search column and index (P4-T2, migration `e3ab5ad233d7`). The query parsing and ranking above are not code yet (P4-T3).
+
 ## 2. What the documentation says
 
 - Only `websearch_to_tsquery` is documented as never raising syntax errors. `to_tsquery` does raise them. Nothing is stated either way for `plainto_tsquery`.
