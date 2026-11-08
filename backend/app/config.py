@@ -61,6 +61,16 @@ class Settings(BaseSettings):
     llm_api_key: SecretStr | None = None
     # How long one model call may take before it fails with `model_timeout`.
     llm_timeout_seconds: float = Field(default=60.0, gt=0)
+    # Upper bound on one response; only tokens actually produced are billed.
+    llm_max_output_tokens: int = Field(default=8000, gt=0)
+    # Extra attempts when the output breaks the answer format (FR-QA-003).
+    llm_malformed_retries: int = Field(default=1, ge=0)
+
+    # Passages retrieved per question; 5 matches the measured Recall@5 baseline.
+    answer_top_k: int = Field(default=5, gt=0)
+    # Budget for the passages sent to the model (FR-QA-002). Holds five of the
+    # longest passages seen in the Phase 1 papers (about 2,800 characters each).
+    max_context_chars: int = Field(default=16000, gt=0)
 
     @field_validator("postgres_password")
     @classmethod

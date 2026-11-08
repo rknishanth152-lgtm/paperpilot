@@ -7,6 +7,7 @@ see the explanation for the reason code instead.
 
 import logging
 import uuid
+from collections.abc import Collection
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -156,6 +157,17 @@ def process_in_background(ingestion: Ingestion, document_id: uuid.UUID) -> None:
         ingestion.process(document_id)
     except DocumentStateError as error:
         logger.info("ingestion document_id=%s skipped: %s", document_id, error)
+
+
+def get_paper_titles(
+    sessions: sessionmaker[Session], paper_ids: Collection[uuid.UUID]
+) -> dict[uuid.UUID, str | None]:
+    """Stored titles by paper id. A paper with no parsed title maps to None."""
+    with sessions() as session:
+        rows = session.execute(
+            select(Paper.id, Paper.title).where(Paper.id.in_(paper_ids))
+        )
+        return {row.id: row.title for row in rows}
 
 
 def _load(session: Session, document_id: uuid.UUID) -> Document:
