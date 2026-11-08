@@ -5,6 +5,10 @@ Retry policy for malformed output: the identical request is sent again, up to
 about the failure is fed back to the model, and retrieval is not repeated.
 Provider errors are not retried here: each is raised as its own `ModelError`.
 
+If there is nothing to show the model, it is not called, and the answer is
+`insufficient` (FR-QA-004). An `insufficient` answer from the model is kept as
+it is.
+
 Citations are not checked here; that is the validator's job (P5-T7).
 
 Logs carry counts only, never the question or paper text (NFR-PRI-002).
@@ -32,6 +36,11 @@ from app.services.llm import LanguageModel, ModelRequest, ModelUsage
 from app.services.retrieval.keyword import search_passages
 
 logger = logging.getLogger(__name__)
+
+NOTHING_RETRIEVED = (
+    "No passages matching the question were found in the material searched."
+)
+NOTHING_FITS = "Matching passages were found, but they were too long to include."
 
 
 @dataclass(frozen=True)
@@ -61,10 +70,27 @@ class ModelRun:
 
     answer: ModelAnswer
     context: AnswerContext
-    model: str
-    prompt_version: str
+    model: str | None  # None when no model was called
+    prompt_version: str | None
     usage: ModelUsage  # across all attempts
     attempts: int
+
+
+def _no_evidence(context: AnswerContext) -> ModelRun:
+    """The answer when there is nothing to show the model (FR-QA-004)."""
+    logger.info("answering skipped_model dropped=%d", context.passages_dropped)
+    return ModelRun(
+        answer=ModelAnswer(
+            statements=(),
+            evidence_sufficiency="insufficient",
+            limitations=NOTHING_FITS if context.dropped else NOTHING_RETRIEVED,
+        ),
+        context=context,
+        model=None,
+        prompt_version=None,
+        usage=ModelUsage(0, 0),
+        attempts=0,
+    )
 
 
 def request_answer(
@@ -136,4 +162,6 @@ class Answering:
             ),
             max_chars=limits.max_context_chars,
         )
+        if not context.aliases:
+            return _no_evidence(context)
         return request_answer(self._model, context, limits)

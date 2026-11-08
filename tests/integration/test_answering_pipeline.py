@@ -1,6 +1,7 @@
 """One retrieval, one model call, against PostgreSQL (P5-T5; FR-QA-001, AD-006)."""
 
 import json
+import uuid
 from typing import Any
 
 import pytest
@@ -9,7 +10,8 @@ from tests.integration.test_keyword_retrieval import add_document, add_paper
 from tests.unit.test_answer_call import VALID, limits
 
 from app.models import Paper
-from app.services.answering.pipeline import Answering
+from app.schemas.answer import MalformedAnswerError
+from app.services.answering.pipeline import NOTHING_FITS, NOTHING_RETRIEVED, Answering
 from app.services.ingestion.documents import get_paper_titles
 from app.services.llm import FakeModel
 from app.services.retrieval.keyword import QueryTooLongError, search_passages
@@ -137,3 +139,98 @@ def test_get_paper_titles(sessions: sessionmaker[Session]) -> None:
 
     assert get_paper_titles(sessions, ids) == {ids[0]: "Named", ids[1]: None}
     assert get_paper_titles(sessions, []) == {}
+
+
+# --- Insufficient evidence (P5-T8, FR-QA-004) ---------------------------------
+
+
+@pytest.mark.parametrize(
+    "question",
+    ["volcano eruption", "", "   ", "?!...", "the of and is"],
+)
+def test_nothing_retrieved_skips_the_model(
+    sessions: sessionmaker[Session], question: str
+) -> None:
+    add_document(sessions, "Glaciers retreated.")
+    model = FakeModel([])  # raises if it is ever called
+
+    result = Answering(sessions, model, limits()).ask(question)
+
+    assert model.requests == []
+    assert result.answer.evidence_sufficiency == "insufficient"
+    assert result.answer.statements == ()
+    assert result.answer.limitations == NOTHING_RETRIEVED
+    assert result.attempts == 0
+    assert (result.model, result.prompt_version) == (None, None)
+    assert (result.usage.input_tokens, result.usage.output_tokens) == (0, 0)
+    assert result.context.aliases == {}
+
+
+@pytest.mark.parametrize(
+    "scope",
+    [{"document_ids": []}, {"paper_ids": []}, {"paper_ids": [uuid.uuid4()]}],
+)
+def test_an_empty_or_unknown_scope_skips_the_model(
+    sessions: sessionmaker[Session], scope: dict[str, Any]
+) -> None:
+    add_document(sessions, "Glaciers retreated.")
+    model = FakeModel([])
+
+    result = Answering(sessions, model, limits()).ask("glacier", **scope)
+
+    assert model.requests == []
+    assert result.answer.evidence_sufficiency == "insufficient"
+
+
+def test_passages_too_long_for_the_budget_skip_the_model_and_say_why(
+    sessions: sessionmaker[Session],
+) -> None:
+    add_document(sessions, "Glaciers retreated. " * 50)
+    model = FakeModel([])
+
+    result = Answering(sessions, model, limits(max_context_chars=50)).ask("glacier")
+
+    assert model.requests == []
+    assert result.answer.evidence_sufficiency == "insufficient"
+    assert result.answer.limitations == NOTHING_FITS
+    assert result.context.passages_dropped == 1
+
+
+def test_the_models_insufficient_answer_is_preserved_without_citations(
+    sessions: sessionmaker[Session],
+) -> None:
+    add_document(sessions, "Glaciers retreated.")
+    reply = json.dumps(
+        {
+            "statements": [],
+            "evidence_sufficiency": "insufficient",
+            "limitations": "The passages do not cover this.",
+        }
+    )
+    model = FakeModel([reply], model_name="fake-b")
+
+    result = Answering(sessions, model, limits()).ask("glacier cost")
+
+    assert len(model.requests) == 1
+    assert result.answer.statements == ()
+    assert result.answer.limitations == "The passages do not cover this."
+    assert result.model == "fake-b"
+    assert result.prompt_version is not None
+
+
+def test_an_insufficient_answer_with_statements_is_not_accepted(
+    sessions: sessionmaker[Session],
+) -> None:
+    add_document(sessions, "Glaciers retreated.")
+    reply = json.dumps(
+        {
+            "statements": [
+                {"text": "A guess.", "citations": [{"alias": "P1", "quote": None}]}
+            ],
+            "evidence_sufficiency": "insufficient",
+            "limitations": None,
+        }
+    )
+
+    with pytest.raises(MalformedAnswerError):
+        Answering(sessions, FakeModel([reply, reply]), limits()).ask("glacier")
