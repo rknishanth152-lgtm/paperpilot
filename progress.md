@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T9 done). M1–M4 `completed` 2026-11-03. |
+| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T9 done; P3-T10 run done, developer review pending). M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -109,7 +109,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`; next **P3-T10**, the manual run on real papers. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`. **P3-T10** `in_progress`: the run on five real papers is done and recorded (§6.12); the developer's own review is pending. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
 | Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
 
@@ -122,7 +122,7 @@ In dependency order (roadmap Phase 3).
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. The bounded reading carried from here was done in P3-T8.
 3. ~~P3-T3~~ to ~~P3-T8~~ `completed`. TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). A database failure in the final ingestion transaction leaves the document `processing` until the next startup marks it `interrupted` (P3-T7). Recovery assumes one server process; FR-ING-010's timeout alternative is not built (it needs a periodic job). Only WARNING-level log lines are visible under uvicorn's default logging (the per-document `interrupted` line shows; the `recovered=N` INFO summary does not); logging configuration is not yet set up.
-4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. Next **P3-T10:** manual run on at least three real papers through the UI, with observations recorded. To look at during it: GROBID's text keeps broken ligatures (`signifi cance`, `fi ndings` in the raw TEI of p3), and some headings are not real headings (`P`, or a sentence used as a section title). The UI shows these exactly as stored. **The ligature spacing matters for Phase 4:** a keyword search for "findings" would miss those passages. Passages are immutable, so any fix needs a decision (at parse time or in the search index); not decided.
+4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. **P3-T10:** the developer opens the papers in the UI, including one upload with the real file picker, and adds or confirms observations (§6.12); then P3-T10 and M5 can be `completed`. **Before Phase 4, decide** how to handle broken ligatures (p3: 202 matches) and leaked figure text: at parse time, in the search index, or accepted as a limit. Not decided; the Recall@5 baseline will show the effect.
 5. P0-T9 (CI) remains deferred.
 
 ## 6. Decisions and blockers
@@ -238,6 +238,33 @@ Developer decided each of these.
 | npm instead of pnpm | pnpm on this machine is broken (answers `CommandNotFound`); npm ships with Node and needs no global install. `CLAUDE.md` §5 updated |
 | IBM Plex Sans and Serif through `@fontsource` (OFL-1.1) | A matched pair for technical reading; self-hosted, so no font requests leave the machine |
 | Dependencies: react, react-dom (MIT); vite, @vitejs/plugin-react, vitest, jsdom, Testing Library (react, dom, user-event), @types/react, @types/react-dom (MIT); typescript (Apache-2.0). Versions pinned exactly | No component, state, data-fetching, router or animation library: two views and CSS transitions do not need one |
+
+### 6.12 P3-T10 manual run observations (2026-11-08)
+
+Observations by Claude Code, from the development database and the running UI. **The developer has not yet reviewed these or looked at the papers in the UI** (`AC-VS-02` asks for the author's observations), so P3-T10 and M5 stay `in_progress` until they have. Real papers: the Phase 1 set (CC BY), not committed. The GROBID model in use is the CRF image (`AD-003`).
+
+| Paper | Upload to final status | Passages (abstract / body / caption / back) | Pages | Metadata |
+|---|---|---|---|---|
+| p1 BERT | 5.0 s | 128 (2 / 97 / 8 / 21) | 16 | Title and 4 authors correct. No DOI: the PDF prints none, so this is right |
+| p2 eLife | 5.9 s | 104 (2 / 77 / 15 / 10) | 30 | Title, 7 authors, DOI correct |
+| p3 PLoS Med | 2.0 s | 32 (1 / 24 / 6 / 1) | 6 | Title, author, DOI correct |
+| p4 PLoS ONE | 2.0 s | 39 (1 / 29 / 6 / 3) | 5 | Title, 3 authors, DOI correct |
+| p5 PLoS ONE | 1.8 s | 21 (3 / 12 / 2 / 4) | 4 | Title, 4 authors, DOI correct |
+
+**What held up.** All five reached `parsed`. 324 passages, ordinals continuous, every passage has a page, no body page runs backwards, no body passage lacks a section.
+
+**Page numbers against the PDFs.** Every passage was compared with `pdftotext` output for its stated page (315 checked; 9 had too little text to compare). The first and last 40 normalised characters were found on the stated pages for 291. For 23 of the other 24, most of the passage's text is still on its stated pages; the exact check failed on inline maths, footnote marks or leaked figure text. One is a real error: p1 passage 104 (caption of Table 2) mixes in body text from page 7 while recording only page 6.
+
+**Parser limits seen (GROBID's output, shown as stored).**
+
+| Limit | Where | Why it matters |
+|---|---|---|
+| Broken ligatures: `signifi cance`, `fi ndings`, `confl icts` | p3 only: 202 matches in 25 of 32 passages (regular-expression count). 0 in the other four | Keyword search for those words misses the passages (Phase 4) |
+| Figure or table text taken as prose | p1 passages 15, 93 (end of a real paragraph), 122 (chart axis labels); p2 passage 100 (table cells, region `back`) | Noise in retrieval; could be cited as if it were prose |
+| Caption mixed with body text | p1 passage 104 | Wrong content under a caption, and an incomplete page range |
+| Text that is not a heading used as a section title | p3: `P` (a drop cap), two pull-quote sentences. p2: `Table 1 continued on next page`, `Papers Experiments Effects All outcomes`. p1: a sentence beginning `QNLI Question Natural...` | Section labels shown and later cited can be wrong; following passages inherit them |
+
+None of these is a pipeline defect, and none is hidden: passages keep the parser's text unmodified (`DR-002`). Passages are immutable, so any correction is a decision about the parse step or the search index, not an edit.
 
 ## 7. Verification log
 
@@ -419,6 +446,12 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-08 | P3-T9: keyboard on the upload view (Tab order; focus visible on the file control) | Skip link, wordmark, file control, submit; focus ring visible. Keyboard path checked on the upload view only |
 | 2026-11-08 | P3-T9: mutation check (11 changes) | 10 caught at first; "Try again on any error" survived; test added; 11/11 caught; files restored |
 | 2026-11-08 | P3-T9: `npm ci`, `npm run dev` without and with `frontend/.env`, `npm run build`; backend ruff, mypy (56 files), all tests | Clean install; refuses to start without the setting and starts with it; build succeeds; clean; 310 backend tests passed. **P3-T9 `completed`** |
+| 2026-11-08 | P3-T10: five real papers uploaded through the frontend's `/api` proxy on the development database (real backend, GROBID, PostgreSQL) | All `parsed`, status sequence pending, processing, parsed; 1.8-5.9 s; details in §6.12 |
+| 2026-11-08 | P3-T10: structure view in the browser pane for all five | Badge `Parsed`, correct title, full passage counts (128, 104, 32, 39, 21), passages in order, each with a page line. Files were sent by script, not the file picker |
+| 2026-11-08 | P3-T10: every passage compared with `pdftotext` for its stated page | 315 checked: 291 exact at both ends; 23 of 24 others mostly on the stated pages; 1 real error (p1 passage 104) |
+| 2026-11-08 | P3-T10: database checks | 5 documents, 5 papers, 324 passages; all `parsed`; 0 parsed with zero passages; 0 page 0 or empty section; stored hash equals recorded hash 5/5; 5 TEI files present |
+| 2026-11-08 | P3-T10: re-upload of all five (`AC-VS-04`) | `200`, `created: false` each; counts unchanged (5, 5, 324); 5 PDFs on disk |
+| 2026-11-08 | P3-T10: real GROBID outage on a throwaway database (container stopped, file uploaded, container restarted, Retry; `AC-VS-03`) | `failed`/`parser_unreachable` with no structure; after Retry the document was processed again and ended `failed`/`unreadable_pdf`, the correct result for that damaged test file. Database dropped, storage removed |
 | 2026-11-08 | **Not verified for P3-T9:** `prefers-reduced-motion` in a browser (the pane cannot emulate it; only confirmed the CSS rule is loaded); screen reader use; drag and drop with a real file; file picker dialog (file set from script in the browser check) | Open |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

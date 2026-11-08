@@ -198,6 +198,26 @@ npm run build
 
 Commands are added here only after they have been run and verified.
 
+## Trying it end to end
+
+Verified 2026-11-08 with five real papers. In three terminals, from the repository folder:
+
+```bash
+docker compose up -d --wait
+```
+
+```bash
+uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+```
+
+```bash
+npm --prefix frontend run dev
+```
+
+Open `http://127.0.0.1:5173`, upload a PDF, and wait for it to reach `Parsed` or `Failed`. There is no list of uploaded documents yet: to get back to one, keep its address, or upload the same file again, which opens the existing document without processing it again.
+
+Parser limits you will see in the structure view are recorded in `progress.md` §6.12. Passages are shown exactly as stored, including the parser's mistakes.
+
 ## Important limits
 
 - **Local, single-user only.** There is no authentication. Do not expose PaperPilot to a shared or public network (`NFR-SEC-006`).
