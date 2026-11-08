@@ -51,6 +51,10 @@ class Settings(BaseSettings):
     # Upload limit (FR-ING-001). Placeholder until OQ-005 is answered in Phase 1.
     max_upload_mb: int = Field(default=50, gt=0)
 
+    # Longest question accepted for retrieval. Far longer input exhausts
+    # PostgreSQL's stack (docs/design/retrieval.md §3).
+    max_query_chars: int = Field(default=2000, gt=0)
+
     # LLM provider (OQ-011, decided in Phase 5). Unused until then.
     llm_provider: str | None = None
     llm_model: str | None = None

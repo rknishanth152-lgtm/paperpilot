@@ -16,7 +16,11 @@
 | Ranking | `ts_rank(vector, query)`, normalisation 0 | Length normalisation favours fragments. `ts_rank_cd`: no evidence either way (§3) |
 | Tie-break | Passage id, so equal scores have a fixed order (`FR-RET-002`) | — |
 
-**Implemented so far:** the search column and index (P4-T2, migration `e3ab5ad233d7`). The query parsing and ranking above are not code yet (P4-T3).
+**Implemented:** the search column and index (P4-T2, migration `e3ab5ad233d7`); query parsing, ranking and scope in `backend/app/services/retrieval/keyword.py` (P4-T3).
+
+**Scope rules (P4-T3).** Only `parsed` documents are searched. `None` means no restriction by that field. An empty collection means nothing is in scope, never everything. When document and paper scope are both given, a passage must satisfy both. An unknown id gives an empty list.
+
+**Input handling (P4-T3).** NUL characters and unpaired surrogates are removed, because they carry no meaning and the driver rejects them. A question over `MAX_QUERY_CHARS` (default 2,000) raises `QueryTooLongError` with code `query_too_long`. The roadmap says "no exception on arbitrary input"; this is the one deliberate exception. The PRD lists a very long query as a failure case with a structured error, and truncating would silently answer a different question. No other input raises.
 
 ## 2. What the documentation says
 

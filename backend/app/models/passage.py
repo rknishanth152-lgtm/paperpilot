@@ -26,7 +26,8 @@ SECTION_PATH_SQL = (
 
 # The configuration is named so the column never depends on the session's
 # default_text_search_config (docs/design/retrieval.md).
-SEARCH_VECTOR_SQL = "to_tsvector('english'::regconfig, text)"
+SEARCH_CONFIG = "english"
+SEARCH_VECTOR_SQL = f"to_tsvector('{SEARCH_CONFIG}'::regconfig, text)"
 
 
 class Passage(Base):
