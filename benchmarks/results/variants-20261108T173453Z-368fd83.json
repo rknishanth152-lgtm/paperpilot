@@ -1,0 +1,111 @@
+{
+  "kind": "exploratory comparison, not an evaluation metric",
+  "run_at": "2026-11-08T17:34:53.811709+00:00",
+  "code_revision": "368fd83975ecb1b306a0bd32fff6db9edee7793c",
+  "working_tree_clean": false,
+  "baseline_result": "retrieval-20261108T173245Z-368fd83.json",
+  "variants": [
+    {
+      "variant": "baseline: ts_rank, words ORed",
+      "hits_all_papers": 8,
+      "hits_question_paper": 9,
+      "evaluated": 16,
+      "gained": [],
+      "lost": []
+    },
+    {
+      "variant": "words ANDed",
+      "hits_all_papers": 0,
+      "hits_question_paper": 0,
+      "evaluated": 16,
+      "gained": [],
+      "lost": [
+        "q02",
+        "q03",
+        "q08",
+        "q09",
+        "q10",
+        "q11",
+        "q14",
+        "q16"
+      ]
+    },
+    {
+      "variant": "ts_rank_cd",
+      "hits_all_papers": 9,
+      "hits_question_paper": 10,
+      "evaluated": 16,
+      "gained": [
+        "q07",
+        "q12"
+      ],
+      "lost": [
+        "q08"
+      ]
+    },
+    {
+      "variant": "ts_rank, normalisation 1",
+      "hits_all_papers": 6,
+      "hits_question_paper": 7,
+      "evaluated": 16,
+      "gained": [
+        "q15"
+      ],
+      "lost": [
+        "q02",
+        "q09",
+        "q16"
+      ]
+    },
+    {
+      "variant": "ts_rank, normalisation 2",
+      "hits_all_papers": 0,
+      "hits_question_paper": 2,
+      "evaluated": 16,
+      "gained": [],
+      "lost": [
+        "q02",
+        "q03",
+        "q08",
+        "q09",
+        "q10",
+        "q11",
+        "q14",
+        "q16"
+      ]
+    },
+    {
+      "variant": "ts_rank_cd, normalisation 1",
+      "hits_all_papers": 7,
+      "hits_question_paper": 9,
+      "evaluated": 16,
+      "gained": [
+        "q07",
+        "q12"
+      ],
+      "lost": [
+        "q02",
+        "q08",
+        "q09"
+      ]
+    },
+    {
+      "variant": "split-ligature repair",
+      "hits_all_papers": 8,
+      "hits_question_paper": 9,
+      "evaluated": 16,
+      "gained": [],
+      "lost": []
+    },
+    {
+      "variant": "section title in the vector",
+      "hits_all_papers": 7,
+      "hits_question_paper": 10,
+      "evaluated": 16,
+      "gained": [],
+      "lost": [
+        "q09"
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Task | P4-T1 (`FR-RET-001`, `FR-RET-003`, `OQ-004`) |
-| Status | **Interim choice**, 2026-11-08. `OQ-004` is settled by the evaluation set (P4-T7), which does not exist yet |
+| Status | **Interim choice**, 2026-11-08, kept after the baseline (`docs/experiments/retrieval-baseline.md`). `OQ-004` stays open: 16 scored questions are too few to settle it |
 | Source | PostgreSQL 18 documentation, chapters 12.1, 12.2, 12.3 and 12.11, read 2026-11-08. Local server: PostgreSQL 18 |
 
 ## 1. The choice
@@ -55,7 +55,7 @@ Read-only queries on the development database: 324 passages from five real paper
 - **`simple` keeps stop words.** With AND almost nothing matches; with OR nearly every passage matches on words like "the".
 - **`websearch_to_tsquery` reads a question as operators.** `non-animal -experiments` produced a NOT on `experi`, and the word `or` becomes an operator. `FR-RET-003` asks that the question be treated as data.
 - **Length normalisation promotes very short passages.** Normalisation 2 ranked a passage under 100 characters first in 5 of the 6 probes, and normalisation 1 in 3 of 6. Without normalisation, the top passage was over 1,000 characters in all 6.
-- **`ts_rank` and `ts_rank_cd` overlap on these probes.** Neither was checked against what a correct answer would be. `ts_rank` is the interim default only because nothing here separates them; compare in P4-T7.
+- **`ts_rank` and `ts_rank_cd` overlap on these probes.** Neither was checked against what a correct answer would be. `ts_rank` is the interim default because nothing here separates them. The P4-T7 comparison moved one question net, which is noise.
 
 **Hostile input** (empty, spaces, punctuation, stop words only, SQL text, tsquery operators, unbalanced quotes, backslashes, a URL with `&`, Unicode, one 3,000-character token) returned rows or an empty result with all three parsers, with no errors. Two inputs raised errors with **every** parser, including `websearch_to_tsquery`:
 
@@ -66,13 +66,13 @@ Read-only queries on the development database: 324 passages from five real paper
 
 "Never raises syntax errors" does not cover size or driver errors. Because the OR form casts text back to a tsquery, which the documentation does not guarantee for arbitrary input, the P4-T4 tests must cover these inputs.
 
-**Stop-word limit (found in P4-T4).** The `english` list removes short words even when they are part of a term: `AT&T` reduces to nothing, and the `A` in "vitamin A" is lost. Such terms cannot be searched. A test pins this behaviour. Compare with the baseline misses in P4-T7.
+**Stop-word limit (found in P4-T4).** The `english` list removes short words even when they are part of a term: `AT&T` reduces to nothing, and the `A` in "vitamin A" is lost. Such terms cannot be searched. A test pins this behaviour. No baseline miss came from this limit.
 
 ## 4. Known weakness: broken ligatures
 
 In p3, a search for "findings" matches 6 passages, while 17 contain the split form `fi ndings`. A pattern for split `fi`/`fl` words matches 25 passages in p3 and none in the other four papers.
 
-**Plan:** leave the search text as stored for the baseline. Then test a repair in the search representation only, never in `passages` (`DR-002`), as a before/after in P4-T7 with the evaluation set held fixed.
+**Tested in P4-T7:** a repair in the search representation only, never in `passages` (`DR-002`), changed nothing on the evaluation set, whose three p3 questions were already hits. No repair is added now; the defect remains.
 
 ## 5. Probe queries (excluded from the evaluation set)
 
