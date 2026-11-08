@@ -53,7 +53,7 @@ At the end of meaningful work, update `progress.md` (inventory, task status, ver
 - **Logging:** structured logs; never log full paper text, prompts containing paper text, or credentials (`NFR-PRI-002`).
 - **Naming:** use the PRD terminology exactly: Paper, Document, Passage, Extracted item, Evidence, Citation. Statuses are lowercase snake_case values as defined in the PRD.
 - **Dependencies:** add one only with a stated reason and a check of its maintenance and licence. Prefer the standard library or an existing dependency for small tasks.
-- **Tooling:** the project's linter, formatter, type checker and test runner are an explicit setup decision (`OQ-014`). Use whatever `README.md` and the configuration files say. Decided 2026-11-03 in `progress.md` §6.8 (uv, pytest, ruff, mypy; pnpm for the frontend); `README.md` records the commands once installed (P0-T4). Anything not covered there: ask rather than choose silently. Do not reformat unrelated files.
+- **Tooling:** the project's linter, formatter, type checker and test runner are an explicit setup decision (`OQ-014`). Use whatever `README.md` and the configuration files say. Decided 2026-11-03 in `progress.md` §6.8 (uv, pytest, ruff, mypy; npm for the frontend, changed from pnpm at P3-T9); `README.md` records the commands once installed (P0-T4). Anything not covered there: ask rather than choose silently. Do not reformat unrelated files.
 
 ### Commands
 

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Proposed.** Nothing here is implemented. Values are provisional until the first pages are built and checked in a browser (roadmap P3-T9). |
+| Status | **§2 agreed and implemented** (P3-T9, `frontend/src/styles/tokens.css`). §3 motion: only the tokens and patterns used so far are implemented; the rest remains proposed. |
 | Owns | Visual and motion tokens, reusable patterns, implementation conventions |
 | Implements | `NFR-UX-001` (interface quality) and `NFR-ACC-001` in `PRD.md` |
 | Does not own | Requirements (`PRD.md`), working rules (`CLAUDE.md`) |
@@ -11,7 +11,7 @@ This document is where tokens live once agreed. Components use tokens from here,
 
 ## 1. Product character
 
-PaperPilot is a concentration tool for reading and checking evidence. The interface should feel **precise, calm and trustworthy**: the evidence and its status are the most important things on any screen. Visual direction (palette, typography, layout) is **not yet chosen**; it is decided at P3-T9 using the page process in `.claude/skills/paperpilot-engineering/references/ui-page-process.md`.
+PaperPilot is a concentration tool for reading and checking evidence. The interface should feel **precise, calm and trustworthy**: the evidence and its status are the most important things on any screen. Visual direction: cool grey-white surfaces, near-black ink, one ink-blue accent, and a reading serif for source text (agreed with the developer at P3-T9).
 
 **Developer requirements (2026-11-03):**
 
@@ -21,7 +21,35 @@ PaperPilot is a concentration tool for reading and checking evidence. The interf
 
 ## 2. Visual tokens
 
-To be defined at P3-T9: colour (with text-based status pairs that meet `NFR-ACC-001`), typography scale, spacing, radius, elevation, breakpoints.
+Agreed with the developer at P3-T9. The CSS custom properties in `frontend/src/styles/tokens.css` are the implementation. Contrast ratios were measured in the browser from those tokens.
+
+| Colour | Hex | Use |
+|---|---|---|
+| Mist | `#F5F7FA` | Page background |
+| Sheet | `#FFFFFF` | Panels |
+| Frost | `#EDF0F4` | Passage blocks |
+| Rule | `#D9DEE5` | Borders, dividers |
+| Ink | `#161A1F` | Body and passage text (16.28:1 on Mist, 15.29:1 on Frost) |
+| Slate text | `#535B66` | Secondary text, labels (6.40:1 on Mist, 6.01:1 on Frost) |
+| Ink blue | `#1F4F82` | Primary button, links, focus ring (7.83:1 on Mist; white text on it 8.40:1) |
+| Ink blue hover | `#183F69` | Primary button hover |
+| Blue wash | `#E6EEF7` | Hover, selected (Ink blue on it 7.18:1) |
+| Marker | `#FFF1B8` | Reserved for highlighting cited text; not used yet and not yet a token |
+
+| Status | Text on background | Contrast | Icon |
+|---|---|---|---|
+| Pending | `#4A5560` on `#EEF0F2` | 6.66:1 | Clock |
+| Processing | `#8A5A00` on `#FBF1DC` | 5.28:1 | Spinner |
+| Parsed | `#1E6B3A` on `#E5F2E8` | 5.65:1 | Check |
+| Failed | `#A3302A` on `#FBEAE7` | 5.98:1 | Alert |
+
+A status is always a word plus an icon; colour only reinforces it (`NFR-ACC-001`).
+
+**Type.** IBM Plex Sans (interface; 400, 500, 600) and IBM Plex Serif (paper titles and passage text; 400), self-hosted through `@fontsource`, so no font request leaves the machine. Sizes: `--text-sm` 13px, `--text-base` 15px, `--text-reading` 17px, `--text-lg` 20px, `--text-xl` 24px. Passage text is limited to `--measure-reading` (68 characters wide).
+
+**Space and shape.** `--space-1` to `--space-7` (4, 8, 12, 16, 24, 32, 48 px); `--radius-sm` 4px, `--radius-md` 8px. No shadows or gradients.
+
+**Breakpoints.** At 64rem (1024px) and above, the section list becomes a sticky left column. At 30rem (480px) and below, page and panel padding tighten.
 
 ## 3. Motion system
 

@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–2 complete. Local services, tooling, configuration, backend skeleton, GROBID experiment and decision, and the core database schema exist; no ingestion feature yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-03 |
-| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T8 done). M1–M4 `completed` 2026-11-03. |
+| Current milestone | M5: Paper ingestion and passage persistence (`in_progress`: P3-T1 to P3-T9 done). M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 3, end-to-end ingestion (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -70,6 +70,7 @@ Verification method and date are given for each line. "Not verified" means it co
 | Ingestion pipeline: `backend/app/services/ingestion/pipeline.py` (register: store then create `pending`, cleanup on failure; process: `processing`, GROBID, store TEI, parse, one transaction for paper + passages + `parsed`; every expected failure `failed` with its reason; identical files return the existing document, also under concurrent uploads; `failed` documents can be retried; one `process` per document at a time), 24 integration tests | Tests, mutation check, real end-to-end run (see §7) | 2026-11-04 |
 | Startup recovery: `backend/app/services/ingestion/recovery.py` (`recover_interrupted`: every `processing` document becomes `failed`/`interrupted`, start time kept; run from the app lifespan; startup fails if the database is unreachable), 6 integration and 4 unit tests | Tests, real server run, mutation check (see §7) | 2026-11-04 |
 | Document API: `backend/app/api/documents.py` (upload as raw body with bounded reading, status, structure, retry; processing as a background task), `api/errors.py` (one error envelope, no internals), `schemas/documents.py`, read service `services/ingestion/documents.py`, `explanations.py`; 27 integration and 5 unit tests | Tests, mutation check, real server with GROBID (see §7) | 2026-11-04 |
+| Frontend (P0-T8, P3-T9): `frontend/` with upload view and document view (real status with polling, failure explanation and Retry, metadata, section list, passages exactly as stored with page or "page unknown"), API client, design tokens; 24 tests | Tests, mutation check, browser run with real backend and GROBID (see §7) | 2026-11-08 |
 | GitHub remote `origin`: https://github.com/rknishanth152-lgtm/paperpilot (private), `main` tracks `origin/main` | `gh repo view`, `git ls-remote` (see §7) | 2026-11-03 |
 | Claude Code development skills (project-local, see §3.5) | Fresh headless Claude Code session listed all eight skills; see §7 | 2026-11-03 |
 | `docs/design-system.md`, status **proposed**: motion principles, provisional motion tokens and patterns; visual tokens not yet defined | File created; nothing implemented or browser-tested | 2026-11-03 |
@@ -108,7 +109,7 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery) and P3-T8 (HTTP API) `completed`; next **P3-T9**, the first frontend pages. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`; next **P3-T10**, the manual run on real papers. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
 | Status | `in_progress`. Phases 0, 1 and 2 are `completed` (M1, M2, M3, M4). |
 
@@ -121,7 +122,7 @@ In dependency order (roadmap Phase 3).
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. The bounded reading carried from here was done in P3-T8.
 3. ~~P3-T3~~ to ~~P3-T8~~ `completed`. TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). A database failure in the final ingestion transaction leaves the document `processing` until the next startup marks it `interrupted` (P3-T7). Recovery assumes one server process; FR-ING-010's timeout alternative is not built (it needs a periodic job). Only WARNING-level log lines are visible under uvicorn's default logging (the per-document `interrupted` line shows; the `recovered=N` INFO summary does not); logging configuration is not yet set up.
-4. **P3-T9:** first frontend pages. Before it: P0-T8 (frontend toolchain check), and the colour theme is explained to the developer and agreed (`docs/design-system.md` §1).
+4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. Next **P3-T10:** manual run on at least three real papers through the UI, with observations recorded. To look at during it: GROBID's text keeps broken ligatures (`signifi cance`, `fi ndings` in the raw TEI of p3), and some headings are not real headings (`P`, or a sentence used as a section title). The UI shows these exactly as stored. **The ligature spacing matters for Phase 4:** a keyword search for "findings" would miss those passages. Passages are immutable, so any fix needs a decision (at parse time or in the search index); not decided.
 5. P0-T9 (CI) remains deferred.
 
 ## 6. Decisions and blockers
@@ -196,7 +197,7 @@ The developer asked Claude to settle the remaining Phase 0 questions with the be
 | `OQ-014` Python | Python 3.14, managed by **uv** and pinned in `.python-version` (not the system Python). | 3.14 is a supported bugfix release; cp314 Windows wheels were confirmed for SQLAlchemy 2.1.6, psycopg-binary 3.3.7, asyncpg 0.32.0, lxml 6.1.3, mypy 2.4.1. uv gives one tool for Python versions, virtual environments and a lock file. **FastAPI and pydantic support for 3.14 was not confirmed** (PyPI page blocked/truncated). | FastAPI or pydantic fails to install on 3.14 at P0-T4; then pin 3.13 with uv and record why |
 | `OQ-014` backend libraries | FastAPI + Pydantic v2; SQLAlchemy 2.1 + Alembic (`AD-012`); **psycopg 3** (synchronous) as the driver; httpx for the GROBID client; lxml for TEI parsing. | Synchronous database access is easier to learn and debug; `AD-010` runs ingestion in-process, so async adds complexity without a measured need. psycopg 3 is the maintained PostgreSQL driver with Windows wheels. | Measured concurrency problems |
 | `OQ-014` quality tools | pytest (test runner), ruff (lint and format), mypy (type check). | Widely used, maintained, Windows wheels available; ruff replaces several tools; matches `CLAUDE.md` §5 type-hint rule. | — |
-| `OQ-014` frontend | Vite + React + TypeScript (strict), **pnpm** as package manager (installed at P0-T8/P3 with `npm install -g pnpm`, the method pnpm recommends on Windows). Node 24 is already installed (Vite needs 20.19+ or 22.12+). **No component library, data-fetching library or animation library chosen now**: decided at P3-T9 against `NFR-UX-001`; Motion for React (`motion`, imported from `motion/react`) is the candidate if CSS transitions are not enough. | Avoids committing to libraries before the first page exists (`CLAUDE.md` §10). | — |
+| `OQ-014` frontend | Vite + React + TypeScript (strict). Package manager **npm** (changed from pnpm at P3-T9, see §6.11). Node 24 is already installed (Vite needs 20.19+ or 22.12+). **No component library, data-fetching library or animation library chosen now**: decided at P3-T9 against `NFR-UX-001`; Motion for React (`motion`, imported from `motion/react`) is the candidate if CSS transitions are not enough. | Avoids committing to libraries before the first page exists (`CLAUDE.md` §10). | — |
 | Repository contents (P0-T2) | Commit `notes/` (the developer's own learning notes). Do **not** commit `transcripts/` (add to `.gitignore`). | Transcripts are third-party video content (`RISK-13`); notes are the developer's own writing. | — |
 | OneDrive original folder | Left in place. The developer deletes it when satisfied. | Deleting the developer's data is the developer's call. | — |
 
@@ -226,6 +227,17 @@ Developer chose both recommended options.
 | Upload body is the raw PDF bytes, not multipart; optional `X-Filename` header (percent-encoded, display only) | No new dependency (`python-multipart`); the server stops reading once the body passes `MAX_UPLOAD_MB`, while multipart would spool the whole file first | PRD `FR-ING-001` input wording (v0.8) |
 | Retry is explicit: `POST /documents/{id}/retry` for `failed` documents, and also `pending` ones (a stopped server can leave one `pending` before processing began; startup recovery only handles `processing`) | No hidden side effect on upload; the UI gets a Retry button | Closes §6.7 row 6 |
 | Users see a plain-language `failure_explanation` per reason code, never the stored `failure_message` | `failure_message` is for developers (`NFR-SEC-005`, `FR-UI-001`) | `services/ingestion/explanations.py` |
+
+### 6.11 P3-T9 decisions (2026-11-04 to 2026-11-08)
+
+Developer decided each of these.
+
+| Decision | Reason |
+|---|---|
+| Colour theme: cool neutrals (Mist, Frost, Ink), ink-blue accent, slate/ochre/moss/brick status pairs. The developer first asked for cooler neutrals than the warm proposal, then approved | `docs/design-system.md` §2 |
+| npm instead of pnpm | pnpm on this machine is broken (answers `CommandNotFound`); npm ships with Node and needs no global install. `CLAUDE.md` §5 updated |
+| IBM Plex Sans and Serif through `@fontsource` (OFL-1.1) | A matched pair for technical reading; self-hosted, so no font requests leave the machine |
+| Dependencies: react, react-dom (MIT); vite, @vitejs/plugin-react, vitest, jsdom, Testing Library (react, dom, user-event), @types/react, @types/react-dom (MIT); typescript (Apache-2.0). Versions pinned exactly | No component, state, data-fetching, router or animation library: two views and CSS transitions do not need one |
 
 ## 7. Verification log
 
@@ -398,5 +410,15 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-04 | P3-T8: unit tests for `read_limited` with a counting stream (stops at the first chunk over the limit); a chunked upload test without `Content-Length` | Round 2: the surviving change is caught; files restored |
 | 2026-11-04 | P3-T8: real server (uvicorn, real GROBID, throwaway database `paperpilot_api_check`, storage in a temporary folder) with failure inputs f01-f08 and paper p3 | f01 `415 not_pdf`; f02 `400 empty_file`; f03, f04, f05 `failed`/`unreadable_pdf`; f06 `failed`/`empty_parse`; f07, f08 `failed`/`no_text_layer`; each failed structure `409 document_not_parsed` with status and reason. p3 `parsed` in 10.5 s (upload to final poll), 32 passages, all with a page, title correct. Re-upload of p3: `200`, `created: false`. Retry of parsed: `409`. Unknown id `404`, malformed id `422`. 7 PDFs stored (f03-f08, p3; the duplicate stored nothing); p3's stored hash equals the original. Database dropped, temporary storage removed |
 | 2026-11-04 | P3-T8: ruff check, ruff format --check, mypy (56 files), all tests | Clean; 310 passed. **P3-T8 `completed`** |
+| 2026-11-04 | P0-T8: Node 24.15.0, npm 11.12.1 present; pnpm broken. `npm view` for each package (version, licence, last modified) | All updated within four months; licences MIT, Apache-2.0 (typescript), OFL-1.1 (fonts). `npm audit --omit=dev`: 0 vulnerabilities |
+| 2026-11-04 | P3-T9: helper and client tests written first (failed before the modules existed), then implementation | 15 passed |
+| 2026-11-08 | P3-T9: page tests (upload, polling, failure and retry, duplicate, not found, network error) and components; `npm test`, `npm run typecheck` | 24 passed; strict type check clean |
+| 2026-11-08 | P3-T9: browser pane with real backend, GROBID and a throwaway database: upload, parsed (p3, 32 passages) and failed views; no file; rejected file (`not_pdf`); real status sequence on upload (Processing, Failed) and on Retry; backend stopped | All as designed. Backend-down first showed a bare HTTP 500 message, reworded. Console: only the expected 415 from the rejected upload. Database dropped, storage removed |
+| 2026-11-08 | P3-T9: widths 375, 768, 1280 px on the parsed view | No horizontal scroll at any width; section list sticky at 1280 |
+| 2026-11-08 | P3-T9: contrast measured in the browser from the CSS tokens | 15 pairs, lowest 5.28:1 (Processing), all above AA 4.5:1 |
+| 2026-11-08 | P3-T9: keyboard on the upload view (Tab order; focus visible on the file control) | Skip link, wordmark, file control, submit; focus ring visible. Keyboard path checked on the upload view only |
+| 2026-11-08 | P3-T9: mutation check (11 changes) | 10 caught at first; "Try again on any error" survived; test added; 11/11 caught; files restored |
+| 2026-11-08 | P3-T9: `npm ci`, `npm run dev` without and with `frontend/.env`, `npm run build`; backend ruff, mypy (56 files), all tests | Clean install; refuses to start without the setting and starts with it; build succeeds; clean; 310 backend tests passed. **P3-T9 `completed`** |
+| 2026-11-08 | **Not verified for P3-T9:** `prefers-reduced-motion` in a browser (the pane cannot emulate it; only confirmed the CSS rule is loaded); screen reader use; drag and drop with a real file; file picker dialog (file set from script in the browser check) | Open |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

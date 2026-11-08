@@ -22,7 +22,7 @@ Verified on the developer's machine on 2026-11-03 (see `progress.md` §7):
 
 - Docker Desktop with the WSL 2 backend
 - Git
-- Node.js 24 (frontend, later phases)
+- Node.js 24 with npm (frontend)
 
 - uv 0.13 and Python 3.14 (below)
 
@@ -164,7 +164,39 @@ curl.exe -X POST http://127.0.0.1:8000/documents --data-binary "@paper.pdf" -H "
 
 Every error is `{"error": {"code", "message", "details"?}}` with no internal details. Upload rejections create nothing: `empty_file` (400), `file_too_large` (413, reading stops at `MAX_UPLOAD_MB`), `not_pdf` (415, decided by content). The interactive API docs are at `http://127.0.0.1:8000/docs`.
 
-The frontend does not exist yet (P0-T8/P3). Commands are added here only after they have been run and verified.
+## Running the frontend
+
+The frontend is in `frontend/` (React, TypeScript, Vite). Run these from that folder (verified 2026-11-08). First time only:
+
+```bash
+npm ci
+```
+
+```bash
+cp .env.example .env
+```
+
+With the backend running on port 8000, start the dev server and open `http://127.0.0.1:5173`:
+
+```bash
+npm run dev
+```
+
+The dev server forwards `/api` to `API_PROXY_TARGET` in `frontend/.env`, and refuses to start if that is not set. Checks:
+
+```bash
+npm test
+```
+
+```bash
+npm run typecheck
+```
+
+```bash
+npm run build
+```
+
+Commands are added here only after they have been run and verified.
 
 ## Important limits
 

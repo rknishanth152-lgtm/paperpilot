@@ -1,0 +1,58 @@
+/* Design tokens. Source of truth: docs/design-system.md §2 and §3.
+   Components use these names, never one-off colours or durations. */
+
+:root {
+  color-scheme: light;
+
+  /* Neutrals */
+  --color-mist: #f5f7fa; /* page background */
+  --color-sheet: #ffffff; /* panels */
+  --color-frost: #edf0f4; /* passage blocks */
+  --color-rule: #d9dee5; /* borders, dividers */
+  --color-ink: #161a1f; /* body and passage text */
+  --color-slate-text: #535b66; /* secondary text, labels */
+
+  /* Accent */
+  --color-accent: #1f4f82; /* primary button, links, focus ring */
+  --color-accent-hover: #183f69;
+  --color-accent-wash: #e6eef7; /* hover, selected */
+  --color-on-accent: #ffffff;
+
+  /* Status pairs: always shown with a word (NFR-ACC-001) */
+  --color-pending-bg: #eef0f2;
+  --color-pending-text: #4a5560;
+  --color-processing-bg: #fbf1dc;
+  --color-processing-text: #8a5a00;
+  --color-parsed-bg: #e5f2e8;
+  --color-parsed-text: #1e6b3a;
+  --color-failed-bg: #fbeae7;
+  --color-failed-text: #a3302a;
+  --color-failed-rule: #f1c9c3;
+
+  /* Type */
+  --font-ui: "IBM Plex Sans", system-ui, sans-serif;
+  --font-reading: "IBM Plex Serif", Georgia, serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-reading: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+
+  /* Space and shape */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --measure-reading: 68ch;
+
+  /* Motion (docs/design-system.md §3.2) */
+  --motion-duration-fast: 120ms;
+  --motion-duration-base: 180ms;
+  --motion-ease-out: cubic-bezier(0.2, 0, 0, 1);
+}
