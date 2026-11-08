@@ -10,7 +10,7 @@ This file records **what actually exists and has been verified**. It is not a pl
 | Current stage | Phases 0–3 complete. PDFs can be uploaded through the UI, parsed by GROBID and inspected as stored passages. No retrieval, question answering or LLM integration yet. |
 | Overall status | `in_progress` |
 | Last updated | 2026-11-08 |
-| Current milestone | M6: Keyword retrieval (`in_progress`: P4-T1 to P4-T3 done). M5 `completed` 2026-11-08; M1–M4 `completed` 2026-11-03. |
+| Current milestone | M6: Keyword retrieval (`in_progress`: P4-T1 to P4-T4 done). M5 `completed` 2026-11-08; M1–M4 `completed` 2026-11-03. |
 | Current phase | Phase 4, keyword retrieval (`docs/implementation-roadmap.md`) |
 | Next release target | VS-1 (see `PRD.md` §12.1) |
 
@@ -109,9 +109,9 @@ Rejected: `ghalex/skills` (no licence file; requires auth, Redux and a monorepo 
 
 | Field | Value |
 |---|---|
-| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`. **P3-T10** (manual run on real papers, §6.12) `completed`. Phase 3 is complete. Phase 4: P4-T1 to P4-T3 `completed` (`docs/design/retrieval.md`); next **P4-T4**. |
+| Task | Phase 3 (M5): end-to-end ingestion. P3-T1 (storage), P3-T2 (upload validation), P3-T3 (GROBID client), P3-T4 (TEI parsing), P3-T5 (ingestion pipeline), P3-T6 (duplicates, retries), P3-T7 (startup recovery), P3-T8 (HTTP API) and P3-T9 (first frontend pages) `completed`. **P3-T10** (manual run on real papers, §6.12) `completed`. Phase 3 is complete. Phase 4: P4-T1 to P4-T4 `completed` (`docs/design/retrieval.md`); next **P4-T5**. |
 | Inputs | `docs/design/parser-output.md`, `docs/design/schema.md`, PRD `FR-ING-001`..`FR-ING-010`, `NFR-SEC-002`, `AD-002` |
-| Status | Phase 4 `in_progress`: P4-T1 to P4-T3 `completed`; next **P4-T4**. Phases 0 to 3 are `completed` (M1 to M5). |
+| Status | Phase 4 `in_progress`: P4-T1 to P4-T4 `completed`; next **P4-T5**. Phases 0 to 3 are `completed` (M1 to M5). |
 
 Summary of what is done (details in §3, §6 and §7): planning documents reviewed and approved (P0-T1); repository on E:, private on GitHub (P0-T2); PostgreSQL 18 and GROBID 0.9.1 via Compose (P0-T3); Python 3.14 with uv, pytest, ruff, mypy (P0-T4); settings module (P0-T5); FastAPI skeleton with `/health` (P0-T6); test conventions (P0-T7); GROBID experiment, decision **go with limits** (Phase 1); parser-output contract and schema design notes; database layer and Alembic; tables `papers`, `documents`, `passages` with an immutability trigger; DOI normalisation; 112 tests (Phase 2). Standing rule: every GROBID request sends `consolidateHeader=0`.
 
@@ -122,7 +122,7 @@ In dependency order (roadmap Phase 3).
 1. ~~P3-T1~~ `completed`: `backend/app/storage.py`.
 2. ~~P3-T2~~ `completed`: `backend/app/services/ingestion/validation.py`. The bounded reading carried from here was done in P3-T8.
 3. ~~P3-T3~~ to ~~P3-T8~~ `completed`. TEI files from failed attempts stay in storage, unreferenced; nothing is deleted automatically (`DR-008`). A database failure in the final ingestion transaction leaves the document `processing` until the next startup marks it `interrupted` (P3-T7). Recovery assumes one server process; FR-ING-010's timeout alternative is not built (it needs a periodic job). Only WARNING-level log lines are visible under uvicorn's default logging (the per-document `interrupted` line shows; the `recovered=N` INFO summary does not); logging configuration is not yet set up.
-4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. ~~P3-T10~~ `completed`, M5 `completed`. ~~P4-T1~~ `completed`: interim full-text configuration in `docs/design/retrieval.md` (`OQ-004` stays open until P4-T7). ~~P4-T2~~ `completed`: `passages.search_vector` and its GIN index (migration `e3ab5ad233d7`). ~~P4-T3~~ `completed`: `search_passages` in `backend/app/services/retrieval/keyword.py`, setting `MAX_QUERY_CHARS`. Next **P4-T4:** the fuller test set for hostile input and scope isolation. Carried to P4-T5: do not use the six probe queries listed in `retrieval.md` §5. Broken ligatures and leaked figure text: baseline first, then a before/after in P4-T7 in the search representation only, never in `passages`.
+4. ~~P0-T8~~ and ~~P3-T9~~ `completed`. ~~P3-T10~~ `completed`, M5 `completed`. ~~P4-T1~~ `completed`: interim full-text configuration in `docs/design/retrieval.md` (`OQ-004` stays open until P4-T7). ~~P4-T2~~ `completed`: `passages.search_vector` and its GIN index (migration `e3ab5ad233d7`). ~~P4-T3~~ `completed`: `search_passages` in `backend/app/services/retrieval/keyword.py`, setting `MAX_QUERY_CHARS`. ~~P4-T4~~ `completed`. Next **P4-T5:** the evaluation set, written before looking at retrieval output for those questions. Carried to P4-T5: do not use the six probe queries listed in `retrieval.md` §5. Broken ligatures and leaked figure text: baseline first, then a before/after in P4-T7 in the search representation only, never in `passages`.
 5. P0-T9 (CI) remains deferred.
 
 ## 6. Decisions and blockers
@@ -463,6 +463,9 @@ Only checks actually performed. Nothing in this log refers to application behavi
 | 2026-11-08 | P4-T3: mutation check (13 changes: any status, AND, no tie-break, worst first, no limit, each scope ignored, empty scope as everything, NUL kept, surrogates kept, no length limit, no k check) | All 13 caught; file restored |
 | 2026-11-08 | P4-T3: real function on the development database with the five excluded probe queries | 3.7-11.4 ms per search; results from the expected paper for four probes, a mix of p2 and p3 for the fifth. This shows it runs on real data, not that results are correct. Scope to one document or paper returned only that paper; no-match empty; SQL-like text ran safely; 40,000 words gave `query_too_long`; 324 passages unchanged |
 | 2026-11-08 | P4-T3: ruff check, ruff format --check, mypy (62 files), all tests, `alembic check` | Clean; 352 passed. **P4-T3 `completed`** |
+| 2026-11-08 | P4-T4: `tests/integration/test_retrieval_hostile_input.py`: empty and punctuation-only input, SQL-like input with stored data compared before and after, operator-like input, awkward tokens, 300 seeded arbitrary strings, scope isolation, repeated order. No application code changed | One failure on `AT&T`: `ts_debug` shows `AT` and `T` are `english` stop words, so a limit of the configuration, not a bug. Replaced by an explicit known-limit test and recorded in `retrieval.md` |
+| 2026-11-08 | P4-T4: mutation check (9 changes). "Replace every ampersand" survived because a URL's host still matched; a test isolating the shared path was added. "No tie-break" survives in this file only; `test_keyword_retrieval.py` catches it | 9/9 caught across the retrieval tests; file restored |
+| 2026-11-08 | P4-T4: ruff check, ruff format --check, mypy (63 files), all tests | Clean; 410 passed. **P4-T4 `completed`** |
 | 2026-11-08 | **Not verified for P3-T9:** `prefers-reduced-motion` in a browser (the pane cannot emulate it; only confirmed the CSS rule is loaded); screen reader use; drag and drop with a real file; file picker dialog (file set from script in the browser check) | Open |
 
 Not yet performed: confirmation that the files exist in the developer's folder (see below once committed); any run of application code (none exists). The scripts are structural checks only; they do not prove the documents are correct or complete.

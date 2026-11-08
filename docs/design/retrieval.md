@@ -66,6 +66,8 @@ Read-only queries on the development database: 324 passages from five real paper
 
 "Never raises syntax errors" does not cover size or driver errors. Because the OR form casts text back to a tsquery, which the documentation does not guarantee for arbitrary input, the P4-T4 tests must cover these inputs.
 
+**Stop-word limit (found in P4-T4).** The `english` list removes short words even when they are part of a term: `AT&T` reduces to nothing, and the `A` in "vitamin A" is lost. Such terms cannot be searched. A test pins this behaviour. Compare with the baseline misses in P4-T7.
+
 ## 4. Known weakness: broken ligatures
 
 In p3, a search for "findings" matches 6 passages, while 17 contain the split form `fi ndings`. A pattern for split `fi`/`fl` words matches 25 passages in p3 and none in the other four papers.
