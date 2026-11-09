@@ -8,6 +8,7 @@ Uses the database from `.env`. Reads only; writes one new file under
 benchmarks/results/. Refuses a set that has not been reviewed.
 """
 
+import argparse
 import hashlib
 import sys
 from datetime import UTC, datetime
@@ -90,6 +91,7 @@ def run_retrieval_evaluation(
 
 
 def main() -> None:
+    argparse.ArgumentParser(description=__doc__).parse_args()
     evaluation = load_evaluation_set()
     require_reviewed(evaluation)
     run_retrieval_evaluation(

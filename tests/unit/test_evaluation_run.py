@@ -2,11 +2,12 @@
 
 import json
 import subprocess
+import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from tests.evaluation.code_state import CodeState, code_state
+from tests.evaluation.code_state import REPO_ROOT, CodeState, code_state
 from tests.evaluation.run_answers import (
     AnswerRun,
     answer_configuration,
@@ -189,3 +190,28 @@ def test_answers_do_not_start_when_retrieval_fails() -> None:
         run_all(STATE, retrieval, answers)
 
     assert started == []
+
+
+@pytest.mark.parametrize(
+    "module",
+    [
+        "tests.evaluation.run_evaluation",
+        "tests.evaluation.run_retrieval",
+        "tests.evaluation.run_answers",
+    ],
+)
+def test_each_command_starts_outside_pytest(module: str) -> None:
+    results = REPO_ROOT / "benchmarks" / "results"
+    before = set(results.iterdir())
+
+    done = subprocess.run(
+        [sys.executable, "-m", module, "--help"],
+        check=False,
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+
+    assert done.returncode == 0, done.stderr
+    assert set(results.iterdir()) == before  # --help must not run the evaluation

@@ -15,6 +15,8 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
+
 from tests.evaluation.code_state import CodeState, code_state
 from tests.evaluation.dataset import load_evaluation_set
 from tests.evaluation.retrieval_harness import require_reviewed
