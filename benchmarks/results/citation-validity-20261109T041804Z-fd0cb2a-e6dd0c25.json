@@ -1,0 +1,38 @@
+{
+  "kind": "citation reference validity",
+  "run_at": "2026-11-09T04:18:04.309375+00:00",
+  "code_revision": "fd0cb2a6f869894fe5c371dd5317e91045bd2b56",
+  "working_tree_clean": true,
+  "scope": "Structural correctness only: each valid citation points to a real, in-scope passage containing any quote. This does not show that a passage supports a statement (AD-008). Answers without statements are excluded from the answer rate because they pass validation automatically.",
+  "source": {
+    "file": "answers-gemini-3.5-flash-lite-20261109T040343Z-9654929.json",
+    "sha256": "e6dd0c256d8d2874c3552358df01d7c2fd80ac1ad22af0124d02eb95a4056a25",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "answer-v1",
+    "code_revision": "9654929ca41bbc56409f884fadc3b09c64833c16",
+    "working_tree_clean": true,
+    "stopped_early": null,
+    "answers": 20
+  },
+  "result": {
+    "citations": {
+      "valid": 21,
+      "total": 21,
+      "rate": 1.0
+    },
+    "failure_reasons": {
+      "passage_not_found": 0,
+      "not_in_context": 0,
+      "wrong_paper": 0,
+      "quote_mismatch": 0
+    },
+    "uncited_statements": 0,
+    "answers_with_statements": {
+      "validated": 14,
+      "total": 14,
+      "rate": 1.0
+    },
+    "answers_without_statements": 6,
+    "answers_not_produced": 0
+  }
+}

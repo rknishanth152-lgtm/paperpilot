@@ -70,3 +70,20 @@ Retrieval returned the same passages for all 20 questions, so every difference b
 - Statement text differed in 9 of 20 answers, q19 included.
 
 So one run's "4 of 4" is not a stable figure, and the model's own sufficiency label should not be read as a measure of quality. Two runs are too few to give a rate.
+
+## 6. Citation reference validity (P6-T2)
+
+Computed from the saved answer files, with no model call, by `tests/evaluation/citation_validity.py`.
+
+| Measure | First run (d09c9b6) | Second run (9654929) |
+|---|---|---|
+| Citations valid | 16 of 16 | 21 of 21 |
+| Answers with statements, validated | 13 of 13 | 14 of 14 |
+| Answers without statements (not counted in the rate) | 7 | 6 |
+| Model errors | 0 | 0 |
+| Failures, any of the four reasons | 0 | 0 |
+| Citations that carried a quote | 16 | 21 |
+
+Every citation carried a quote, so each one passed the stricter check. The sample is small, and no failure occurred in either run, so the failure path remains evidenced only by the fault-injection tests.
+
+**This 100% is structural.** It means each citation points to a real, in-scope passage that contains the quoted text. The second run's 14 validated answers include q06 and q19, which pass and still do not answer their questions. Whether passages support statements is measured separately in P6-T3.
