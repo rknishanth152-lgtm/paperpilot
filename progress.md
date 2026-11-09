@@ -320,6 +320,8 @@ The developer asked to finish the project soon while keeping it strong enough fo
 
 The developer asked for a new, unique interface suited to researchers and students, with no internal terms such as GROBID or parsed, and a logo. Approved from a clickable mockup: a three-area reading desk, a new light theme, plain wording, and the dependencies in the §7 entry. `OQ-014` recorded no component library at the time; these are now the choices. `docs/design-system.md` holds the tokens.
 
+Logo: the developer chose **Flight lines** on 2026-11-09 (lines of text forming a heading, the highlighted line leading). `docs/brand/`, `frontend/public/favicon.svg`. No trademark search has been done.
+
 ## 7. Verification log
 
 Only checks actually performed. Nothing in this log refers to application behaviour, because none exists.
