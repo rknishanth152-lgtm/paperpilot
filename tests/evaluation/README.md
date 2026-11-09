@@ -28,4 +28,10 @@ uv run python -m tests.evaluation.citation_validity benchmarks/results/answers-X
 
 It reports valid ÷ total citations with a count per failure reason, and validated ÷ total for answers that contain statements. Answers with no statements pass validation automatically, so they are listed separately instead of raising the rate. Uncited statements and model errors are also listed separately. This is structural correctness only and says nothing about whether a passage supports a statement.
 
+Claim support (P6-T3, `FR-EVL-004`): `claim_support.py` has `draw` (fix the sample once), `sheet` (write the labelling page again) and `report` (check the labels, then save the rate). The guide is `benchmarks/claim_support_guide_v1.md`. The page holds passage text, so it stays in the git-ignored `data/` folder. To open it, serve that folder on this machine only:
+
+```bash
+uv run python -m http.server 8765 --bind 127.0.0.1 --directory data/labelling
+```
+
 Evaluation results are produced only by saved harness runs, never edited by hand (`CLAUDE.md` §6).

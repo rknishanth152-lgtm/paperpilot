@@ -36,7 +36,7 @@ Nine answers (q01, q02, q04, q05, q06, q07, q12, q13, q15) were read beside the 
 - **q06 passes every check but only partly answers the question.** It asked how often repeat studies succeeded for null results. The answer reports a related figure, from combining original and replication data, and marked itself `sufficient`.
 - **q12 was marked `partial`.** Its one statement is true but is about which trials shared data, not what the question asked. Its limitations say so.
 
-q06 is the known gap in practice: a valid citation can back a true statement that does not answer the question. Phase 6 measures this with human labels (`FR-EVL-004`).
+q06 is the known gap in practice: a valid citation can back a true statement that does not answer the question. The claim-support label (`FR-EVL-004`) does not measure this, because such a statement is supported. P6-T3 adds a separate label for it.
 
 The question page was then tried in the browser on the same model with q02 and q17. q02 showed its citation as valid, and the displayed passage, page and section matched the database. q17 showed "Not enough evidence" with no statements.
 

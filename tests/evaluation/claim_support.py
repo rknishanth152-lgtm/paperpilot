@@ -3,10 +3,12 @@
 From the repository folder, with PostgreSQL running and the corpus ingested:
 
     uv run python -m tests.evaluation.claim_support draw benchmarks/results/answers-X.json
+    uv run python -m tests.evaluation.claim_support sheet
     uv run python -m tests.evaluation.claim_support report
 
 `draw` fixes the sample and writes a labelling sheet to the git-ignored data/
-folder, because the sheet holds passage text. `report` checks the labels against
+folder, because the sheet holds passage text. `sheet` writes that page again from
+the fixed sample. `report` checks the labels against
 the sample and guide, then saves a new dated result. Neither calls a model.
 """
 
@@ -188,7 +190,7 @@ blockquote { margin:8px 0 16px; padding:12px 16px; background:var(--bg); border-
 fieldset { border:0; padding:0; margin:12px 0 0; }
 legend { font-weight:600; padding:0; }
 label { display:block; padding:3px 0; }
-.finish { position:sticky; bottom:0; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:16px; }
+.finish { background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:16px; }
 .who input { font:inherit; padding:6px 8px; border:1px solid var(--line); border-radius:6px; margin-right:12px; }
 textarea { width:100%; height:72px; font:12px/1.4 monospace; margin-top:8px; }
 button { font:inherit; color:#fff; background:var(--accent); border:0; border-radius:6px; padding:8px 16px; cursor:pointer; }
@@ -307,7 +309,8 @@ def render_sheet(
         "<h1>Claim-support labels</h1>"
         "<p>Use only the passage text shown. Read "
         "<code>benchmarks/claim_support_guide_v1.md</code> first. Give the two labels "
-        "separately.</p>"
+        "separately. Small extraction glitches, such as a word broken in two, are not "
+        "a reason for a lower label.</p>"
         f"{cards}"
         '<div class="finish"><p class="who">'
         f'<label>Labeller <input id="labeller" value="{DEFAULT_LABELLER}"></label> '
@@ -412,14 +415,30 @@ def draw(answers: Path) -> None:
         statements_in_source=len(items),
         items=items,
     )
-    passages = load_passages(
-        get_sessionmaker(), (c.passage_id for item in items for c in item.citations)
-    )
-    page = render_sheet(sample, passages, today=datetime.now(UTC).date())
+    page = _sheet_page(sample)
     write_new(sample.model_dump(mode="json"), SAMPLE)
+    _save_sheet(page)
+    print(f"Sample: {len(items)} statements. Sheet: {SHEET}")
+
+
+def _sheet_page(sample: Sample) -> str:
+    passages = load_passages(
+        get_sessionmaker(),
+        (c.passage_id for item in sample.items for c in item.citations),
+    )
+    return render_sheet(sample, passages, today=datetime.now(UTC).date())
+
+
+def _save_sheet(page: str) -> None:
     SHEET.parent.mkdir(parents=True, exist_ok=True)
     SHEET.write_text(page, encoding="utf-8")
-    print(f"Sample: {len(items)} statements. Sheet: {SHEET}")
+
+
+def sheet() -> None:
+    """Render the page again from the fixed sample, which stays unchanged."""
+    sample = Sample.model_validate_json(SAMPLE.read_text(encoding="utf-8"))
+    _save_sheet(_sheet_page(sample))
+    print(f"Sheet: {SHEET}")
 
 
 def report() -> None:
@@ -446,10 +465,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("draw").add_argument("answers", type=Path)
+    commands.add_parser("sheet")
     commands.add_parser("report")
     options = parser.parse_args()
     if options.command == "draw":
         draw(options.answers)
+    elif options.command == "sheet":
+        sheet()
     else:
         report()
 
