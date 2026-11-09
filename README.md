@@ -227,7 +227,7 @@ Uploading, parsing and search need no AI model; answering questions does. Set th
 
 ```text
 LLM_PROVIDER=gemini
-LLM_MODEL=gemini-3.8-flash
+LLM_MODEL=gemini-3.5-flash-lite
 LLM_API_KEY=your-key-here
 ```
 

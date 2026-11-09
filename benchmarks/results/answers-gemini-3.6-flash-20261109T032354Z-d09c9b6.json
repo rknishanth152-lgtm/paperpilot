@@ -1,0 +1,48 @@
+{
+  "kind": "manual real-model run",
+  "provider": "gemini",
+  "requested_model": "gemini-3.6-flash",
+  "run_at": "2026-11-09T03:23:54.067372+00:00",
+  "code_revision": "d09c9b67fdc5474f5055886ce424d45e7a244998",
+  "working_tree_clean": true,
+  "prompt_version": "answer-v1",
+  "evaluation_set_sha256": "2d903cc478e83dfa370e447c83f61d18d710408e4e37d1022c76d77d15d0fd86",
+  "limits": "Small set (20 questions, 5 open-access papers, 3 fields). Any Recall@5 from it is a coarse baseline, not a general accuracy figure (RISK-15). Fixed before the first harness run: changes after results are seen must be logged in progress.md.",
+  "stopped_early": "model_rate_limited",
+  "summary": {
+    "questions_run": 1,
+    "answerable": {
+      "total": 1,
+      "errors": 1,
+      "validated_with_statements": 0,
+      "failed_validation": 0,
+      "said_insufficient": 0,
+      "expected_passage_retrieved": 0,
+      "expected_passage_cited": 0
+    },
+    "unanswerable": {
+      "total": 0,
+      "errors": 0,
+      "said_insufficient": 0,
+      "gave_statements": 0,
+      "failed_validation": 0
+    },
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "mean_model_seconds": null,
+    "paid_equivalent_usd_per_answer": null
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "answerable": true,
+      "question": "Which optimizer and learning rate were used to pre-train the BERT model?",
+      "error": "model_rate_limited",
+      "seconds": 0.758,
+      "model_calls": 0,
+      "model_seconds": 0,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  ]
+}
