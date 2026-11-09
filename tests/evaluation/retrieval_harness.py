@@ -114,7 +114,7 @@ def keyword_retriever(
     return retrieve
 
 
-def _expected(
+def expected_passages(
     question: Question, passages: Mapping[str, Sequence[StoredPassage]]
 ) -> tuple[list[uuid.UUID], list[str]]:
     expected: list[uuid.UUID] = []
@@ -176,7 +176,7 @@ def evaluate(
             rows.append(row)
             continue
 
-        expected, unmatched = _expected(question, passages)
+        expected, unmatched = expected_passages(question, passages)
         unmatched_quotes += len(unmatched)
         row.update(
             expected_passage_ids=[str(passage_id) for passage_id in expected],
