@@ -1,0 +1,43 @@
+{
+  "kind": "claim support, human labels",
+  "run_at": "2026-11-09T09:33:35.390772+00:00",
+  "code_revision": "9e8e8c55d78bf75d49f32b861c49682b925ccb27",
+  "working_tree_clean": true,
+  "labeller": "RK Nishanth",
+  "labelled_on": "2026-11-09",
+  "sample_size": 20,
+  "seed": 20261109,
+  "guide_sha256": "47ce8d25a67f3680db3301b2fe399cd14a3b444e73f2b2df20b3505b030e674f",
+  "sample_sha256": "88bbd9cde8109005c4d4f082dcdc87a55e42e2c4b39f9a9784ab956cd6ce19bf",
+  "labels_sha256": "e8ec2a0669c401555e702b97d14d9543fee498b7881f6fd8025aad4bf383487d",
+  "source": {
+    "file": "answers-gemini-3.5-flash-lite-20261109T040343Z-9654929.json",
+    "sha256": "e6dd0c256d8d2874c3552358df01d7c2fd80ac1ad22af0124d02eb95a4056a25",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "answer-v1",
+    "code_revision": "9654929ca41bbc56409f884fadc3b09c64833c16"
+  },
+  "limits": "Small sample: one run of one model, labelled by one labeller, who had already read notes on q06, q12 and q19. It shows agreement with that person, not scientific truth, and is a coarse baseline (RISK-15).",
+  "result": {
+    "sample_size": 20,
+    "claim_support": {
+      "counts": {
+        "supported": 19,
+        "partly_supported": 0,
+        "not_supported": 1,
+        "cannot_judge": 0
+      },
+      "rate": 0.95
+    },
+    "answers_question": {
+      "counts": {
+        "yes": 14,
+        "partly": 5,
+        "no": 1,
+        "cannot_judge": 0
+      },
+      "rate": 0.7
+    },
+    "supported_but_not_fully_answering": 5
+  }
+}
