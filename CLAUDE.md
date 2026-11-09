@@ -14,7 +14,7 @@ PaperPilot is an evidence-first research intelligence and scientific-reproducibi
 |---|---|---|
 | `PRD.md` | Scope, requirements (`FR-`/`NFR-`/`DR-`), decisions (`AD-`), acceptance criteria, open questions (`OQ-`), risks (`RISK-`) | Task order or status |
 | `CLAUDE.md` (this file) | Working rules, architecture constraints, safety rules | Product scope |
-| `docs/implementation-roadmap.md` | Phase order, tasks (`P<n>-T<m>`), dependencies, exit criteria | Redefining requirements |
+| `docs/implementation-roadmap.md` | Release plan (work packages `R1` to `R12`), phase order, tasks (`P<n>-T<m>`), dependencies, exit criteria | Redefining requirements |
 | `progress.md` | What actually exists and has been verified; current task; blockers; verification log | Plans or aspirations |
 
 `notes/` and `transcripts/` (if present) are learning material from tutorial videos. They are **not requirements**. Where they conflict with the four documents above, the four documents win.
@@ -33,7 +33,7 @@ At the end of meaningful work, update `progress.md` (inventory, task status, ver
 
 ## 4. Architecture constraints
 
-- **Modular monolith** (`AD-001`): FastAPI backend, React + TypeScript frontend, PostgreSQL, GROBID as the one separate service. Code layout follows the PRD capability list: `backend/app/{api,models,schemas,services/{discovery,ingestion,extraction,retrieval,comparison,reproducibility},database}`, `tests/{unit,integration,evaluation}`, `benchmarks/`, `scripts/`, `docs/`.
+- **Modular monolith** (`AD-001`): FastAPI backend, React + TypeScript frontend, PostgreSQL, GROBID as the one separate service. Code layout follows the PRD capability list: `backend/app/{api,models,schemas,services/{ingestion,answering,retrieval,reproducibility},database}`, `tests/{unit,integration,evaluation}`, `benchmarks/`, `scripts/`, `docs/`. `discovery`, `extraction` and `comparison` are deferred after v1.0 and are not created unless reopened.
 - **Separation of concerns:** routes do HTTP only; services hold logic; models/database own persistence; schemas define external contracts. Cross-module access goes through service functions, not through another module's tables (`NFR-MNT-001`).
 - **Source vs interpretation:** passages (source) and machine-generated items/statuses are different tables. Never write generated text into `passages` (`DR-002`, `DR-004`). VS-1 answers are not persisted (PRD §8.2).
 - **Provenance:** every derived record links to passage(s) and records producing model/parser/prompt version (`DR-001`, `DR-005`).
@@ -99,11 +99,11 @@ Recorded so far (details in `README.md`): `docker compose up -d --wait`, `docker
 
 ## 9. Required development workflow
 
-Work incrementally, one roadmap task at a time:
+Work incrementally, one work package at a time (the release plan in `docs/implementation-roadmap.md`). Ask questions together when a package starts. Deliberate-breakage checks are required for evidence, validation and status rules. Record one `progress.md` entry per package.
 
 1. **Inspect** the relevant code, tests and documents.
 2. **Explain** the intended change and its impact (files, tables, behaviours) in a few sentences.
-3. **Plan** one small task. For anything that spans sessions, save the plan in `docs/plans/` (create only when needed).
+3. **Plan** one package, in small steps. For anything that spans sessions, save the plan in `docs/plans/` (create only when needed).
 4. **Implement only the approved scope.**
 5. **Add or update tests** in the same change (including failure cases).
 6. **Run** the appropriate tests and checks.
@@ -118,7 +118,7 @@ Ask the developer before: adding a dependency, changing a schema outside the cur
 ## 10. Scope discipline
 
 Do not:
-- Generate large parts of the application in one pass or implement multiple phases together.
+- Generate large parts of the application in one pass or implement multiple work packages together.
 - Rewrite or reformat unrelated files.
 - Add dependencies without justification.
 - Replace established architecture without explaining the trade-off and getting approval.

@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.11 (P5-T12 provider change, 2026-11-09; see `progress.md` §6.13) |
+| Version | 0.12 (v1.0 scope reduction, 2026-11-09; see `progress.md` §6.15) |
 | Date | 2026-11-03 |
-| Status | Planning. No application code exists yet (see `progress.md`). |
+| Status | In force. What actually exists is recorded in `progress.md`. |
 | Companion documents | `CLAUDE.md` (development rules), `progress.md` (actual state), `docs/implementation-roadmap.md` (sequence and exit criteria) |
 
 ## How this document is organised and how to read its labels
@@ -37,7 +37,7 @@ Papers spread objectives, methods, datasets, settings, metrics, results and limi
 
 ### 1.3 Proposed solution
 
-Combine: scholarly document parsing, structured extraction, evidence-linked retrieval, citation validation, cross-paper comparison, and reproducibility assessment. Every derived statement stays connected to a stored source passage.
+Combine: scholarly document parsing, structured extraction, evidence-linked retrieval, citation validation, cross-paper comparison, and reproducibility assessment. Every derived statement stays connected to a stored source passage. Structured extraction and cross-paper comparison are deferred after v1.0 (§12.3).
 
 ### 1.4 Vision
 
@@ -100,7 +100,7 @@ Secondary: developers studying existing methods, research teams comparing publis
 ### 3.1 MVP goals
 
 1. **VS-1 (vertical slice):** upload a permitted PDF, parse with GROBID, store document and passages, retrieve by keyword, answer from retrieved evidence, validate the citation references. (Section 12.)
-2. **MVP-1:** extend VS-1 with a repeatable evaluation harness, structured extraction of datasets/metrics/limitations, semantic and hybrid retrieval *if evaluation shows a benefit*, OpenAlex discovery, a comparison matrix built from extracted items, and an evidence-backed reproducibility checklist.
+2. **MVP-1 (the v1.0 release):** extend VS-1 with a repeatable evaluation harness, semantic and hybrid retrieval *adopted as the default only if evaluation shows a benefit*, and an evidence-backed reproducibility checklist. Structured extraction, OpenAlex discovery and the comparison matrix are deferred after v1.0 (§12.3).
 3. Every shipped capability has observable acceptance criteria and tests.
 
 ### 3.2 Non-goals for the MVP
@@ -140,7 +140,7 @@ FastAPI backend ── modules: api · schemas · models/database · services/
    ├──► Local filesystem via a storage interface (original PDFs, raw parser output)
    ├──► GROBID (HTTP, internal only)
    ├──► LLM provider (via a thin provider-independent interface)
-   └──► OpenAlex (Phase 9)
+   └──► OpenAlex (Phase 9, deferred after v1.0)
 ```
 
 ### 4.2 Core data flow (VS-1)
@@ -179,7 +179,7 @@ Basis column: **[P]** project direction, **[E]** engineering recommendation, **[
 
 ## 5. Functional requirements
 
-**Reading the tables:** "Phase" refers to `docs/implementation-roadmap.md`. "Scope" is **VS-1** or **MVP-1**. Failure cases listed are the ones the acceptance criteria must exercise. Unless stated, all errors return a structured error response without internal stack traces (`NFR-SEC-005`).
+**Reading the tables:** "Phase" refers to `docs/implementation-roadmap.md`. "Scope" is **VS-1**, **MVP-1** (the v1.0 release) or **Deferred after v1.0** (§12.3). Failure cases listed are the ones the acceptance criteria must exercise. Unless stated, all errors return a structured error response without internal stack traces (`NFR-SEC-005`).
 
 ### 5.1 Ingestion and parsing (`FR-ING`)
 
@@ -238,9 +238,9 @@ Basis column: **[P]** project direction, **[E]** engineering recommendation, **[
 | FR-EVL-002 | Compute Recall@5 for retrieval alone: a question counts as a hit if any expected supporting passage appears in the top 5. | eval set, retriever → metric | Expected quote not found in any stored passage (labelling error) | Output lists hits, misses, and unmatched expectations. Result is saved with date, code revision and configuration. | VS-1 · P4 · FR-RET-004 |
 | FR-EVL-003 | Compute the citation reference-validity rate over evaluation answers. | answers → rate | — | Reported as validated / total, with failure reasons. | VS-1 · P6 |
 | FR-EVL-004 | Compute the claim-support rate from human labels on a sample of statements, using a fixed labelling guide. | labelled statements → rate | Labeller disagreement | The guide, sample size and labeller are recorded. The rate is reported with its sample size. | VS-1 · P6 |
-| FR-EVL-005 | Compute extraction precision, recall and F1 against labelled papers using a documented matching rule (`OQ-009`). | extractions, labels → P/R/F1 | Ambiguous matches | Matching rule is written down before scoring. | MVP-1 · P7 |
+| FR-EVL-005 | Compute extraction precision, recall and F1 against labelled papers using a documented matching rule (`OQ-009`). | extractions, labels → P/R/F1 | Ambiguous matches | Matching rule is written down before scoring. | Deferred after v1.0 · P7 |
 | FR-EVL-006 | Compute reproducibility classification accuracy against hand-labelled items. | — | — | Reported per status, including confusion between `not_found` and `needs_review`. | MVP-1 · P11 |
-| FR-EVL-007 | If duplicate detection beyond identical-hash and DOI match is implemented, measure its precision and recall. | — | — | Applies only if fallback matching is built (`FR-DIS-002`). | MVP-1 · P9 |
+| FR-EVL-007 | If duplicate detection beyond identical-hash and DOI match is implemented, measure its precision and recall. | — | — | Applies only if fallback matching is built (`FR-DIS-002`). | Deferred after v1.0 · P9 |
 
 All evaluation outputs are generated by the harness and saved as run artifacts. They are never edited by hand and never presented as targets achieved.
 
@@ -248,31 +248,31 @@ All evaluation outputs are generated by the harness and saved as run artifacts. 
 
 | ID | Requirement | Input → Output | Failure cases | Acceptance criteria | Scope · Phase · Depends |
 |---|---|---|---|---|---|
-| FR-EXT-001 | Extract items of three types initially: `dataset`, `metric`, `limitation`, from a parsed document's passages. | document → extracted items | Document too long for one call (`OQ-009`); no items found | Each item has type, value text, model id, run id, status. "No items found" is recorded as an outcome, not as silence. | MVP-1 · P7 · FR-ING-007 |
-| FR-EXT-002 | Validate model output against a schema; record failures. | model output → items or failure record | Malformed output | A malformed response creates a failed run record, not partial silent data. | MVP-1 · P7 |
-| FR-EXT-003 | Every item must have at least one evidence link (passage + quotation). Verify quotation presence in the passage deterministically. Items with unmatched quotes are flagged `quote_unmatched` and excluded from comparisons by default. | item, passage → verification status | Fabricated quote | Fault-injection test with an invented quote yields `quote_unmatched`. | MVP-1 · P7 · FR-CIT-002 |
-| FR-EXT-004 | Store extracted items separately from passages; never modify passage text. | — | — | Schema review confirms no extracted text is written into `passages`. | MVP-1 · P7 · DR-002 |
-| FR-EXT-005 | Record each extraction run (model, prompt version, time). Re-running must not delete earlier runs or any item that a human has confirmed or corrected. | — | Re-run after correction | A re-run after a (simulated) confirmation leaves the confirmed item intact. | MVP-1 · P7 |
-| FR-EXT-006 | Evaluate against hand-labelled papers (`FR-EVL-005`). | — | — | A recorded baseline exists before extraction is used by comparison. | MVP-1 · P7 |
+| FR-EXT-001 | Extract items of three types initially: `dataset`, `metric`, `limitation`, from a parsed document's passages. | document → extracted items | Document too long for one call (`OQ-009`); no items found | Each item has type, value text, model id, run id, status. "No items found" is recorded as an outcome, not as silence. | Deferred after v1.0 · P7 · FR-ING-007 |
+| FR-EXT-002 | Validate model output against a schema; record failures. | model output → items or failure record | Malformed output | A malformed response creates a failed run record, not partial silent data. | Deferred after v1.0 · P7 |
+| FR-EXT-003 | Every item must have at least one evidence link (passage + quotation). Verify quotation presence in the passage deterministically. Items with unmatched quotes are flagged `quote_unmatched` and excluded from comparisons by default. | item, passage → verification status | Fabricated quote | Fault-injection test with an invented quote yields `quote_unmatched`. | Deferred after v1.0 · P7 · FR-CIT-002 |
+| FR-EXT-004 | Store extracted items separately from passages; never modify passage text. | — | — | Schema review confirms no extracted text is written into `passages`. | Deferred after v1.0 · P7 · DR-002 |
+| FR-EXT-005 | Record each extraction run (model, prompt version, time). Re-running must not delete earlier runs or any item that a human has confirmed or corrected. | — | Re-run after correction | A re-run after a (simulated) confirmation leaves the confirmed item intact. | Deferred after v1.0 · P7 |
+| FR-EXT-006 | Evaluate against hand-labelled papers (`FR-EVL-005`). | — | — | A recorded baseline exists before extraction is used by comparison. | Deferred after v1.0 · P7 |
 
 ### 5.7 Discovery (`FR-DIS`)
 
 | ID | Requirement | Input → Output | Failure cases | Acceptance criteria | Scope · Phase · Depends |
 |---|---|---|---|---|---|
-| FR-DIS-001 | Search OpenAlex by keyword, title or DOI and return normalised metadata. Verify API details and limits in OpenAlex docs before implementation. | query → paper metadata list | API error; timeout; rate limit; malformed response | Errors are reported distinctly from "no results". | MVP-1 · P9 |
-| FR-DIS-002 | Normalise DOIs and detect duplicates by DOI. Define fallback matching when DOI is absent (`OQ-007`). | — | Different DOI formats; same title different works | DOIs in different textual forms match. Fallback matches are flagged as probable, not certain. | MVP-1 · P9 |
-| FR-DIS-003 | Keep three states distinct per paper: metadata only, open-access landing page reported, direct PDF link reported. Never imply a PDF is available or permitted. | — | Landing page mistaken for PDF | A record with only a landing page is shown as such. | MVP-1 · P9 |
-| FR-DIS-004 | Reconstruct abstracts from the provider format where available; abstract is nullable. | — | Missing abstract | Null abstracts remain null. | MVP-1 · P9 |
-| FR-DIS-005 | Adding a discovered paper never blocks manual upload; a discovered paper can later have a document attached. | — | — | Manual upload works with discovery disabled. | MVP-1 · P9 |
+| FR-DIS-001 | Search OpenAlex by keyword, title or DOI and return normalised metadata. Verify API details and limits in OpenAlex docs before implementation. | query → paper metadata list | API error; timeout; rate limit; malformed response | Errors are reported distinctly from "no results". | Deferred after v1.0 · P9 |
+| FR-DIS-002 | Normalise DOIs and detect duplicates by DOI. Define fallback matching when DOI is absent (`OQ-007`). | — | Different DOI formats; same title different works | DOIs in different textual forms match. Fallback matches are flagged as probable, not certain. | Deferred after v1.0 · P9 |
+| FR-DIS-003 | Keep three states distinct per paper: metadata only, open-access landing page reported, direct PDF link reported. Never imply a PDF is available or permitted. | — | Landing page mistaken for PDF | A record with only a landing page is shown as such. | Deferred after v1.0 · P9 |
+| FR-DIS-004 | Reconstruct abstracts from the provider format where available; abstract is nullable. | — | Missing abstract | Null abstracts remain null. | Deferred after v1.0 · P9 |
+| FR-DIS-005 | Adding a discovered paper never blocks manual upload; a discovered paper can later have a document attached. | — | — | Manual upload works with discovery disabled. | Deferred after v1.0 · P9 |
 
 ### 5.8 Comparison (`FR-CMP`)
 
 | ID | Requirement | Input → Output | Failure cases | Acceptance criteria | Scope · Phase · Depends |
 |---|---|---|---|---|---|
-| FR-CMP-001 | Build a matrix for 2 or more papers over selected dimensions, using **only existing extracted items**. | paper ids, dimensions → matrix | Paper with no extractions | Missing cells show `not_extracted`, never a generated guess. | MVP-1 · P10 · FR-EXT-* |
-| FR-CMP-002 | Every cell lists its items with evidence links. | — | — | Clicking/reading any cell yields the source quotation and location. | MVP-1 · P10 |
-| FR-CMP-003 | Label each pair of reported results `directly_comparable`, `requires_context`, `not_comparable`, or `insufficient_information`, by deterministic rules over extracted dataset, metric, split/protocol and conditions. No ranking is produced unless `directly_comparable`. | results → label | Missing split; same dataset name different versions | Two results on different datasets are never `directly_comparable`. Missing context yields `insufficient_information`. Rules are documented and tested. | MVP-1 · P10 · `OQ-008` |
-| FR-CMP-004 | Represent a reported result with dataset, metric, value, split, conditions and evidence. Representation is an open decision (`OQ-008`). | — | — | Decided and documented before Phase 10 starts. | MVP-1 · P10 |
+| FR-CMP-001 | Build a matrix for 2 or more papers over selected dimensions, using **only existing extracted items**. | paper ids, dimensions → matrix | Paper with no extractions | Missing cells show `not_extracted`, never a generated guess. | Deferred after v1.0 · P10 · FR-EXT-* |
+| FR-CMP-002 | Every cell lists its items with evidence links. | — | — | Clicking/reading any cell yields the source quotation and location. | Deferred after v1.0 · P10 |
+| FR-CMP-003 | Label each pair of reported results `directly_comparable`, `requires_context`, `not_comparable`, or `insufficient_information`, by deterministic rules over extracted dataset, metric, split/protocol and conditions. No ranking is produced unless `directly_comparable`. | results → label | Missing split; same dataset name different versions | Two results on different datasets are never `directly_comparable`. Missing context yields `insufficient_information`. Rules are documented and tested. | Deferred after v1.0 · P10 · `OQ-008` |
+| FR-CMP-004 | Represent a reported result with dataset, metric, value, split, conditions and evidence. Representation is an open decision (`OQ-008`). | — | — | Decided and documented before Phase 10 starts. | Deferred after v1.0 · P10 |
 
 ### 5.9 Reproducibility (`FR-REP`)
 
@@ -335,10 +335,10 @@ No latency guarantees or service-level targets are set. Items marked **baseline*
 | W1 | Upload and process a paper | Choose PDF → validation → stored → parse → status `parsed` or `failed` with reason | VS-1 |
 | W2 | Inspect extracted document structure | Open document → see title/authors/abstract, sections, passages, page or "unknown" | VS-1 |
 | W3 | Ask a question | Select paper(s) → ask → see statements with citations → open each cited passage → see validity status and `claim_support: not_evaluated` | VS-1 |
-| W4 | Extract structured information | Run extraction → review items by type with quotes → note `quote_unmatched` items | MVP-1 |
-| W5 | Compare papers | Select papers and dimensions → matrix with evidence per cell → comparability labels | MVP-1 |
+| W4 | Extract structured information | Run extraction → review items by type with quotes → note `quote_unmatched` items | Deferred after v1.0 |
+| W5 | Compare papers | Select papers and dimensions → matrix with evidence per cell → comparability labels | Deferred after v1.0 |
 | W6 | Review reproducibility checklist | Open checklist → each item shows status and evidence → `needs_review` items listed | MVP-1 |
-| W7 | Discover papers | Search → see metadata and availability → add to project → attach a document by manual upload | MVP-1 |
+| W7 | Discover papers | Search → see metadata and availability → add to project → attach a document by manual upload | Deferred after v1.0 |
 | W8 | Correct or verify an item | Human confirms, corrects or rejects extracted items | Future |
 | W9 | Research-gap exploration, knowledge graph | — | Future |
 
@@ -368,8 +368,8 @@ No latency guarantees or service-level targets are set. Items marked **baseline*
 | Document | Table `documents` (VS-1) | One per distinct file hash. Status, failure reason, parser info, storage keys. |
 | Section | Columns `section_title`, `section_path` on `passages` (VS-1) | A separate `sections` table only if Phase 1 shows hierarchy is needed for retrieval or display. |
 | Passage | Table `passages` (VS-1) | Ordinal unique within a document. Carries its region (`abstract`, `body`, `caption`, `back`) and, for back matter, GROBID's type. |
-| Research claim / extracted item | Table `extracted_items` (Phase 7) | Types: `dataset`, `metric`, `limitation`; later more. Method and algorithm are item types, not separate tables, until needed. |
-| Evidence | Table `evidence` (Phase 7) | Links an item to a passage with a quotation and verification status. |
+| Research claim / extracted item | Table `extracted_items` (Phase 7, deferred after v1.0) | Types: `dataset`, `metric`, `limitation`; later more. Method and algorithm are item types, not separate tables, until needed. |
+| Evidence | Table `evidence` (Phase 7, deferred after v1.0) | Links an item to a passage with a quotation and verification status. |
 | Dataset, Metric, Method | Item types (Phase 7); normalised tables only if cross-paper entity merging proves necessary | Merging "ImageNet" variants across papers is a hard problem and is deferred. |
 | Reported result | Representation open (`OQ-008`) | Required fields: dataset, metric, value, split, conditions. |
 | Reproducibility item | Table `reproducibility_items` (Phase 11) | Status plus evidence links. |
@@ -478,13 +478,15 @@ Rules: the evaluation set exists before tuning. The same questions and ground tr
 
 **Definition of done for VS-1:** all AC-VS items satisfied with evidence; migrations apply cleanly to an empty database; tests run from a documented command; `README.md` states how to run GROBID, PostgreSQL, backend and frontend; known limitations are written down.
 
-### 12.2 MVP-1
+### 12.2 MVP-1 (the v1.0 release)
 
-VS-1 (accepted at the end of Phase 6, which completes its evaluation requirements) plus Phases 7–11 (`docs/implementation-roadmap.md`) and the release-readiness gate (milestone M14). Adoption of semantic or hybrid retrieval as the default is conditional on recorded evaluation.
+VS-1 (accepted at the end of Phase 6, which completes its evaluation requirements) plus semantic and hybrid retrieval (`FR-RET-005` to `FR-RET-007`), the reproducibility checklist (`FR-REP-001` to `FR-REP-005`, `FR-EVL-006`) and the release-readiness gate (milestone M14), delivered through work packages R1 to R12 in `docs/implementation-roadmap.md`. Adoption of semantic or hybrid retrieval as the default is conditional on recorded evaluation.
+
+Reduced by the developer on 2026-11-09 to finish sooner without lowering the quality bar (`progress.md` §6.15). Requirements marked **Deferred after v1.0** are not part of this release and must not be described as existing capabilities.
 
 ### 12.3 After the MVP
 
-Human correction workflow, knowledge graph, research-gap exploration (as hypotheses only), code repository analysis (static), stronger claim-support evaluation, asynchronous workers, object storage, authentication, deployment.
+Structured extraction (`FR-EXT-*`, `FR-EVL-005`), cross-paper comparison (`FR-CMP-*`), OpenAlex discovery (`FR-DIS-*`, `FR-EVL-007`), human correction workflow, knowledge graph, research-gap exploration (as hypotheses only), code repository analysis (static), stronger claim-support evaluation, asynchronous workers, object storage, authentication, deployment.
 
 ---
 
@@ -497,10 +499,10 @@ Human correction workflow, knowledge graph, research-gap exploration (as hypothe
 | OQ-003 | Are references stored (structured or raw only)? Are bibliography entries excluded from retrieval? | **Answered 2026-11-03** (`docs/experiments/grobid-feasibility.md` §7): GROBID returns structured and raw references separately from body text. References are not passages in VS-1; they stay in the stored raw TEI. Whether non-reference back matter (appendix, data availability, funding) becomes passages is decided in P1-T7. | Phase 3 |
 | OQ-004 | FTS language configuration and query function (e.g. `english` vs `simple`; `websearch_to_tsquery` vs others). Ranking function and its limits. | Phase 4 experiment on the evaluation set | Phase 4 |
 | OQ-005 | Upload size limit default. | **Answered 2026-11-03** (`docs/experiments/grobid-feasibility.md` §7): default 50 MB, configurable. Real papers were 0.09–1.85 MB; GROBID has no size limit and rejects over-long documents with `TOO_MANY_TOKENS`. | Phase 3 |
-| OQ-006 | Re-parse policy: how to keep evidence links valid when passages are regenerated. | Design review | Phase 7 |
-| OQ-007 | Paper matching when DOI is absent. | Phase 9 experiment | Phase 9 |
-| OQ-008 | Representation of reported results (table, JSON, typed items). | Design review with hand-built examples | Phase 10 |
-| OQ-009 | Extraction strategy for long documents; extraction-matching rule for scoring. | Phase 7 experiment | Phase 7 |
+| OQ-006 | Re-parse policy: how to keep evidence links valid when passages are regenerated. | **Deferred 2026-11-09** with Phase 7. Design review if reopened | Phase 7 |
+| OQ-007 | Paper matching when DOI is absent. | **Deferred 2026-11-09** with Phase 9. Experiment if reopened | Phase 9 |
+| OQ-008 | Representation of reported results (table, JSON, typed items). | **Deferred 2026-11-09** with Phase 10. Design review with hand-built examples if reopened | Phase 10 |
+| OQ-009 | Extraction strategy for long documents; extraction-matching rule for scoring. | **Deferred 2026-11-09** with Phase 7. Experiment if reopened | Phase 7 |
 | OQ-010 | Initial reproducibility checklist items. | Hand-label 3 papers | Phase 11 |
 | OQ-011 | LLM provider and model for answers and extraction (cost, structured-output support). | **Interim 2026-11-09:** Google Gemini free tier, `gemini-3.5-flash-lite`, developer's choice because a paid API account was out of reach (`progress.md` §6.13, `docs/experiments/answer-baseline.md`). Open-access papers only on the free tier. Settled by a short comparison on the evaluation set at P5-T12 | Phase 5 |
 | OQ-012 | Embedding model, dimension, pgvector index choice and limits. Verify limits in pgvector docs. | Phase 8 | Phase 8 |

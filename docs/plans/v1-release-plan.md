@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Proposed**, 2026-11-09. Not in force until the developer approves it. |
+| Status | **Approved** by the developer and applied, 2026-11-09 (`progress.md` §6.15). |
 | Replaces | Phases 6 (remainder) to 11 and gate M14 of `docs/implementation-roadmap.md` |
 | Why | The developer wants the project finished soon, at a standard fit for a public GitHub repository |
 

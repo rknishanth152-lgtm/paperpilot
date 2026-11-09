@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.2 (P0-T1 review changes applied 2026-11-03; see `progress.md` §6.7) |
+| Version | 0.3 (v1.0 release plan applied 2026-11-09; see `progress.md` §6.15) |
 | Date | 2026-11-03 |
 | Implements | `PRD.md` (requirement, decision, question and risk IDs below refer to it) |
 | Governed by | `CLAUDE.md` (how to work) |
@@ -12,10 +12,37 @@ The roadmap orders the work. It does not add or change requirements. If a phase 
 
 ---
 
+## Release plan in force (v1.0, since 2026-11-09)
+
+The unit of work is the **work package** below, one at a time, each with one go-ahead from the developer. Task IDs refer to the phase details later in this file, which remain the task definitions. Each package ends with tests, a recorded result, a commit and a push. Reasons are in `docs/plans/v1-release-plan.md` and `progress.md` §6.15.
+
+| # | Package | Covers | Developer input |
+|---|---|---|---|
+| R1 | Baseline report and VS-1 acceptance | P6-T5, P6-T6 | Accept VS-1 |
+| R2 | Embeddings: official docs check, migration, interface with fake and Gemini adapter, batch job, missing embeddings reported | P8-T1, P8-T2, P8-T3 | Approve sending passages to the embedding service |
+| R3 | Semantic and hybrid retrieval | P8-T4, P8-T5 | None |
+| R4 | Compare all three on the unchanged question set; choose the default from the results | P8-T6, P8-T7 | None |
+| R5 | Checklist v1 (about 6 items) and schema; labelling sheet | P11-T1, P11-T2 | Label 3 papers, about 18 items, **before any model output exists** |
+| R6 | Assessment pipeline, status rules, fault-injection tests | P11-T3, P11-T4, P11-T6 | None |
+| R7 | Checklist page and API wording review, no score or verdict | P11-T5 | Review the colour explanation and page |
+| R8 | Score against the labels; per-status accuracy and `not_found` versus `needs_review` confusion | P11-T7 | None |
+| R9 | CI, secret scan of full history, security, privacy, dependency and licence reviews, `LICENSE` file | P0-T9, M14-T2, M14-T3, M14-T7 | Choose a licence |
+| R10 | Fresh clone from README only, re-run all evaluations, keyboard, screen-reader and reduced-motion checks | M14-T1, M14-T4, M14-T5 | None |
+| R11 | Portfolio README: screenshots, architecture diagram, measured results, known limitations | M14-T6 | Review |
+| R12 | Sign-off, then make the repository public | M14 definition of done | Sign off; approve going public |
+
+**Order:** R1 first, because the baseline must exist before retrieval changes. R2 to R4 and R5 to R8 are independent of each other. R9 to R12 come last.
+
+**Deferred after v1.0:** Phases 7, 9 and 10 are not scheduled. Their details stay below as the starting point if they are reopened.
+
+**Working rules for packages:** questions are asked together when a package starts; deliberate-breakage checks are required for evidence, validation and status rules; `progress.md` gets one entry per package.
+
+---
+
 ## 1. How to use this roadmap
 
 1. Work one phase at a time, in the order below unless section 3 allows otherwise.
-2. Inside a phase, work **one task at a time** (`P<phase>-T<n>`). A task is small enough to implement, test and review in one sitting. If a task cannot be described with a concrete check, split it.
+2. Phases 0 to 5 were worked **one task at a time** (`P<phase>-T<n>`). From 2026-11-09 the unit of work is the work package in the release plan above. A task must still be describable with a concrete check; if it is not, split it.
 3. A phase is finished only when every **exit criterion** has evidence recorded in `progress.md`. Generated code or a passing demo is not evidence by itself.
 4. Statuses are `not_started`, `in_progress`, `blocked`, `completed`. Only `progress.md` holds them.
 5. Where a phase begins with an experiment or an open question, the result may change later phases. Update this file and record why.
@@ -33,12 +60,12 @@ The roadmap orders the work. It does not add or change requirements. If a phase 
 | M6 | Keyword retrieval | 4 | VS-1 |
 | M7 | Evidence-backed question answering | 5 | VS-1 |
 | M8 | Evaluation harness | 6 | VS-1 (acceptance) |
-| M9 | Structured extraction | 7 | MVP-1 |
-| M10 | Semantic and hybrid retrieval | 8 | MVP-1 |
-| M11 | Academic paper discovery | 9 | MVP-1 |
-| M12 | Cross-paper comparison | 10 | MVP-1 |
-| M13 | Reproducibility assessment | 11 | MVP-1 |
-| M14 | Reliability and release readiness | cross-phase gate after Phase 11 | MVP-1 |
+| M9 | Structured extraction | 7 | deferred after v1.0 |
+| M10 | Semantic and hybrid retrieval | 8 | v1.0 (MVP-1) |
+| M11 | Academic paper discovery | 9 | deferred after v1.0 |
+| M12 | Cross-paper comparison | 10 | deferred after v1.0 |
+| M13 | Reproducibility assessment | 11 | v1.0 (MVP-1) |
+| M14 | Reliability and release readiness | cross-phase gate after Phase 11 | v1.0 (MVP-1) |
 | — | Future extensions | 12 | not scheduled |
 
 **VS-1 is functionally complete at the end of Phase 5** (the full chain works) and **accepted at the end of Phase 6**, once all `AC-VS-xx` criteria in the PRD have recorded evidence.
@@ -66,7 +93,7 @@ Ph0 ─► Ph1 ─► Ph2 ─► Ph3 ─► Ph4 ─► Ph5 ─► Ph6 ═══ 
                                   ├─► Ph8 (needs Ph4 baseline + Ph6 harness)
                        Ph9 (needs Ph2/Ph3; independent of Ph4-Ph8)
                        Ph11 (needs Ph3, Ph5 quote verification; benefits from Ph7)
-   Ph7 + Ph8 + Ph9 + Ph10 + Ph11 ─► M14 gate ═══ MVP-1
+   Ph8 + Ph11 ─► M14 gate ═══ MVP-1 (v1.0)     Ph7, Ph9, Ph10 deferred after v1.0
 ```
 
 | Phase | Hard prerequisites | Notes |
@@ -83,7 +110,7 @@ Ph0 ─► Ph1 ─► Ph2 ─► Ph3 ─► Ph4 ─► Ph5 ─► Ph6 ═══ 
 | 9 | 2, 3 | May be done after Phase 6 in any order relative to 7 and 8. Must not delay VS-1. |
 | 10 | 7 | `OQ-008` decided at start. |
 | 11 | 3, 5, 6 | `OQ-010` decided at start. Using Phase 7 extraction as an input is optional. |
-| M14 | 7–11 complete (or explicitly descoped in `progress.md`) | |
+| M14 | 8 and 11 complete; 7, 9 and 10 descoped 2026-11-09 (`progress.md` §6.15) | |
 
 Order within 7, 8, 9 is flexible. Moving a phase earlier than its prerequisites is not.
 
@@ -376,7 +403,7 @@ Order within 7, 8, 9 is flexible. Moving a phase earlier than its prerequisites 
 
 ---
 
-## Phase 7: Structured research extraction (M9)
+## Phase 7: Structured research extraction (M9, deferred after v1.0)
 
 **Objective.** Extract datasets, metrics and limitations, each with an evidence link and a deterministic quote check, and measure quality against hand-labelled papers.
 
@@ -414,6 +441,8 @@ Order within 7, 8, 9 is flexible. Moving a phase earlier than its prerequisites 
 
 ## Phase 8: Semantic and hybrid retrieval (M10)
 
+Delivered by work packages R2 to R4.
+
 **Objective.** Add embeddings and pgvector and compare keyword, semantic and hybrid retrieval on the same evaluation set, adopting a new default only on evidence.
 
 **Why needed.** Keyword search may miss paraphrases; whether vectors help on this corpus is an empirical question (`FR-RET-007`).
@@ -446,7 +475,7 @@ Order within 7, 8, 9 is flexible. Moving a phase earlier than its prerequisites 
 
 ---
 
-## Phase 9: Academic discovery (M11)
+## Phase 9: Academic discovery (M11, deferred after v1.0)
 
 **Objective.** Search OpenAlex, normalise metadata, detect duplicates, and distinguish a paper record from an accessible document.
 
@@ -481,7 +510,7 @@ Order within 7, 8, 9 is flexible. Moving a phase earlier than its prerequisites 
 
 ---
 
-## Phase 10: Cross-paper comparison (M12)
+## Phase 10: Cross-paper comparison (M12, deferred after v1.0)
 
 **Objective.** Matrices of extracted information across papers that preserve experimental context, label comparability deterministically, and link every cell to evidence.
 
@@ -517,6 +546,8 @@ Order within 7, 8, 9 is flexible. Moving a phase earlier than its prerequisites 
 
 ## Phase 11: Reproducibility assessment (M13)
 
+Delivered by work packages R5 to R8. The developer's labels are made before any model output exists.
+
 **Objective.** A limited, versioned checklist of experimental reporting items with the four statuses and evidence, with wording that never turns "not found" into "irreproducible".
 
 **Why needed.** It is a core project capability (`FR-REP-*`, `RISK-12`).
@@ -551,11 +582,13 @@ Order within 7, 8, 9 is flexible. Moving a phase earlier than its prerequisites 
 
 ## Cross-phase gate: Reliability and release readiness (M14)
 
+Delivered by work packages R9 to R12.
+
 **Objective.** Confirm that the whole MVP-1 meets the PRD's non-functional requirements and that claims about it are backed by records.
 
 **Why needed.** Individual phases check their own features; this gate checks the whole.
 
-**Prerequisites.** Phases 7–11 completed or explicitly descoped in `progress.md` with reasons.
+**Prerequisites.** Phases 8 and 11 completed. Phases 7, 9 and 10 descoped 2026-11-09 with reasons in `progress.md` §6.15.
 
 **Tasks.**
 
