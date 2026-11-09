@@ -67,6 +67,6 @@ Retrieval returned the same passages for all 20 questions, so every difference b
 
 - **q19 (unanswerable, about astronomy) gave a statement**, labelled `partial`. The statement is true about microarray data and its limitations say the passages do not cover astronomy, but it does not answer the question.
 - **q12 moved from `partial` to `sufficient`** with the same off-question statement.
-- Statement wording differed in 10 of 20 answers.
+- Statement text differed in 9 of 20 answers, q19 included.
 
 So one run's "4 of 4" is not a stable figure, and the model's own sufficiency label should not be read as a measure of quality. Two runs are too few to give a rate.
