@@ -1,0 +1,189 @@
+{
+  "kind": "manual real-model run",
+  "provider": "gemini",
+  "requested_model": "gemini-3.6-flash",
+  "run_at": "2026-11-09T03:22:10.232995+00:00",
+  "code_revision": "aefe32fbeda12fc6517215f23e88968e7d919408",
+  "working_tree_clean": true,
+  "prompt_version": "answer-v1",
+  "evaluation_set_sha256": "2d903cc478e83dfa370e447c83f61d18d710408e4e37d1022c76d77d15d0fd86",
+  "limits": "Small set (20 questions, 5 open-access papers, 3 fields). Any Recall@5 from it is a coarse baseline, not a general accuracy figure (RISK-15). Fixed before the first harness run: changes after results are seen must be logged in progress.md.",
+  "stopped_early": "model_rate_limited",
+  "summary": {
+    "questions_run": 4,
+    "answerable": {
+      "total": 4,
+      "errors": 1,
+      "validated_with_statements": 2,
+      "failed_validation": 0,
+      "said_insufficient": 1,
+      "expected_passage_retrieved": 2,
+      "expected_passage_cited": 2
+    },
+    "unanswerable": {
+      "total": 0,
+      "errors": 0,
+      "said_insufficient": 0,
+      "gave_statements": 0,
+      "failed_validation": 0
+    },
+    "input_tokens": 4553,
+    "output_tokens": 2330,
+    "mean_model_seconds": 5.31,
+    "paid_equivalent_usd_per_answer": null
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "answerable": true,
+      "question": "Which optimizer and learning rate were used to pre-train the BERT model?",
+      "error": null,
+      "seconds": 5.146,
+      "model_calls": 1,
+      "model_seconds": 5.125,
+      "input_tokens": 1423,
+      "output_tokens": 534,
+      "evidence_sufficiency": "insufficient",
+      "validation_status": "validated",
+      "limitations": "The provided passages do not contain information regarding the optimizer or learning rate used to pre-train the BERT model.",
+      "statements": [],
+      "retrieved_passage_ids": [
+        "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+        "01a1bc06-dcbf-79f3-ae33-e17574d26473",
+        "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+        "01a1bc06-dcfc-7da0-b530-4c40590d7da9",
+        "01a1bc06-dcb2-7a66-a9c6-1a15ee339d61"
+      ],
+      "evidence_passage_ids": [],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.6-flash",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q02",
+      "answerable": true,
+      "question": "Does making the network bigger help accuracy on the GLUE benchmark?",
+      "error": null,
+      "seconds": 6.684,
+      "model_calls": 1,
+      "model_seconds": 6.666,
+      "input_tokens": 1419,
+      "output_tokens": 1193,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "Larger model sizes result in a strict accuracy improvement across GLUE benchmark datasets.",
+          "citations": [
+            {
+              "alias": "P4",
+              "quote": "We can see that larger models lead to a strict accuracy improvement across all four datasets, even for MRPC which only has 3,600 labeled training examples, and is substantially different from the pre-training tasks.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc06-dce1-7312-b870-87b914c06808"
+            }
+          ],
+          "has_valid_citation": true
+        },
+        {
+          "text": "BERT BASE and BERT LARGE outperform prior systems on GLUE tasks, obtaining 4.5% and 7.0% average accuracy improvements over the prior state of the art, respectively.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "Both BERT BASE and BERT LARGE outperform all systems on all tasks by a substantial margin, obtaining 4.5% and 7.0% respective average accuracy improvement over the prior state of the art.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+        "01a1bc06-dcfc-7337-abde-4322efdf3e70",
+        "01a1bc06-dccd-7da2-89e7-392e6285fcb7",
+        "01a1bc06-dce1-7312-b870-87b914c06808",
+        "01a1bc06-dcff-75b2-9aba-404b4c0900ee"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+        "01a1bc06-dce1-7312-b870-87b914c06808"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.6-flash",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q03",
+      "answerable": true,
+      "question": "What share of input words gets hidden at random during the masked-word objective?",
+      "error": null,
+      "seconds": 4.16,
+      "model_calls": 1,
+      "model_seconds": 4.137,
+      "input_tokens": 1711,
+      "output_tokens": 603,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "In all BERT experiments, 15% of all WordPiece tokens in each sequence are masked at random.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "In all of our experiments, we mask 15% of all WordPiece tokens in each sequence at random.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc06-dcc6-77ae-a987-06dbcaedea5e"
+            }
+          ],
+          "has_valid_citation": true
+        },
+        {
+          "text": "Language model masking uses a uniform masking rate of 15% applied after WordPiece tokenization.",
+          "citations": [
+            {
+              "alias": "P3",
+              "quote": "The LM masking is applied after WordPiece tokenization with a uniform masking rate of 15%, and no special consideration given to partial word pieces.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc06-dcc6-77ae-a987-06dbcaedea5e",
+        "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+        "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3",
+        "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+        "01a1bc06-dd07-7fe8-8cc1-f8b2d6eff7a7"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc06-dcc6-77ae-a987-06dbcaedea5e",
+        "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.6-flash",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q04",
+      "answerable": true,
+      "question": "How much did effect sizes shrink when preclinical cancer studies were repeated?",
+      "error": "model_rate_limited",
+      "seconds": 0.565,
+      "model_calls": 0,
+      "model_seconds": 0,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  ]
+}

@@ -48,6 +48,7 @@ RESULTS = REPO_ROOT / "benchmarks" / "results"
 # The free tier costs nothing; this is what the same usage would cost if paid.
 PAID_PRICE = {
     "gemini-3.8-flash": (0.75, 3.75),
+    "gemini-3.6-flash": (0.75, 3.75),
     "gemini-3.5-flash-lite": (0.30, 2.50),
 }
 Answer = Callable[[str, list[uuid.UUID]], AnswerResponse]
