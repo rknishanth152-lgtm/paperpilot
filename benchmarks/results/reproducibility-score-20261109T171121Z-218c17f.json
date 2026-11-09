@@ -1,0 +1,252 @@
+{
+  "kind": "manual real-model run, reproducibility checklist",
+  "run_at": "2026-11-09T17:11:21.443205+00:00",
+  "code_revision": "218c17f6968090a661b6e5ba8c31eea83468bb81",
+  "working_tree_clean": true,
+  "labels_sha256": "b0b677cbe08bcb69bc5454053e92637df3696b00e05d3f1f3991065030d8febf",
+  "guide_sha256": "339ac6b3ca43fe4e440439ebd0274101bce04a43fb8a5916ad36581bcb010422",
+  "checklist_version": "checklist-v1",
+  "model": "gemini-3.5-flash-lite",
+  "prompt_version": "reproducibility-v1",
+  "retrieval_method": "semantic_cosine",
+  "labeller": "RK Nishanth",
+  "labelled_on": "2026-11-09",
+  "limits": "18 items from 3 papers, one labeller, one model. It shows agreement with that person on the text PaperPilot stored, not whether the papers can be reproduced, and is a coarse baseline (RISK-15).",
+  "result": {
+    "items": 18,
+    "agreements": 15,
+    "agreement_rate": 0.8333,
+    "majority_baseline": {
+      "label": "reported",
+      "agreements": 16,
+      "rate": 0.8889
+    },
+    "per_status": {
+      "reported": {
+        "labelled": 16,
+        "assessed": 13,
+        "agreed": 13,
+        "recall": 0.8125,
+        "precision": 1.0
+      },
+      "partially_reported": {
+        "labelled": 0,
+        "assessed": 1,
+        "agreed": 0,
+        "recall": null,
+        "precision": 0.0
+      },
+      "not_found": {
+        "labelled": 2,
+        "assessed": 3,
+        "agreed": 2,
+        "recall": 1.0,
+        "precision": 0.6667
+      },
+      "needs_review": {
+        "labelled": 0,
+        "assessed": 1,
+        "agreed": 0,
+        "recall": null,
+        "precision": 0.0
+      }
+    },
+    "confusion": {
+      "reported": {
+        "reported": 13,
+        "partially_reported": 1,
+        "not_found": 1,
+        "needs_review": 1
+      },
+      "partially_reported": {
+        "reported": 0,
+        "partially_reported": 0,
+        "not_found": 0,
+        "needs_review": 0
+      },
+      "not_found": {
+        "reported": 0,
+        "partially_reported": 0,
+        "not_found": 2,
+        "needs_review": 0
+      },
+      "needs_review": {
+        "reported": 0,
+        "partially_reported": 0,
+        "not_found": 0,
+        "needs_review": 0
+      }
+    },
+    "not_found_vs_needs_review": {
+      "labelled_not_found_assessed_needs_review": 0,
+      "labelled_needs_review_assessed_not_found": 0,
+      "measurable": false
+    },
+    "overstated": 0,
+    "understated": 2
+  },
+  "items": [
+    {
+      "paper": "p1",
+      "item": "dataset_access",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 1,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p1",
+      "item": "code_availability",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 1,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p1",
+      "item": "data_preparation",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 2,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p1",
+      "item": "analysis_procedure",
+      "labelled": "reported",
+      "assessed": "needs_review",
+      "review_reason": "model_uncertain",
+      "evidence_quotes": 0,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p1",
+      "item": "measures_and_comparisons",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 2,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p1",
+      "item": "software_environment",
+      "labelled": "reported",
+      "assessed": "partially_reported",
+      "review_reason": null,
+      "evidence_quotes": 1,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p4",
+      "item": "dataset_access",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 1,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p4",
+      "item": "code_availability",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 1,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p4",
+      "item": "data_preparation",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 2,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p4",
+      "item": "analysis_procedure",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 2,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p4",
+      "item": "measures_and_comparisons",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 1,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p4",
+      "item": "software_environment",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 1,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p5",
+      "item": "dataset_access",
+      "labelled": "reported",
+      "assessed": "not_found",
+      "review_reason": null,
+      "evidence_quotes": 0,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p5",
+      "item": "code_availability",
+      "labelled": "not_found",
+      "assessed": "not_found",
+      "review_reason": null,
+      "evidence_quotes": 0,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p5",
+      "item": "data_preparation",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 2,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p5",
+      "item": "analysis_procedure",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 1,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p5",
+      "item": "measures_and_comparisons",
+      "labelled": "reported",
+      "assessed": "reported",
+      "review_reason": null,
+      "evidence_quotes": 1,
+      "passages_examined": 8
+    },
+    {
+      "paper": "p5",
+      "item": "software_environment",
+      "labelled": "not_found",
+      "assessed": "not_found",
+      "review_reason": null,
+      "evidence_quotes": 0,
+      "passages_examined": 8
+    }
+  ]
+}

@@ -17,8 +17,9 @@ from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from functools import partial
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
 
@@ -49,7 +50,6 @@ RESULTS = REPO_ROOT / "benchmarks" / "results"
 DEFAULT_PAUSE = 30.0
 OUTAGE_RETRIES = 3
 OUTAGE_WAIT = 60.0
-_T = TypeVar("_T")
 LIMITS = (
     "18 items from 3 papers, one labeller, one model. It shows agreement with that "
     "person on the text PaperPilot stored, not whether the papers can be reproduced, "
@@ -67,13 +67,13 @@ class Pair:
     assessed: str
 
 
-def assess_with_retries(
-    assess: Callable[[], _T],
+def assess_with_retries[T](
+    assess: Callable[[], T],
     *,
     retries: int,
     wait: float,
     sleep: Callable[[float], None] = time.sleep,
-) -> _T:
+) -> T:
     """Retry only a brief provider outage. Anything else stops the run."""
     for _ in range(retries):
         try:
@@ -244,9 +244,8 @@ def main() -> int:
         for index, paper in enumerate(PAPERS):
             if index:
                 time.sleep(options.pause)
-            document = documents[paper]
             assessment_id = assess_with_retries(
-                lambda: assessor.assess(document),
+                partial(assessor.assess, documents[paper]),
                 retries=OUTAGE_RETRIES,
                 wait=OUTAGE_WAIT,
             )
