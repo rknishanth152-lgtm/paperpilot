@@ -56,6 +56,13 @@ def test_the_fake_raises_a_scripted_failure_on_the_chosen_call() -> None:
     embedder.embed_documents([DOC])
 
 
+def test_the_fake_can_be_given_chosen_vectors() -> None:
+    embedder = FakeEmbedder(dimensions=2, vectors={"Why?": [1.0, 0.0]})
+
+    assert embedder.embed_query("Why?") == [1.0, 0.0]
+    assert embedder.embed_documents([DocumentText(None, "Why?")]) == [[1.0, 0.0]]
+
+
 def test_valid_vectors_are_returned_as_floats() -> None:
     assert validated_vectors([[1, 0.5], [0, 2]], count=2, dimensions=2) == [
         [1.0, 0.5],

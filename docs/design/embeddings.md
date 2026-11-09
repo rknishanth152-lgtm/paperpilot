@@ -70,3 +70,18 @@ Manual real-model run, 2026-11-09, at commit b728134, with the developer's appro
 | Cost | $0, free tier |
 
 This shows embeddings were produced and stored. It does not show whether they improve retrieval; R4 measures that.
+
+## 8. Semantic and hybrid search (R3)
+
+| Topic | Behaviour |
+|---|---|
+| Semantic | Exact cosine distance, best first, ties by passage id. Same scope and `k` meaning as keyword search; `parsed` documents only; only this model's embeddings |
+| Missing embeddings | Counted for the scope and returned as `missing_embeddings` |
+| Nothing sent | A blank question, or a scope with no embeddings, never reaches the provider |
+| Hybrid | Each method supplies `candidates`; Reciprocal Rank Fusion adds `1 / (constant + rank)`, ties by passage id |
+| One method unavailable | A semantic failure leaves keyword results, and `semantic_failure` gives the code. `methods` names those with a passage in the result |
+| Keyword failure | Not caught: both methods use the same database, so a database failure stops both and is raised |
+
+Semantic search always returns a nearest passage, even for an unrelated question, so a result does not mean a passage is relevant. Answering must keep relying on the model's `insufficient` answer and citation checks. Hybrid is therefore likelier than keyword search to send passages to the model for an unanswerable question, which R4 must check against `AC-VS-07`.
+
+Neither method is connected to answering yet. R4 chooses the default from recorded results, and exposes `methods` in the API if hybrid is adopted.

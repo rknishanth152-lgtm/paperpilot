@@ -68,7 +68,7 @@ def _pending(sessions: sessionmaker[Session], model: str) -> list[_Pending]:
     return [_Pending(row.id, DocumentText(row.title, row.text)) for row in rows]
 
 
-def _refuse_a_different_size(
+def refuse_a_different_size(
     sessions: sessionmaker[Session], embedder: Embedder
 ) -> None:
     with sessions() as session:
@@ -118,7 +118,7 @@ def embed_missing(
     """
     if batch_size < 1:
         raise ValueError("batch_size must be positive")
-    _refuse_a_different_size(sessions, embedder)
+    refuse_a_different_size(sessions, embedder)
     pending = _pending(sessions, embedder.model_name)
     embedded = 0
     for start in range(0, len(pending), batch_size):

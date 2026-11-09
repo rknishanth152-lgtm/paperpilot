@@ -80,6 +80,7 @@ class FakeEmbedder:
     """Deterministic and offline vectors made from a hash of the text.
 
     `failures` maps a 1-based call number to the error that call raises.
+    `vectors` gives chosen vectors for exact texts, for tests about ranking.
     """
 
     text_format = "fake-v1"
@@ -90,10 +91,12 @@ class FakeEmbedder:
         dimensions: int = 8,
         model_name: str = "fake-embedding",
         failures: Mapping[int, ModelError] | None = None,
+        vectors: Mapping[str, list[float]] | None = None,
     ) -> None:
         self._dimensions = dimensions
         self._model_name = model_name
         self._failures = dict(failures or {})
+        self._vectors = dict(vectors or {})
         self._calls = 0
         self.document_calls: list[list[DocumentText]] = []
         self.query_calls: list[str] = []
@@ -123,5 +126,7 @@ class FakeEmbedder:
             raise failure
 
     def _vector(self, text: str) -> list[float]:
+        if text in self._vectors:
+            return self._vectors[text]
         digest = hashlib.sha256(text.encode("utf-8")).digest()
         return [(digest[i % len(digest)] + 1) / 256 for i in range(self._dimensions)]
