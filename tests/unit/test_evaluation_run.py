@@ -199,6 +199,7 @@ def test_answers_do_not_start_when_retrieval_fails() -> None:
         "tests.evaluation.run_retrieval",
         "tests.evaluation.run_answers",
         "tests.evaluation.citation_validity",
+        "tests.evaluation.claim_support",
     ],
 )
 def test_each_command_starts_outside_pytest(module: str) -> None:
