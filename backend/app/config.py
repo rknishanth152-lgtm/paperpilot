@@ -82,6 +82,10 @@ class Settings(BaseSettings):
     # Small batches with pauses, because free-tier limits are not published.
     embedding_batch_size: int = Field(default=20, gt=0)
     embedding_pause_seconds: float = Field(default=10.0, ge=0)
+    # Hybrid retrieval (FR-RET-006): passages each method supplies, and the
+    # Reciprocal Rank Fusion constant, 60 being the value commonly used.
+    hybrid_candidates: int = Field(default=20, gt=0)
+    hybrid_rrf_constant: int = Field(default=60, gt=0)
 
     @field_validator("postgres_password")
     @classmethod
