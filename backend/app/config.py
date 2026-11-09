@@ -74,6 +74,15 @@ class Settings(BaseSettings):
     # longest passages seen in the Phase 1 papers (about 2,800 characters each).
     max_context_chars: int = Field(default=16000, gt=0)
 
+    # Embeddings for semantic retrieval (OQ-012, docs/design/embeddings.md).
+    # Gemini uses LLM_API_KEY and GEMINI_BASE_URL.
+    embedding_provider: str = Field(default="gemini", min_length=1)
+    embedding_model: str = Field(default="gemini-embedding-2", min_length=1)
+    embedding_dimensions: int = Field(default=768, gt=0)
+    # Small batches with pauses, because free-tier limits are not published.
+    embedding_batch_size: int = Field(default=20, gt=0)
+    embedding_pause_seconds: float = Field(default=10.0, ge=0)
+
     @field_validator("postgres_password")
     @classmethod
     def password_not_empty(cls, value: SecretStr) -> SecretStr:

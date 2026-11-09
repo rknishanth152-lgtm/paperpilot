@@ -131,4 +131,6 @@ def sessions(schema_engine: Engine) -> Iterator[sessionmaker[Session]]:
     """
     yield sessionmaker(bind=schema_engine, expire_on_commit=False)
     with schema_engine.begin() as connection:
-        connection.execute(text("TRUNCATE passages, documents, papers"))
+        connection.execute(
+            text("TRUNCATE passage_embeddings, passages, documents, papers")
+        )

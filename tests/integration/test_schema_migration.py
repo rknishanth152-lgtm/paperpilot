@@ -11,7 +11,8 @@ from app.config import Settings
 
 CORE_TABLES = {"papers", "documents", "passages"}
 BEFORE_SEARCH = "d2ea199dd3d3"
-HEAD = "e3ab5ad233d7"
+AFTER_SEARCH = "e3ab5ad233d7"
+HEAD = "f4a9c1d27b60"
 
 
 @pytest.fixture
@@ -89,7 +90,7 @@ def test_search_migration_covers_existing_passages_and_reverses(
             {"d": document_id, "t": body},
         ).scalar_one()
 
-    run_alembic(empty_engine, "upgrade", "head")
+    run_alembic(empty_engine, "upgrade", AFTER_SEARCH)
 
     with empty_engine.connect() as connection:
         row = connection.execute(
@@ -116,3 +117,43 @@ def test_search_migration_covers_existing_passages_and_reverses(
             text("SELECT version_num FROM alembic_version")
         ).scalar_one()
     assert (kept, version) == (body, BEFORE_SEARCH)
+
+
+def test_embeddings_migration_adds_the_table_and_reverses(empty_engine: Engine) -> None:
+    """R2: enabling pgvector and the new table leave passages alone."""
+    run_alembic(empty_engine, "upgrade", AFTER_SEARCH)
+    with empty_engine.begin() as connection:
+        document_id = connection.execute(
+            text(
+                "INSERT INTO documents (sha256, size_bytes, storage_key) "
+                "VALUES (repeat('a', 64), 10, 'pdf/a') RETURNING id"
+            )
+        ).scalar_one()
+        connection.execute(
+            text(
+                "INSERT INTO passages (document_id, ordinal, region, text) "
+                "VALUES (:d, 0, 'body', 'Kept.')"
+            ),
+            {"d": document_id},
+        )
+
+    run_alembic(empty_engine, "upgrade", "head")
+
+    assert "passage_embeddings" in tables(empty_engine)
+    assert extension_count(empty_engine) == 1
+
+    run_alembic(empty_engine, "downgrade", "-1")
+
+    assert "passage_embeddings" not in tables(empty_engine)
+    assert extension_count(empty_engine) == 0
+    with empty_engine.connect() as connection:
+        kept = connection.execute(text("SELECT text FROM passages")).scalar_one()
+    assert kept == "Kept."
+
+
+def extension_count(engine: Engine) -> int:
+    with engine.connect() as connection:
+        count: int = connection.execute(
+            text("SELECT count(*) FROM pg_extension WHERE extname = 'vector'")
+        ).scalar_one()
+    return count

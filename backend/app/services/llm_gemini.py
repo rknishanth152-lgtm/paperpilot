@@ -42,7 +42,7 @@ _BLOCK_CODES = frozenset(
         "content_blocked",
     }
 )
-_STATUS_ERRORS: dict[int, type[ModelError]] = {
+STATUS_ERRORS: dict[int, type[ModelError]] = {
     401: ModelAuthenticationError,
     403: ModelAuthenticationError,
     429: ModelRateLimitError,
@@ -127,7 +127,7 @@ class GeminiModel:
             raise ModelUnavailableError() from None
 
         if response.status_code != 200:
-            raise _STATUS_ERRORS.get(response.status_code, ModelUnavailableError)()
+            raise STATUS_ERRORS.get(response.status_code, ModelUnavailableError)()
         return self._read(response)
 
     def _read(self, response: httpx.Response) -> ModelResponse:
