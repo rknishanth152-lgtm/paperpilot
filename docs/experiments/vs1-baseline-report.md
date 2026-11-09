@@ -146,6 +146,10 @@ Re-run on 2026-11-09 at commit 90f4944: 883 backend tests passed; 44 frontend te
 
 **Decision.** The developer accepted VS-1 on 2026-11-09 with `AC-VS-07` as a recorded exception: an unanswerable question (q19) gave a cited statement in one of two runs. A prompt fix will be tried when answers are re-run in R4, and logged as a change made after seeing results.
 
+## 8a. Update after R4
+
+Semantic retrieval became the default (`docs/experiments/retrieval-comparison.md`). In two runs on it with the same prompt, all 4 unanswerable questions, q19 included, returned `insufficient`. The `AC-VS-07` exception stays on record because two runs are few. The figures above describe the keyword baseline and are not changed.
+
 ## 9. How to reproduce
 
 ```bash

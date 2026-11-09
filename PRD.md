@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.13 (`OQ-012` resolved, 2026-11-09; see `docs/design/embeddings.md`) |
+| Version | 0.14 (`AD-017`, semantic default, 2026-11-09; see `docs/experiments/retrieval-comparison.md`) |
 | Date | 2026-11-03 |
 | Status | In force. What actually exists is recorded in `progress.md`. |
 | Companion documents | `CLAUDE.md` (development rules), `progress.md` (actual state), `docs/implementation-roadmap.md` (sequence and exit criteria) |
@@ -174,6 +174,7 @@ Basis column: **[P]** project direction, **[E]** engineering recommendation, **[
 | AD-014 | Embeddings (Phase 8) live in their own table keyed by passage and embedding model. | Lets the model change without touching passages. | A vector column on `passages`. | Phase 8 design review (`OQ-012`). | [E][Q] |
 | AD-015 | Docker Compose runs PostgreSQL and GROBID for development; backend and frontend run on the host. Choose a Postgres image that can later enable pgvector, but do not enable it until Phase 8. | GROBID is a separate Java service. Compose makes the environment repeatable. Image names/tags must be verified, not guessed (`OQ-015`). | Installing both natively. | Compose proves harder than native on the developer's machine. | [E][A] |
 | AD-016 | Observability in the MVP is structured logging only. | Enough for a single-user tool. The CC video used a hosted tracing product; it is not required. | Tracing platform. | Debugging LLM pipelines becomes the bottleneck (`OQ-016`). | [E][T] |
+| AD-017 | Semantic retrieval is the default for answering; a selection with missing embeddings uses keyword search and the response names the method. | Recorded comparison (`docs/experiments/retrieval-comparison.md`, 2026-11-09): Recall@5 of 16 of 16 against 8 of 16, by a rule fixed before the run. | Hybrid: qualified, scored 11 of 16. Keyword: the baseline. | A larger evaluation set, or a change of embedding model. | [E] |
 
 ---
 

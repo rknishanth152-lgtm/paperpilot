@@ -237,7 +237,7 @@ LLM_API_KEY=your-key-here
 
 ## Embeddings
 
-Semantic retrieval needs an embedding for each stored passage, made with `gemini-embedding-2` using the same `LLM_API_KEY`. New uploads are not embedded automatically. See how many are missing without sending anything:
+Questions are answered with semantic retrieval by default, because it was measured to find more of the expected passages (`docs/experiments/retrieval-comparison.md`). It needs an embedding for each stored passage, made with `gemini-embedding-2` using the same `LLM_API_KEY`. New uploads are not embedded automatically: until they are, a question on them uses keyword search, and the answer names the method used. See how many are missing without sending anything:
 
 ```bash
 uv run python scripts/embed_passages.py --check
