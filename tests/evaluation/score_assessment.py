@@ -14,11 +14,11 @@ import json
 import sys
 import time
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
 
@@ -38,7 +38,7 @@ from app.config import get_settings
 from app.database import get_sessionmaker
 from app.models.constraints import REPRODUCIBILITY_STATUSES
 from app.schemas.answer import MalformedAnswerError
-from app.services.llm import ModelError
+from app.services.llm import ModelError, ModelUnavailableError
 from app.services.llm_factory import build_language_model
 from app.services.reproducibility.assessment import Assessor, assessment_limits
 from app.services.reproducibility.checklist import CHECKLIST_VERSION
@@ -47,6 +47,9 @@ from app.services.retrieval.selection import build_retriever
 
 RESULTS = REPO_ROOT / "benchmarks" / "results"
 DEFAULT_PAUSE = 30.0
+OUTAGE_RETRIES = 3
+OUTAGE_WAIT = 60.0
+_T = TypeVar("_T")
 LIMITS = (
     "18 items from 3 papers, one labeller, one model. It shows agreement with that "
     "person on the text PaperPilot stored, not whether the papers can be reproduced, "
@@ -62,6 +65,22 @@ class Pair:
     item: str
     labelled: str
     assessed: str
+
+
+def assess_with_retries(
+    assess: Callable[[], _T],
+    *,
+    retries: int,
+    wait: float,
+    sleep: Callable[[float], None] = time.sleep,
+) -> _T:
+    """Retry only a brief provider outage. Anything else stops the run."""
+    for _ in range(retries):
+        try:
+            return assess()
+        except ModelUnavailableError:
+            sleep(wait)
+    return assess()
 
 
 def _ratio(part: int, whole: int) -> float | None:
@@ -225,7 +244,12 @@ def main() -> int:
         for index, paper in enumerate(PAPERS):
             if index:
                 time.sleep(options.pause)
-            assessment_id = assessor.assess(documents[paper])
+            document = documents[paper]
+            assessment_id = assess_with_retries(
+                lambda: assessor.assess(document),
+                retries=OUTAGE_RETRIES,
+                wait=OUTAGE_WAIT,
+            )
             assessed[paper] = get_assessment(sessions, assessment_id)
             print(f"{paper} assessed", flush=True)
     except (ModelError, MalformedAnswerError) as error:

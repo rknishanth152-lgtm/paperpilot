@@ -17,4 +17,5 @@ Written and committed before any model assessed the labelled papers, and coded i
 - **Per status:** recall (of items labelled this, how many were assessed this) and precision (of items assessed this, how many were labelled this). A status with no labels has no recall.
 - **`not_found` versus `needs_review` confusion** is reported only as measurable if both labels occur. With no `needs_review` labels it is not measurable from this set.
 - **Overstated and understated.** Among `reported`, `partially_reported` and `not_found`, whether the assessment claimed more or less than the label. `needs_review` claims nothing and is excluded.
+- A brief provider outage retries that paper after a wait. It does not change what is scored. Two earlier attempts stopped on such an outage and saved no score.
 - Two runs, because answers vary between runs. Neither the prompt nor the checklist is changed after seeing results unless that change is logged here.

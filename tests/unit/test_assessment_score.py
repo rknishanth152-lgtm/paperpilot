@@ -9,6 +9,7 @@ import pytest
 from tests.evaluation.code_state import CodeState
 from tests.evaluation.score_assessment import (
     Pair,
+    assess_with_retries,
     pairs_from,
     score,
     score_record,
@@ -16,6 +17,8 @@ from tests.evaluation.score_assessment import (
 )
 
 STATE = CodeState(revision="abcdef1234567", clean=True)
+from app.services.llm import ModelRateLimitError, ModelUnavailableError
+
 RUN_AT = datetime(2026, 11, 9, 8, 30, 5, tzinfo=UTC)
 R, P, N, V = "reported", "partially_reported", "not_found", "needs_review"
 
@@ -177,6 +180,41 @@ def test_a_missing_assessment_item_is_refused() -> None:
 
     with pytest.raises(KeyError):
         pairs_from(labels, assessed)
+
+
+def test_a_brief_outage_is_retried_after_a_wait() -> None:
+    calls: list[str] = []
+    waits: list[float] = []
+
+    def assess() -> str:
+        calls.append("x")
+        if len(calls) < 3:
+            raise ModelUnavailableError()
+        return "done"
+
+    assert assess_with_retries(assess, retries=2, wait=60, sleep=waits.append) == "done"
+    assert waits == [60, 60]
+
+
+def test_an_outage_that_continues_stops_the_run() -> None:
+    def assess() -> str:
+        raise ModelUnavailableError()
+
+    with pytest.raises(ModelUnavailableError):
+        assess_with_retries(assess, retries=1, wait=0, sleep=lambda _: None)
+
+
+def test_a_rate_limit_is_not_retried() -> None:
+    calls: list[str] = []
+
+    def assess() -> str:
+        calls.append("x")
+        raise ModelRateLimitError()
+
+    with pytest.raises(ModelRateLimitError):
+        assess_with_retries(assess, retries=5, wait=0, sleep=lambda _: None)
+
+    assert len(calls) == 1
 
 
 def record() -> dict[str, Any]:
