@@ -21,7 +21,7 @@ The unit of work is the **work package** below, one at a time, each with one go-
 | R1 | Baseline report and VS-1 acceptance | P6-T5, P6-T6 | Accept VS-1 |
 | R2 | Embeddings: official docs check, migration, interface with fake and Gemini adapter, batch job, missing embeddings reported | P8-T1, P8-T2, P8-T3 | Approve sending passages to the embedding service |
 | R3 | Semantic and hybrid retrieval | P8-T4, P8-T5 | None |
-| R4 | Compare all three on the unchanged question set; choose the default from the results | P8-T6, P8-T7 | None |
+| R4 | Compare all three on the unchanged question set; choose the default from the results; re-run answers with a prompt fix for the `AC-VS-07` exception, logged as made after seeing results | P8-T6, P8-T7 | None |
 | R5 | Checklist v1 (about 6 items) and schema; labelling sheet | P11-T1, P11-T2 | Label 3 papers, about 18 items, **before any model output exists** |
 | R6 | Assessment pipeline, status rules, fault-injection tests | P11-T3, P11-T4, P11-T6 | None |
 | R7 | Checklist page and API wording review, no score or verdict | P11-T5 | Review the colour explanation and page |

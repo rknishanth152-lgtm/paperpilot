@@ -142,7 +142,9 @@ Re-run on 2026-11-09 at commit 90f4944: 883 backend tests passed; 44 frontend te
 | Tests run from a documented command | Met | `README.md` |
 | README states how to run GROBID, PostgreSQL, backend and frontend | Met | `README.md` |
 | Known limitations written down | Met | §7 |
-| Developer acceptance | **Pending** | |
+| Developer acceptance | **Accepted with one exception**, 2026-11-09 | `AC-VS-07`, see below |
+
+**Decision.** The developer accepted VS-1 on 2026-11-09 with `AC-VS-07` as a recorded exception: an unanswerable question (q19) gave a cited statement in one of two runs. A prompt fix will be tried when answers are re-run in R4, and logged as a change made after seeing results.
 
 ## 9. How to reproduce
 
