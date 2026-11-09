@@ -1,0 +1,300 @@
+{
+  "version": 1,
+  "seed": 20261109,
+  "guide_sha256": "47ce8d25a67f3680db3301b2fe399cd14a3b444e73f2b2df20b3505b030e674f",
+  "source": {
+    "file": "answers-gemini-3.5-flash-lite-20261109T040343Z-9654929.json",
+    "sha256": "e6dd0c256d8d2874c3552358df01d7c2fd80ac1ad22af0124d02eb95a4056a25",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "answer-v1",
+    "code_revision": "9654929ca41bbc56409f884fadc3b09c64833c16"
+  },
+  "statements_in_source": 20,
+  "items": [
+    {
+      "item": "S01",
+      "question_id": "q09",
+      "statement_index": 0,
+      "question": "What happens to reliability when many groups compete on a fashionable topic?",
+      "statement": "The hotter a scientific field with more scientific teams involved, the less likely the research findings are to be true.",
+      "citations": [
+        {
+          "alias": "P1",
+          "quote": "Corollary 6: The hotter a scientifi c fi eld (with more scientifi c teams involved), the less likely the research fi ndings are to be true.",
+          "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde"
+        }
+      ]
+    },
+    {
+      "item": "S02",
+      "question_id": "q15",
+      "statement_index": 0,
+      "question": "Did having US federal grants make authors more likely to post their complete raw data?",
+      "statement": "Among papers covered by a data availability policy, having US government funding did not significantly affect the proportion of papers depositing full primary data online.",
+      "citations": [
+        {
+          "alias": "P5",
+          "quote": "Among papers covered by some data availability policy (n = 351), the proportion depositing full primary data online was not different when US government funding (e.g. National Institutes of Health or National Science Foundation) was listed (15% versus 12% when US funding was not listed, P = 0.42)",
+          "passage_id": "01a1bc07-3703-755a-9a93-472b1194282a"
+        }
+      ]
+    },
+    {
+      "item": "S03",
+      "question_id": "q07",
+      "statement_index": 0,
+      "question": "Did studies in living animals reproduce as well as studies without animals?",
+      "statement": "Animal experiments were less likely to replicate than non-animal experiments.",
+      "citations": [
+        {
+          "alias": "P5",
+          "quote": "Animal experiments were less likely to replicate than non-animal experiments and this may be a consequence of animal experiments eliciting smaller effect sizes on average than non-animal experiments (see main text for further discussion).",
+          "passage_id": "01a1bc07-06ce-7986-8dff-5c9895beb786"
+        }
+      ]
+    },
+    {
+      "item": "S04",
+      "question_id": "q10",
+      "statement_index": 0,
+      "question": "Is it realistic to run very large studies for every question scientists ask?",
+      "statement": "Large-scale evidence is impossible to obtain for all of the millions and trillions of research questions posed in current research.",
+      "citations": [
+        {
+          "alias": "P2",
+          "quote": "Moreover, large-scale evidence is impossible to obtain for all of the millions and trillions of research questions posed in current research.",
+          "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea"
+        }
+      ]
+    },
+    {
+      "item": "S05",
+      "question_id": "q11",
+      "statement_index": 0,
+      "question": "Where online were most of the shared gene expression datasets hosted?",
+      "statement": "Most of the shared gene expression datasets were located on lab websites.",
+      "citations": [
+        {
+          "alias": "P2",
+          "quote": "Most data sets were located on lab websites (28), with a few found on publisher websites (4), or within public databases (6 in the Stanford Microarray Database (SMD) [8], 6 in Gene Expression Omnibus (GEO) [9], 2 in ArrayExpress [10], 2 in the NCI GeneExpression Data Portal (GEDP)(gedp.nci.nih.gov); some datasets in more than one location).",
+          "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30"
+        }
+      ]
+    },
+    {
+      "item": "S06",
+      "question_id": "q09",
+      "statement_index": 1,
+      "question": "What happens to reliability when many groups compete on a fashionable topic?",
+      "statement": "A research finding is less likely to be true when more teams are involved in a scientific field in chase of statistical significance.",
+      "citations": [
+        {
+          "alias": "P3",
+          "quote": "In this framework, a research fi nding is less likely to be true when the studies conducted in a fi eld are smaller; when effect sizes are smaller; when there is a greater number and lesser preselection of tested relationships; where there is greater fl exibility in designs, defi nitions, outcomes, and analytical modes; when there is greater fi nancial and other interest and prejudice; and when more teams are involved in a scientifi c fi eld in chase of statistical signifi cance.",
+          "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c"
+        }
+      ]
+    },
+    {
+      "item": "S07",
+      "question_id": "q14",
+      "statement_index": 0,
+      "question": "How many people extracted the information from the sampled articles?",
+      "statement": "Data extraction from the 500 papers was done by a single investigator.",
+      "citations": [
+        {
+          "alias": "P1",
+          "quote": "Data extraction from the 500 papers was done by a single investigator (WQ) with cross-checking in the first 50 papers by two investigators (AA and MA).",
+          "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2"
+        }
+      ]
+    },
+    {
+      "item": "S08",
+      "question_id": "q08",
+      "statement_index": 1,
+      "question": "Why are results from underpowered, small studies less trustworthy?",
+      "statement": "As the statistical power decreases, the positive predictive value (PPV) for a true research finding also decreases.",
+      "citations": [
+        {
+          "alias": "P3",
+          "quote": "Small sample size means smaller power and, for all functions above, the PPV for a true research fi nding decreases as power decreases towards 1 -β = 0.05.",
+          "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259"
+        }
+      ]
+    },
+    {
+      "item": "S09",
+      "question_id": "q04",
+      "statement_index": 0,
+      "question": "How much did effect sizes shrink when preclinical cancer studies were repeated?",
+      "statement": "For original positive effects reported as numerical values, the median effect size for the replications was 0.43.",
+      "citations": [
+        {
+          "alias": "P1",
+          "quote": "For original positive effects that were reported as numerical values, the median effect size for the replications was 0.43, which was 85% smaller than the median of the original effect sizes (2.96).",
+          "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe"
+        }
+      ]
+    },
+    {
+      "item": "S10",
+      "question_id": "q16",
+      "statement_index": 0,
+      "question": "What was the usual way that articles broke their journal's rules on data?",
+      "statement": "When articles failed to adhere to their journal's data availability instructions, they most commonly did so by not publicly depositing microarray data.",
+      "citations": [
+        {
+          "alias": "P1",
+          "quote": "Of the remaining 351 papers that were covered by some data availability policy (with or without data deposition as a condition of publication), 208/351 papers (59%) did not fully adhere to the data availability instructions of the journals they were published in, most commonly (73%) by not publicly depositing microarray data.",
+          "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563"
+        },
+        {
+          "alias": "P2",
+          "quote": "Of the remaining 351 papers that were covered by some data availability policy, 208 papers (59%) did not fully adhere to the data availability instructions of the journals they were published in, most commonly (73%) by not publicly depositing microarray data.",
+          "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4"
+        }
+      ]
+    },
+    {
+      "item": "S11",
+      "question_id": "q06",
+      "statement_index": 1,
+      "question": "How often did repeat studies succeed for results that originally showed no effect?",
+      "statement": "Combining the data for original null effects led to a third of cases showing statistically significant effects.",
+      "citations": [
+        {
+          "alias": "P2",
+          "quote": "meaning that combining the data led to a third of cases showing statistically significant effects, even though the original reported a null finding.",
+          "passage_id": "01a1bc07-06c5-70bb-83ed-8406c2a2b743"
+        }
+      ]
+    },
+    {
+      "item": "S12",
+      "question_id": "q02",
+      "statement_index": 0,
+      "question": "Does making the network bigger help accuracy on the GLUE benchmark?",
+      "statement": "Larger models lead to a strict accuracy improvement across all four datasets on selected GLUE tasks.",
+      "citations": [
+        {
+          "alias": "P4",
+          "quote": "We can see that larger models lead to a strict accuracy improvement across all four datasets, even for MRPC which only has 3,600 labeled training examples, and is substantially different from the pre-training tasks.",
+          "passage_id": "01a1bc06-dce1-7312-b870-87b914c06808"
+        }
+      ]
+    },
+    {
+      "item": "S13",
+      "question_id": "q03",
+      "statement_index": 0,
+      "question": "What share of input words gets hidden at random during the masked-word objective?",
+      "statement": "During the masked-word objective, 15% of all WordPiece tokens in each sequence are masked at random.",
+      "citations": [
+        {
+          "alias": "P1",
+          "quote": "In all of our experiments, we mask 15% of all WordPiece tokens in each sequence at random.",
+          "passage_id": "01a1bc06-dcc6-77ae-a987-06dbcaedea5e"
+        }
+      ]
+    },
+    {
+      "item": "S14",
+      "question_id": "q19",
+      "statement_index": 0,
+      "question": "How does publishing raw data affect citation counts in astronomy?",
+      "statement": "Sharing raw probe data or actual microarray images did not result in additional citations for the studied trials.",
+      "citations": [
+        {
+          "alias": "P4",
+          "quote": "The few trials in this cohort which, in addition to gene expression fold-change or other preprocessed information, shared their raw probe data or actual microarray images did not receive additional citations.",
+          "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c"
+        }
+      ]
+    },
+    {
+      "item": "S15",
+      "question_id": "q06",
+      "statement_index": 0,
+      "question": "How often did repeat studies succeed for results that originally showed no effect?",
+      "statement": "For cases where the original result was a null effect, 10 out of the 15 (67%) meta-analytic effects were likewise null.",
+      "citations": [
+        {
+          "alias": "P2",
+          "quote": "For cases in which the original was a null effect, 10 of the 15 (67%) meta-analytic effects were likewise null (p > 0.05)",
+          "passage_id": "01a1bc07-06c5-70bb-83ed-8406c2a2b743"
+        }
+      ]
+    },
+    {
+      "item": "S16",
+      "question_id": "q04",
+      "statement_index": 1,
+      "question": "How much did effect sizes shrink when preclinical cancer studies were repeated?",
+      "statement": "The median replication effect size was 85% smaller than the median of the original effect sizes of 2.96.",
+      "citations": [
+        {
+          "alias": "P1",
+          "quote": "For original positive effects that were reported as numerical values, the median effect size for the replications was 0.43, which was 85% smaller than the median of the original effect sizes (2.96).",
+          "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe"
+        }
+      ]
+    },
+    {
+      "item": "S17",
+      "question_id": "q08",
+      "statement_index": 0,
+      "question": "Why are results from underpowered, small studies less trustworthy?",
+      "statement": "Smaller sample sizes mean smaller statistical power.",
+      "citations": [
+        {
+          "alias": "P3",
+          "quote": "Small sample size means smaller power and, for all functions above, the PPV for a true research fi nding decreases as power decreases towards 1 -β = 0.05.",
+          "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259"
+        }
+      ]
+    },
+    {
+      "item": "S18",
+      "question_id": "q12",
+      "statement_index": 0,
+      "question": "Among trials with public data, which properties went along with being cited more?",
+      "statement": "Trials published in high impact journals, prior to 2001, or with US authors were more likely to share their data.",
+      "citations": [
+        {
+          "alias": "P3",
+          "quote": "As seen in Table 1, trials published in high impact journals, prior to 2001, or with US authors were more likely to share their data.",
+          "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30"
+        }
+      ]
+    },
+    {
+      "item": "S19",
+      "question_id": "q02",
+      "statement_index": 1,
+      "question": "Does making the network bigger help accuracy on the GLUE benchmark?",
+      "statement": "Both BERT BASE and BERT LARGE outperform all systems on all tasks by a substantial margin, obtaining 4.5% and 7.0% respective average accuracy improvement over the prior state of the art.",
+      "citations": [
+        {
+          "alias": "P1",
+          "quote": "Both BERT BASE and BERT LARGE outperform all systems on all tasks by a substantial margin, obtaining 4.5% and 7.0% respective average accuracy improvement over the prior state of the art.",
+          "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6"
+        }
+      ]
+    },
+    {
+      "item": "S20",
+      "question_id": "q04",
+      "statement_index": 2,
+      "question": "How much did effect sizes shrink when preclinical cancer studies were repeated?",
+      "statement": "92% of replication effect sizes were smaller than the original when combining numeric and representative images.",
+      "citations": [
+        {
+          "alias": "P1",
+          "quote": "And although 79% of the replication effects were in the same direction as the original finding (random would be 50%), 92% of replication effect sizes were smaller than the original (combining numeric and representative images).",
+          "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe"
+        }
+      ]
+    }
+  ]
+}
