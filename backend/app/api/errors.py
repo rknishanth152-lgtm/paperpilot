@@ -23,6 +23,7 @@ from app.services.ingestion.documents import (
 )
 from app.services.ingestion.validation import UploadRejectedError
 from app.services.llm import ModelError
+from app.services.reproducibility.records import AssessmentNotFoundError
 from app.services.retrieval.keyword import QueryTooLongError
 from app.storage import StorageError
 
@@ -68,6 +69,16 @@ def install_error_handlers(app: FastAPI) -> None:
     async def storage_failed(request: Request, exc: StorageError) -> JSONResponse:
         return error_response(
             500, "storage_error", "The file could not be stored on the server."
+        )
+
+    @app.exception_handler(AssessmentNotFoundError)
+    async def assessment_not_found(
+        request: Request, exc: AssessmentNotFoundError
+    ) -> JSONResponse:
+        return error_response(
+            404,
+            "assessment_not_found",
+            "This paper has not been checked against the checklist yet.",
         )
 
     @app.exception_handler(DocumentNotFoundError)

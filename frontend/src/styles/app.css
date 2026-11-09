@@ -317,6 +317,28 @@ code {
   animation: spin 1s linear infinite;
 }
 
+/* Reporting statuses: no red or green, so nothing reads as a grade. */
+.badge-reported {
+  background: var(--color-accent-wash);
+  color: var(--color-accent);
+}
+
+.badge-partially_reported {
+  background: var(--color-sheet);
+  box-shadow: inset 0 0 0 1px var(--color-rule);
+  color: var(--color-accent);
+}
+
+.badge-not_found {
+  background: var(--color-pending-bg);
+  color: var(--color-pending-text);
+}
+
+.badge-needs_review {
+  background: var(--color-processing-bg);
+  color: var(--color-processing-text);
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -690,9 +712,119 @@ code {
   }
 }
 
+.checklist-panel {
+  margin-bottom: var(--space-5);
+}
+
+.checklist-intro {
+  margin-bottom: var(--space-1);
+}
+
+.checklist-result {
+  margin-top: var(--space-5);
+  animation: checklist-arrive var(--motion-duration-base) var(--motion-ease-out);
+}
+
+@keyframes checklist-arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+.checklist-items {
+  display: grid;
+  padding: 0;
+  list-style: none;
+}
+
+.checklist-item {
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-rule);
+}
+
+.checklist-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+}
+
+.checklist-title {
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.checklist-badge {
+  white-space: normal;
+}
+
+.checklist-question {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.checklist-description,
+.checklist-explanation {
+  margin-top: var(--space-2);
+}
+
+.checklist-evidence-list {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.checklist-evidence {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-frost);
+  border-radius: var(--radius-sm);
+}
+
+.checklist-quote {
+  font-family: var(--font-reading);
+  overflow-wrap: anywhere;
+}
+
+.checklist-quote mark {
+  padding: 0 0.125rem;
+  background: var(--color-marker);
+  color: var(--color-ink);
+}
+
+.checklist-where,
+.checklist-examined {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.checklist-examined {
+  margin-top: var(--space-3);
+}
+
+.checklist-passage {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.checklist-passage summary {
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.checklist-passage .passage-text {
+  margin-top: var(--space-2);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .checklist-result {
+    animation: none;
   }
 
   .button,

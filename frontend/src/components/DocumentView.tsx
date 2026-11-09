@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { ApiError, getDocument, getStructure, retryDocument } from "../api/client";
 import type { DocumentResponse, StructureResponse } from "../api/types";
 import { formatBytes } from "../lib/format";
+import { ChecklistPanel } from "./ChecklistPanel";
 import { Icon } from "./Icon";
 import { QuestionPanel } from "./QuestionPanel";
 import { StatusBadge } from "./StatusBadge";
@@ -181,6 +182,7 @@ export function DocumentView({ documentId, pollIntervalMs, onHome }: Props) {
         (structure ? (
           <>
             <QuestionPanel documentId={documentId} />
+            <ChecklistPanel documentId={documentId} />
             <StructureView structure={structure} />
           </>
         ) : (

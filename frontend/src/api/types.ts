@@ -83,6 +83,46 @@ export interface EvidencePassage {
   text: string;
 }
 
+export type ReportingStatus =
+  | "reported"
+  | "partially_reported"
+  | "not_found"
+  | "needs_review";
+
+export interface AssessmentEvidence {
+  passage_id: string;
+  section: string | null;
+  page_start: number | null;
+  page_end: number | null;
+  quote: string;
+  text: string;
+}
+
+export interface AssessmentItem {
+  key: string;
+  title: string;
+  question: string;
+  status: ReportingStatus;
+  status_label: string;
+  status_description: string;
+  review_reason: "parse_incomplete" | "evidence_unverified" | "model_uncertain" | null;
+  explanation: string | null;
+  passages_examined: number;
+  evidence: AssessmentEvidence[];
+}
+
+export interface AssessmentResponse {
+  assessment_id: string;
+  document_id: string;
+  checklist_version: string;
+  document_status: DocumentStatus;
+  model: string | null;
+  prompt_version: string | null;
+  retrieval_method: string | null;
+  created_at: string;
+  items: AssessmentItem[];
+}
+
 export interface AnswerResponse {
   statements: StatementResponse[];
   evidence: EvidencePassage[];

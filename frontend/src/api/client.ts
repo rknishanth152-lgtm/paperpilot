@@ -4,6 +4,7 @@
 
 import type {
   AnswerResponse,
+  AssessmentResponse,
   DocumentResponse,
   StructureResponse,
   UploadResponse,
@@ -102,6 +103,16 @@ export function getStructure(documentId: string): Promise<StructureResponse> {
 
 export function retryDocument(documentId: string): Promise<DocumentResponse> {
   return request<DocumentResponse>(`${BASE}/${encodeURIComponent(documentId)}/retry`, {
+    method: "POST",
+  });
+}
+
+export function getAssessment(documentId: string): Promise<AssessmentResponse> {
+  return request<AssessmentResponse>(`${BASE}/${encodeURIComponent(documentId)}/assessment`);
+}
+
+export function runAssessment(documentId: string): Promise<AssessmentResponse> {
+  return request<AssessmentResponse>(`${BASE}/${encodeURIComponent(documentId)}/assessment`, {
     method: "POST",
   });
 }

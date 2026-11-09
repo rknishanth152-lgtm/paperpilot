@@ -43,6 +43,15 @@ Agreed with the developer at P3-T9. The CSS custom properties in `frontend/src/s
 | Parsed | `#1E6B3A` on `#E5F2E8` | 5.65:1 | Check |
 | Failed | `#A3302A` on `#FBEAE7` | 5.98:1 | Alert |
 
+Reporting checklist statuses (agreed with the developer at R7). Existing colours only, with deliberately no red or green, so nothing reads as a pass or fail grade (`FR-REP-004`).
+
+| Status | Text on background | Contrast | Icon |
+|---|---|---|---|
+| Reported | `#1F4F82` on `#E6EEF7` | 7.18:1 | Check |
+| Partly reported | `#1F4F82` on `#FFFFFF`, inset `#D9DEE5` border | 8.40:1 | Half circle |
+| Not found in the material examined | `#4A5560` on `#EEF0F2` | 6.66:1 | Info |
+| Needs review | `#8A5A00` on `#FBF1DC` | 5.28:1 | Alert |
+
 A status is always a word plus an icon; colour only reinforces it (`NFR-ACC-001`).
 
 **Type.** IBM Plex Sans (interface; 400, 500, 600) and IBM Plex Serif (paper titles and passage text; 400), self-hosted through `@fontsource`, so no font request leaves the machine. Sizes: `--text-sm` 13px, `--text-base` 15px, `--text-reading` 17px, `--text-lg` 20px, `--text-xl` 24px. Passage text is limited to `--measure-reading` (68 characters wide).

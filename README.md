@@ -235,6 +235,12 @@ LLM_API_KEY=your-key-here
 
 **Anthropic Claude (paid).** Create a key at <https://platform.claude.com/settings/keys>, and use `LLM_PROVIDER=anthropic` with `LLM_MODEL=claude-haiku-5-5`. Anthropic's commercial API data is not used for training by default.
 
+## Reporting checklist
+
+A parsed paper's page has a **Reporting checklist** panel. It checks what the paper states about six reporting items and shows a status in words, with quoted evidence and its section and page. It gives no score or verdict, and **Not found in the material examined** is not a judgement about the paper.
+
+Running it sends passages found in the paper to the configured provider, once per item. `GET /documents/{id}/assessment` returns the latest result and `POST` runs a new one. Earlier results are kept.
+
 ## Embeddings
 
 Questions are answered with semantic retrieval by default, because it was measured to find more of the expected passages (`docs/experiments/retrieval-comparison.md`). It needs an embedding for each stored passage, made with `gemini-embedding-2` using the same `LLM_API_KEY`. New uploads are not embedded automatically: until they are, a question on them uses keyword search, and the answer names the method used. See how many are missing without sending anything:
