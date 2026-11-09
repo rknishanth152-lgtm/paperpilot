@@ -20,4 +20,12 @@ uv run python -m tests.evaluation.run_evaluation --pause 30
 
 Each file records the commit, whether the working tree differed from it (saved results do not count), configuration, model and prompt version. The command exits with 1 if the provider stops the run early.
 
+Citation reference validity (P6-T2, `FR-EVL-003`): new answer runs include it in their summary. To compute it from an already saved answer result, without calling a model:
+
+```bash
+uv run python -m tests.evaluation.citation_validity benchmarks/results/answers-X.json
+```
+
+It reports valid ÷ total citations with a count per failure reason, and validated ÷ total for answers that contain statements. Answers with no statements pass validation automatically, so they are listed separately instead of raising the rate. Uncited statements and model errors are also listed separately. This is structural correctness only and says nothing about whether a passage supports a statement.
+
 Evaluation results are produced only by saved harness runs, never edited by hand (`CLAUDE.md` §6).

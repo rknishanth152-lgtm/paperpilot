@@ -26,6 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "backend"))
 
 from sqlalchemy.orm import Session, sessionmaker
+from tests.evaluation.citation_validity import citation_validity
 from tests.evaluation.code_state import CodeState, code_state
 from tests.evaluation.dataset import (
     EVALUATION_SET,
@@ -183,6 +184,7 @@ def summarize(rows: Sequence[dict[str, Any]], model: str) -> dict[str, Any]:
             "gave_statements": stated(unanswerable),
             "failed_validation": count(unanswerable, "validation_status", "failed"),
         },
+        "citation_validity": citation_validity(rows),
         "input_tokens": tokens_in,
         "output_tokens": tokens_out,
         "mean_model_seconds": (
