@@ -34,4 +34,6 @@ Claim support (P6-T3, `FR-EVL-004`): `claim_support.py` has `draw` (fix the samp
 uv run python -m http.server 8765 --bind 127.0.0.1 --directory data/labelling
 ```
 
+Labels changed after a result was seen go in a new file, `benchmarks/claim_support_labels_v2.json`. `report --revised` saves a new result listing every changed label and marking it as made after seeing results (`CLAUDE.md` §6). The first labels and result stay in place.
+
 Evaluation results are produced only by saved harness runs, never edited by hand (`CLAUDE.md` §6).

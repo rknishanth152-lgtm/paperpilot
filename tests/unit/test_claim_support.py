@@ -8,7 +8,10 @@ from typing import Any
 
 import pytest
 from pydantic import ValidationError
+from tests.evaluation import claim_support
 from tests.evaluation.claim_support import (
+    LIMITS,
+    REVISION_LIMITS,
     Label,
     Labels,
     Sample,
@@ -19,8 +22,10 @@ from tests.evaluation.claim_support import (
     claim_support_record,
     claim_support_result,
     draw_items,
+    label_changes,
     normalised_sha256,
     render_sheet,
+    report,
     write_new,
 )
 from tests.evaluation.code_state import CodeState
@@ -338,6 +343,110 @@ def test_a_saved_report_says_who_labelled_what() -> None:
     assert saved["run_at"] == "2026-11-09T08:30:05+00:00"
     assert saved["result"] == claim_support_result(TWO, GOOD)
     assert "one labeller" in saved["limits"]
+
+
+# --- Labels revised after a result was seen (CLAUDE.md §6) ---------------------
+
+
+REVISED = labels(("S01", "partly_supported", "yes"), ("S02", "supported", "partly"))
+
+
+def test_a_revision_lists_every_changed_label() -> None:
+    assert label_changes(GOOD, REVISED) == [
+        {
+            "item": "S01",
+            "field": "claim_support",
+            "from": "supported",
+            "to": "partly_supported",
+        },
+        {"item": "S02", "field": "answers_question", "from": "no", "to": "partly"},
+    ]
+
+
+def test_a_revision_that_changes_nothing_is_refused() -> None:
+    with pytest.raises(ValueError, match="change nothing"):
+        label_changes(GOOD, GOOD)
+
+
+class ReportFiles:
+    """The report's input files, in a temporary folder."""
+
+    def __init__(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        self.guide = tmp_path / "guide.md"
+        self.guide.write_text("The guide.\n", encoding="utf-8")
+        self.sample = tmp_path / "sample.json"
+        self.first = tmp_path / "first.json"
+        self.revised = tmp_path / "revised.json"
+        self.results = tmp_path / "results"
+        self.results.mkdir()
+        for name, path in {
+            "GUIDE": self.guide,
+            "SAMPLE": self.sample,
+            "LABELS": self.first,
+            "REVISED_LABELS": self.revised,
+            "RESULTS": self.results,
+        }.items():
+            monkeypatch.setattr(claim_support, name, path)
+        monkeypatch.setattr(claim_support, "code_state", lambda: STATE)
+        self.save(TWO, self.sample)
+
+    def save(self, content: Sample | Labels, path: Path) -> None:
+        digest = normalised_sha256(self.guide)
+        current = content.model_copy(update={"guide_sha256": digest})
+        path.write_text(current.model_dump_json(), encoding="utf-8")
+
+    def only_result(self) -> dict[str, Any]:
+        [path] = list(self.results.iterdir())
+        saved: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+        return saved
+
+
+@pytest.fixture
+def files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> ReportFiles:
+    return ReportFiles(tmp_path, monkeypatch)
+
+
+def test_a_revised_report_says_it_came_after_the_results(files: ReportFiles) -> None:
+    files.save(GOOD, files.first)
+    files.save(REVISED, files.revised)
+
+    report(revised=True)
+
+    saved = files.only_result()
+    assert saved["revision"] == {
+        "revises_labels_sha256": normalised_sha256(files.first),
+        "made_after_seeing_results": True,
+        "changes": label_changes(GOOD, REVISED),
+    }
+    assert saved["labels_sha256"] == normalised_sha256(files.revised)
+    assert saved["result"] == claim_support_result(TWO, REVISED)
+    assert saved["limits"] == f"{LIMITS} {REVISION_LIMITS}"
+
+
+def test_a_first_report_is_not_marked_as_a_revision(files: ReportFiles) -> None:
+    files.save(GOOD, files.first)
+
+    report()
+
+    saved = files.only_result()
+    assert saved["revision"] is None
+    assert saved["labels_sha256"] == normalised_sha256(files.first)
+    assert saved["result"] == claim_support_result(TWO, GOOD)
+    assert saved["limits"] == LIMITS
+
+
+@pytest.mark.parametrize("broken", ["first", "revised"])
+def test_a_revision_needs_both_sets_of_labels_to_cover_the_sample(
+    files: ReportFiles, broken: str
+) -> None:
+    partial = labels(("S01", "not_supported", "no"))
+    files.save(partial if broken == "first" else GOOD, files.first)
+    files.save(partial if broken == "revised" else REVISED, files.revised)
+
+    with pytest.raises(ValueError, match="do not match the sample"):
+        report(revised=True)
+
+    assert list(files.results.iterdir()) == []
 
 
 def test_a_new_file_never_replaces_an_old_one(tmp_path: Path) -> None:

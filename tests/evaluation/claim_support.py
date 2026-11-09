@@ -5,6 +5,7 @@ From the repository folder, with PostgreSQL running and the corpus ingested:
     uv run python -m tests.evaluation.claim_support draw benchmarks/results/answers-X.json
     uv run python -m tests.evaluation.claim_support sheet
     uv run python -m tests.evaluation.claim_support report
+    uv run python -m tests.evaluation.claim_support report --revised
 
 `draw` fixes the sample and writes a labelling sheet to the git-ignored data/
 folder, because the sheet holds passage text. `sheet` writes that page again from
@@ -44,6 +45,7 @@ RESULTS = BENCHMARKS / "results"
 GUIDE = BENCHMARKS / "claim_support_guide_v1.md"
 SAMPLE = BENCHMARKS / "claim_support_sample_v1.json"
 LABELS = BENCHMARKS / "claim_support_labels_v1.json"
+REVISED_LABELS = BENCHMARKS / "claim_support_labels_v2.json"
 SHEET = REPO_ROOT / "data" / "labelling" / "claim-support-sheet.html"
 SEED = 20261109
 DEFAULT_LABELLER = "rknishanth152-lgtm"
@@ -51,6 +53,11 @@ LIMITS = (
     "Small sample: one run of one model, labelled by one labeller, who had already "
     "read notes on q06, q12 and q19. It shows agreement with that person, not "
     "scientific truth, and is a coarse baseline (RISK-15)."
+)
+REVISION_LIMITS = (
+    "These labels replace an earlier set. They were changed after the labeller saw "
+    "the first result and the assistant's notes on q06 and q12, which disagreed "
+    "with three labels, so they are not independent of those notes."
 )
 
 ClaimSupport = Literal["supported", "partly_supported", "not_supported", "cannot_judge"]
@@ -379,6 +386,7 @@ def claim_support_record(
     labels_sha256: str,
     state: CodeState,
     run_at: datetime,
+    revision: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "kind": "claim support, human labels",
@@ -393,7 +401,8 @@ def claim_support_record(
         "sample_sha256": sample_sha256,
         "labels_sha256": labels_sha256,
         "source": sample.source,
-        "limits": LIMITS,
+        "limits": LIMITS if revision is None else f"{LIMITS} {REVISION_LIMITS}",
+        "revision": revision,
         "result": claim_support_result(sample, labels),
     }
 
@@ -441,19 +450,56 @@ def sheet() -> None:
     print(f"Sheet: {SHEET}")
 
 
-def report() -> None:
-    sample = Sample.model_validate_json(SAMPLE.read_text(encoding="utf-8"))
-    labels = Labels.model_validate_json(LABELS.read_text(encoding="utf-8"))
+def label_changes(previous: Labels, revised: Labels) -> list[dict[str, str]]:
+    """Every label that differs, so a revision cannot pass unnoticed."""
+    before = {label.item: label for label in previous.labels}
+    changes = [
+        {
+            "item": label.item,
+            "field": field,
+            "from": getattr(before[label.item], field),
+            "to": getattr(label, field),
+        }
+        for label in revised.labels
+        for field in ("claim_support", "answers_question")
+        if getattr(label, field) != getattr(before[label.item], field)
+    ]
+    if not changes:
+        raise ValueError("the revised labels change nothing")
+    return changes
+
+
+def _checked_labels(path: Path, sample: Sample) -> Labels:
+    labels = Labels.model_validate_json(path.read_text(encoding="utf-8"))
     check_labels(sample, labels, guide_sha256=normalised_sha256(GUIDE))
+    return labels
+
+
+def report(*, revised: bool = False) -> None:
+    """Save the rate. The first labels stay in place when `revised` is used."""
+    sample = Sample.model_validate_json(SAMPLE.read_text(encoding="utf-8"))
+    first = _checked_labels(LABELS, sample)
+    labels = first
+    labels_path = LABELS
+    revision = None
+    if revised:
+        labels_path = REVISED_LABELS
+        labels = _checked_labels(labels_path, sample)
+        revision = {
+            "revises_labels_sha256": normalised_sha256(LABELS),
+            "made_after_seeing_results": True,
+            "changes": label_changes(first, labels),
+        }
     state = code_state()
     now = datetime.now(UTC)
     record = claim_support_record(
         sample=sample,
         labels=labels,
         sample_sha256=normalised_sha256(SAMPLE),
-        labels_sha256=normalised_sha256(LABELS),
+        labels_sha256=normalised_sha256(labels_path),
         state=state,
         run_at=now,
+        revision=revision,
     )
     path = RESULTS / f"claim-support-{now:%Y%m%dT%H%M%SZ}-{state.revision[:7]}.json"
     write_new(record, path)
@@ -466,14 +512,18 @@ def main() -> None:
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("draw").add_argument("answers", type=Path)
     commands.add_parser("sheet")
-    commands.add_parser("report")
+    commands.add_parser("report").add_argument(
+        "--revised",
+        action="store_true",
+        help="report the revised labels and record what changed from the first set",
+    )
     options = parser.parse_args()
     if options.command == "draw":
         draw(options.answers)
     elif options.command == "sheet":
         sheet()
     else:
-        report()
+        report(revised=options.revised)
 
 
 if __name__ == "__main__":
