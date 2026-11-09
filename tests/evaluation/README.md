@@ -12,4 +12,12 @@ Retrieval evaluation (P4-T6, `FR-EVL-002`): `run_retrieval.py` reads `benchmarks
 uv run python -m tests.evaluation.run_retrieval
 ```
 
+Whole evaluation (P6-T1, `FR-EVL-002`, `FR-EVL-003`): one command runs retrieval, then answers, on the same code, and saves one new dated file for each. The answer step is a **manual real-model run** that sends the questions and retrieved passages to the provider set in `.env`. Use open-access papers only on a free tier. `--pause` is seconds between questions; `--answer-limit N` runs only the first N answers.
+
+```bash
+uv run python -m tests.evaluation.run_evaluation --pause 30
+```
+
+Each file records the commit, whether the working tree differed from it (saved results do not count), configuration, model and prompt version. The command exits with 1 if the provider stops the run early.
+
 Evaluation results are produced only by saved harness runs, never edited by hand (`CLAUDE.md` §6).

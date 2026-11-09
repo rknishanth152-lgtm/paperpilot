@@ -9,7 +9,6 @@ benchmarks/results/. Refuses a set that has not been reviewed.
 """
 
 import hashlib
-import subprocess
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -17,8 +16,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "backend"))
 
+from sqlalchemy.orm import Session, sessionmaker
+from tests.evaluation.code_state import CodeState, code_state
 from tests.evaluation.dataset import (
     EVALUATION_SET,
+    EvaluationSet,
     load_evaluation_set,
 )
 from tests.evaluation.retrieval_harness import (
@@ -31,30 +33,19 @@ from tests.evaluation.retrieval_harness import (
     write_result,
 )
 
-from app.config import get_settings
+from app.config import Settings, get_settings
 from app.database import get_sessionmaker
 from app.models.passage import SEARCH_CONFIG, SEARCH_VECTOR_SQL
 
 RESULTS = REPO_ROOT / "benchmarks" / "results"
 
 
-def _git(*arguments: str) -> str:
-    done = subprocess.run(
-        ["git", *arguments],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    return done.stdout.strip()
-
-
-def main() -> None:
-    evaluation = load_evaluation_set()
-    require_reviewed(evaluation)
-    settings = get_settings()
-    sessions = get_sessionmaker()
-
+def run_retrieval_evaluation(
+    evaluation: EvaluationSet,
+    settings: Settings,
+    sessions: sessionmaker[Session],
+    state: CodeState,
+) -> Path:
     documents, passages = load_corpus(sessions, evaluation)
     result = evaluate(
         evaluation,
@@ -67,8 +58,8 @@ def main() -> None:
         evaluation=evaluation,
         evaluation_sha256=hashlib.sha256(EVALUATION_SET.read_bytes()).hexdigest(),
         run_at=datetime.now(UTC),
-        code_revision=_git("rev-parse", "HEAD"),
-        working_tree_clean=_git("status", "--porcelain") == "",
+        code_revision=state.revision,
+        working_tree_clean=state.clean,
         configuration={
             "k": K,
             "retriever": "keyword",
@@ -82,7 +73,7 @@ def main() -> None:
     path = write_result(record, RESULTS)
 
     summary = record["summary"]
-    print(f"Saved {path.relative_to(REPO_ROOT)}")
+    print(f"Saved {path.name}")
     print(
         f"Recall@{summary['k']} across all papers: "
         f"{summary['hits_all_papers']}/{summary['evaluated']}"
@@ -94,6 +85,15 @@ def main() -> None:
     print(
         f"Unmatched: {summary['unmatched_questions']} questions, "
         f"{summary['unmatched_quotes']} quotes. Small set: {record['limits']}"
+    )
+    return path
+
+
+def main() -> None:
+    evaluation = load_evaluation_set()
+    require_reviewed(evaluation)
+    run_retrieval_evaluation(
+        evaluation, get_settings(), get_sessionmaker(), code_state()
     )
 
 

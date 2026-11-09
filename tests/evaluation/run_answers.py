@@ -3,7 +3,7 @@
 Sends the evaluation questions and the retrieved passages to the configured
 provider. Not part of any test run. From the repository folder:
 
-    uv run python -m tests.evaluation.run_answers --model gemini-3.8-flash
+    uv run python -m tests.evaluation.run_answers --model gemini-3.5-flash-lite
 
 Saves a new file in benchmarks/results/, labelled as a manual run. Stops early
 if the provider reports a rate limit, keeping what it has. The key is never
@@ -13,12 +13,11 @@ printed or saved.
 import argparse
 import hashlib
 import json
-import subprocess
 import sys
 import time
 import uuid
-from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -26,7 +25,14 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "backend"))
 
-from tests.evaluation.dataset import EVALUATION_SET, Question, load_evaluation_set
+from sqlalchemy.orm import Session, sessionmaker
+from tests.evaluation.code_state import CodeState, code_state
+from tests.evaluation.dataset import (
+    EVALUATION_SET,
+    EvaluationSet,
+    Question,
+    load_evaluation_set,
+)
 from tests.evaluation.retrieval_harness import (
     StoredPassage,
     expected_passages,
@@ -34,16 +40,18 @@ from tests.evaluation.retrieval_harness import (
     require_reviewed,
 )
 
-from app.config import get_settings
+from app.config import Settings, get_settings
 from app.database import get_sessionmaker
 from app.schemas.answer import MalformedAnswerError
 from app.schemas.answer_response import AnswerResponse
 from app.services.answering.pipeline import Answering, AnswerLimits
 from app.services.answering.prompt import PROMPT_VERSION
+from app.services.answering.response import RETRIEVAL_METHOD
 from app.services.llm import LanguageModel, ModelError, ModelRequest, ModelResponse
 from app.services.llm_factory import build_language_model
 
 RESULTS = REPO_ROOT / "benchmarks" / "results"
+DEFAULT_PAUSE = 7.0
 # Standard paid prices, US$ per million tokens (input, output), read 2026-11-09.
 # The free tier costs nothing; this is what the same usage would cost if paid.
 PAID_PRICE = {
@@ -190,37 +198,85 @@ def summarize(rows: Sequence[dict[str, Any]], model: str) -> dict[str, Any]:
     }
 
 
-def _git(*arguments: str) -> str:
-    return subprocess.run(
-        ["git", *arguments], cwd=REPO_ROOT, capture_output=True, text=True, check=True
-    ).stdout.strip()
+@dataclass(frozen=True)
+class AnswerRun:
+    path: Path | None
+    stopped: str | None
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", required=True)
-    parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--pause", type=float, default=7.0)
-    parser.add_argument("--no-save", action="store_true")
-    options = parser.parse_args()
+def answer_configuration(limits: AnswerLimits) -> dict[str, Any]:
+    """The settings that shape an answer. No request sets a temperature."""
+    return {
+        "retriever": RETRIEVAL_METHOD,
+        **asdict(limits),
+        "temperature": "provider default",
+    }
 
-    evaluation = load_evaluation_set()
-    require_reviewed(evaluation)
-    settings = get_settings().model_copy(update={"llm_model": options.model})
-    sessions = get_sessionmaker()
+
+def answer_record(
+    *,
+    provider: str | None,
+    model: str,
+    rows: Sequence[dict[str, Any]],
+    stopped: str | None,
+    limits: AnswerLimits,
+    state: CodeState,
+    run_at: datetime,
+    evaluation_limits: str,
+    evaluation_sha256: str,
+) -> dict[str, Any]:
+    """The answers with what is needed to reproduce and interpret them."""
+    return {
+        "kind": "manual real-model run",
+        "provider": provider,
+        "requested_model": model,
+        "run_at": run_at.isoformat(),
+        "code_revision": state.revision,
+        "working_tree_clean": state.clean,
+        "prompt_version": PROMPT_VERSION,
+        "configuration": answer_configuration(limits),
+        "evaluation_set_sha256": evaluation_sha256,
+        "limits": evaluation_limits,
+        "stopped_early": stopped,
+        "summary": summarize(rows, model),
+        "questions": list(rows),
+    }
+
+
+def write_answers(record: Mapping[str, Any], directory: Path) -> Path:
+    """Save to a new dated file. An existing result is never overwritten."""
+    stamp = datetime.fromisoformat(record["run_at"]).strftime("%Y%m%dT%H%M%SZ")
+    name = f"answers-{record['requested_model']}-{stamp}-{record['code_revision'][:7]}"
+    path = directory / f"{name}.json"
+    with path.open("x", encoding="utf-8", newline="\n") as handle:
+        json.dump(record, handle, indent=2, ensure_ascii=False)
+        handle.write("\n")
+    return path
+
+
+def run_answer_evaluation(
+    evaluation: EvaluationSet,
+    settings: Settings,
+    sessions: sessionmaker[Session],
+    state: CodeState,
+    *,
+    limit: int | None = None,
+    pause: float = DEFAULT_PAUSE,
+    save: bool = True,
+) -> AnswerRun:
     documents, passages = load_corpus(sessions, evaluation)
     tracker = TrackingModel(build_language_model(settings))
-    answering = Answering(sessions, tracker, AnswerLimits.from_settings(settings))
+    limits = AnswerLimits.from_settings(settings)
+    answering = Answering(sessions, tracker, limits)
 
     def answer(question: str, document_ids: list[uuid.UUID]) -> AnswerResponse:
         return answering.answer(question, document_ids=document_ids)
 
-    questions = evaluation.questions[: options.limit]
     rows: list[dict[str, Any]] = []
     stopped: str | None = None
-    for index, question in enumerate(questions):
+    for index, question in enumerate(evaluation.questions[:limit]):
         if index:
-            time.sleep(options.pause)
+            time.sleep(pause)
         scope = [documents[p] for p in question.papers] or list(documents.values())
         row = run_question(answer, tracker, question, scope, passages)
         rows.append(row)
@@ -233,33 +289,45 @@ def main() -> None:
             stopped = row["error"]
             break
 
-    summary = summarize(rows, options.model)
+    summary = summarize(rows, tracker.model_name)
     print(json.dumps({"stopped_early": stopped, **summary}, indent=2))
-    if options.no_save:
-        return
-    now = datetime.now(UTC)
-    revision = _git("rev-parse", "HEAD")
-    record = {
-        "kind": "manual real-model run",
-        "provider": settings.llm_provider,
-        "requested_model": options.model,
-        "run_at": now.isoformat(),
-        "code_revision": revision,
-        "working_tree_clean": _git("status", "--porcelain") == "",
-        "prompt_version": PROMPT_VERSION,
-        "evaluation_set_sha256": hashlib.sha256(
-            EVALUATION_SET.read_bytes()
-        ).hexdigest(),
-        "limits": evaluation.limits,
-        "stopped_early": stopped,
-        "summary": summary,
-        "questions": rows,
-    }
-    path = RESULTS / f"answers-{options.model}-{now:%Y%m%dT%H%M%SZ}-{revision[:7]}.json"
-    with path.open("x", encoding="utf-8", newline="\n") as handle:
-        json.dump(record, handle, indent=2, ensure_ascii=False)
-        handle.write("\n")
-    print(f"Saved {path.relative_to(REPO_ROOT)}")
+    if not save:
+        return AnswerRun(None, stopped)
+    record = answer_record(
+        provider=settings.llm_provider,
+        model=tracker.model_name,
+        rows=rows,
+        stopped=stopped,
+        limits=limits,
+        state=state,
+        run_at=datetime.now(UTC),
+        evaluation_limits=evaluation.limits,
+        evaluation_sha256=hashlib.sha256(EVALUATION_SET.read_bytes()).hexdigest(),
+    )
+    path = write_answers(record, RESULTS)
+    print(f"Saved {path.name}")
+    return AnswerRun(path, stopped)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model", required=True)
+    parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--pause", type=float, default=DEFAULT_PAUSE)
+    parser.add_argument("--no-save", action="store_true")
+    options = parser.parse_args()
+
+    evaluation = load_evaluation_set()
+    require_reviewed(evaluation)
+    run_answer_evaluation(
+        evaluation,
+        get_settings().model_copy(update={"llm_model": options.model}),
+        get_sessionmaker(),
+        code_state(),
+        limit=options.limit,
+        pause=options.pause,
+        save=not options.no_save,
+    )
 
 
 if __name__ == "__main__":
