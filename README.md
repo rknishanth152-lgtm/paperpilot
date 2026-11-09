@@ -235,9 +235,23 @@ LLM_API_KEY=your-key-here
 
 **Anthropic Claude (paid).** Create a key at <https://platform.claude.com/settings/keys>, and use `LLM_PROVIDER=anthropic` with `LLM_MODEL=claude-haiku-5-5`. Anthropic's commercial API data is not used for training by default.
 
+## Embeddings
+
+Semantic retrieval needs an embedding for each stored passage, made with `gemini-embedding-2` using the same `LLM_API_KEY`. New uploads are not embedded automatically. See how many are missing without sending anything:
+
+```bash
+uv run python scripts/embed_passages.py --check
+```
+
+Create the missing ones. This sends the text of those passages to Google, so use it only with papers you may send there. It is safe to run again, and continues after a rate limit:
+
+```bash
+uv run python scripts/embed_passages.py
+```
+
 ## Important limits
 
 - **Local, single-user only.** There is no authentication. Do not expose PaperPilot to a shared or public network (`NFR-SEC-006`).
 - **Only upload papers you are allowed to use**, including sending their text to the configured AI provider (`NFR-PRI-001`, `RISK-13`). Papers are never committed to this repository.
-- **Question answering sends text to an outside service (Phase 5).** With an API key configured, your question and the retrieved passages are sent to the provider you chose (`NFR-PRI-001`); PDFs and whole papers are not. Nothing is sent without a key, and uploading and parsing stay on your machine. The terms differ a lot by provider, so read "Connecting an AI model" above and check the current terms before using papers that are not open access.
+- **Question answering sends text to an outside service (Phase 5).** With an API key configured, your question and the retrieved passages are sent to the provider you chose (`NFR-PRI-001`); PDFs are not. Running `scripts/embed_passages.py` also sends the text of every stored passage once. Nothing is sent without a key, and uploading and parsing stay on your machine. The terms differ a lot by provider, so read "Connecting an AI model" above and check the current terms before using papers that are not open access.
 - **Never commit secrets.** Settings go in `.env`, which is ignored; `.env.example` lists placeholders only (`NFR-SEC-001`).

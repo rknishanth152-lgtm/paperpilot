@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.12 (v1.0 scope reduction, 2026-11-09; see `progress.md` §6.15) |
+| Version | 0.13 (`OQ-012` resolved, 2026-11-09; see `docs/design/embeddings.md`) |
 | Date | 2026-11-03 |
 | Status | In force. What actually exists is recorded in `progress.md`. |
 | Companion documents | `CLAUDE.md` (development rules), `progress.md` (actual state), `docs/implementation-roadmap.md` (sequence and exit criteria) |
@@ -505,7 +505,7 @@ Structured extraction (`FR-EXT-*`, `FR-EVL-005`), cross-paper comparison (`FR-CM
 | OQ-009 | Extraction strategy for long documents; extraction-matching rule for scoring. | **Deferred 2026-11-09** with Phase 7. Experiment if reopened | Phase 7 |
 | OQ-010 | Initial reproducibility checklist items. | Hand-label 3 papers | Phase 11 |
 | OQ-011 | LLM provider and model for answers and extraction (cost, structured-output support). | **Interim 2026-11-09:** Google Gemini free tier, `gemini-3.5-flash-lite`, developer's choice because a paid API account was out of reach (`progress.md` §6.13, `docs/experiments/answer-baseline.md`). Open-access papers only on the free tier. Settled by a short comparison on the evaluation set at P5-T12 | Phase 5 |
-| OQ-012 | Embedding model, dimension, pgvector index choice and limits. Verify limits in pgvector docs. | Phase 8 | Phase 8 |
+| OQ-012 | Embedding model, dimension, pgvector index choice and limits. Verify limits in pgvector docs. | **Resolved 2026-11-09** (`docs/design/embeddings.md`): `gemini-embedding-2`, 768 dimensions, no approximate index (exact search), limits checked in the pgvector README | Phase 8 |
 | OQ-013 | Quote normalisation rules for PDF text artifacts. | **Resolved for VS-1, 2026-11-08, P5-T6** (`progress.md` §6.14): compare against stored passage text, never the PDF text layer, after Unicode NFKC and folding quotes and dashes, ignoring all whitespace; case is kept. Replaces the provisional split-ligature rule. | Phase 5 |
 | OQ-014 | Tooling: Python packaging/dependency tool, linter/formatter, type checker, test runner, frontend package manager and UI library, SQLAlchemy/driver versions. (Earlier videos used uv, pnpm, pytest and ruff [T]; none is mandated here.) | **Resolved 2026-11-03** (`progress.md` §6.8): Python 3.14 via uv, pytest, ruff, mypy, SQLAlchemy 2.1 + Alembic + psycopg 3; frontend Vite + React + TypeScript with pnpm, no component library or animation library chosen yet (P3-T9). | Phase 0 |
 | OQ-015 | GROBID image/tag, resource needs, and which model variant to use; PostgreSQL image that can later enable pgvector. | **Resolved 2026-11-03** (`progress.md` §6.8): `grobid/grobid:0.9.1-crf` (CPU, about 0.5 GB, needs about 4 GB RAM for full text); `pgvector/pgvector:0.8.7-pg18-trixie` (PostgreSQL 18, extension not enabled until Phase 8). Both bound to 127.0.0.1 only. | Phase 0 |
@@ -544,7 +544,7 @@ The earlier notes (`notes/architecture-notes-*.md`, `implementation-notes.md`, `
 ### A.3 Unsupported or unverified assumptions
 
 - ~~That GROBID gives usable page numbers and section structure (`OQ-001`).~~ Checked in Phase 1 on five papers: pages yes, sections flat (`docs/experiments/grobid-feasibility.md`).
-- Pgvector index limits quoted in the notes came from a third-party summary and have not been checked against the pgvector documentation (`OQ-012`).
+- Pgvector index limits quoted in the notes came from a third-party summary and have not been checked against the pgvector documentation (`OQ-012`). Checked against the pgvector README on 2026-11-09 (`docs/design/embeddings.md`).
 - GROBID endpoint and option details in the notes came from a documentation branch rather than the current stable pages (`OQ-015`).
 - Any specific model, model price, or latency mentioned in the videos is the speaker's statement about one setup and does not predict PaperPilot's behaviour.
 - Timeouts and top-k values are placeholders until measured. The upload limit (50 MB) is now based on Phase 1 measurements (`OQ-005`).
