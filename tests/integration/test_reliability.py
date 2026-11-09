@@ -21,6 +21,7 @@ from tests.integration.test_ingestion_pipeline import (
 from tests.integration.test_keyword_retrieval import add_document
 
 from app.models import Document, Paper, Passage
+from app.services.answering.pipeline import NOT_PARSED
 from app.services.ingestion.documents import process_in_background
 from app.services.ingestion.grobid import ParserFailure
 from app.services.ingestion.pipeline import Ingestion
@@ -251,6 +252,7 @@ def test_a_document_that_is_not_parsed_gives_no_evidence(
     assert body["statements"] == []
     assert body["evidence"] == []
     assert body["model"] is None
+    assert body["limitations"] == NOT_PARSED
 
 
 def test_only_the_parsed_document_in_a_mixed_scope_is_used(

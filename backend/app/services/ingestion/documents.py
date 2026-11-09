@@ -182,6 +182,18 @@ def get_paper_titles(
         return {row.id: row.title for row in rows}
 
 
+def get_document_statuses(
+    sessions: sessionmaker[Session], document_ids: Collection[uuid.UUID]
+) -> list[str]:
+    """One status per document that exists. Unknown ids are left out."""
+    with sessions() as session:
+        return list(
+            session.scalars(
+                select(Document.status).where(Document.id.in_(document_ids))
+            )
+        )
+
+
 def _load(session: Session, document_id: uuid.UUID) -> Document:
     document = session.get(Document, document_id)
     if document is None:

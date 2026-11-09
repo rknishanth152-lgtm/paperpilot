@@ -11,7 +11,13 @@ from tests.unit.test_answer_call import VALID, limits
 
 from app.models import Paper
 from app.schemas.answer import MalformedAnswerError
-from app.services.answering.pipeline import NOTHING_FITS, NOTHING_RETRIEVED, Answering
+from app.services.answering.pipeline import (
+    NOT_PARSED,
+    NOTHING_FITS,
+    NOTHING_RETRIEVED,
+    PARTLY_NOT_PARSED,
+    Answering,
+)
 from app.services.ingestion.documents import get_paper_titles
 from app.services.llm import FakeModel
 from app.services.retrieval.keyword import QueryTooLongError, search_passages
@@ -194,6 +200,77 @@ def test_passages_too_long_for_the_budget_skip_the_model_and_say_why(
     assert result.answer.evidence_sufficiency == "insufficient"
     assert result.answer.limitations == NOTHING_FITS
     assert result.context.passages_dropped == 1
+
+
+# "Not parsed" must not read as "not found" (DR-006).
+
+
+@pytest.mark.parametrize("status", ["pending", "processing", "failed"])
+def test_a_scope_with_no_parsed_document_says_so(
+    sessions: sessionmaker[Session], status: str
+) -> None:
+    document = add_document(sessions, "Glaciers retreated.", status=status)
+    model = FakeModel([])
+
+    result = Answering(sessions, model, limits()).ask(
+        "glacier", document_ids=[document]
+    )
+
+    assert model.requests == []
+    assert result.answer.evidence_sufficiency == "insufficient"
+    assert result.answer.limitations == NOT_PARSED
+
+
+def test_no_match_in_a_partly_parsed_scope_says_what_was_not_searched(
+    sessions: sessionmaker[Session],
+) -> None:
+    parsed = add_document(sessions, "Rocks only.")
+    failed = add_document(sessions, "Glaciers retreated.", status="failed")
+    model = FakeModel([])
+
+    result = Answering(sessions, model, limits()).ask(
+        "glacier", document_ids=[parsed, failed]
+    )
+
+    assert model.requests == []
+    assert result.answer.limitations == PARTLY_NOT_PARSED
+
+
+def test_an_unknown_id_is_not_reported_as_unparsed(
+    sessions: sessionmaker[Session],
+) -> None:
+    result = Answering(sessions, FakeModel([]), limits()).ask(
+        "glacier", document_ids=[uuid.uuid4()]
+    )
+
+    assert result.answer.limitations == NOTHING_RETRIEVED
+
+
+def test_an_unparsed_document_outside_the_scope_is_not_mentioned(
+    sessions: sessionmaker[Session],
+) -> None:
+    add_document(sessions, "Glaciers retreated.", status="failed")
+    parsed = add_document(sessions, "Rocks only.")
+    answering = Answering(sessions, FakeModel([]), limits())
+
+    in_scope = answering.ask("glacier", document_ids=[parsed])
+    no_scope = answering.ask("glacier")
+
+    assert in_scope.answer.limitations == NOTHING_RETRIEVED
+    assert no_scope.answer.limitations == NOTHING_RETRIEVED
+
+
+def test_passages_too_long_are_reported_before_an_unparsed_document(
+    sessions: sessionmaker[Session],
+) -> None:
+    parsed = add_document(sessions, "Glaciers retreated. " * 50)
+    failed = add_document(sessions, "Rocks only.", status="failed")
+
+    result = Answering(sessions, FakeModel([]), limits(max_context_chars=50)).ask(
+        "glacier", document_ids=[parsed, failed]
+    )
+
+    assert result.answer.limitations == NOTHING_FITS
 
 
 def test_the_models_insufficient_answer_is_preserved_without_citations(

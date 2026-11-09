@@ -35,7 +35,7 @@ from app.services.answering.citations import AnswerScope, validate_answer
 from app.services.answering.context import AnswerContext, build_context
 from app.services.answering.prompt import PROMPT_VERSION, SYSTEM_PROMPT
 from app.services.answering.response import assemble_response
-from app.services.ingestion.documents import get_paper_titles
+from app.services.ingestion.documents import get_document_statuses, get_paper_titles
 from app.services.llm import LanguageModel, ModelRequest, ModelUsage
 from app.services.retrieval.keyword import search_passages
 
@@ -45,6 +45,13 @@ NOTHING_RETRIEVED = (
     "No passages matching the question were found in the material searched."
 )
 NOTHING_FITS = "Matching passages were found, but they were too long to include."
+NOT_PARSED = (
+    "The selected documents have not been parsed, so they could not be searched."
+)
+PARTLY_NOT_PARSED = (
+    "No passages matching the question were found in the parsed documents. "
+    "Other selected documents have not been parsed, so they were not searched."
+)
 
 
 @dataclass(frozen=True)
@@ -80,14 +87,27 @@ class ModelRun:
     attempts: int
 
 
-def _no_evidence(context: AnswerContext) -> ModelRun:
-    """The answer when there is nothing to show the model (FR-QA-004)."""
+def _why_no_evidence(context: AnswerContext, statuses: Collection[str]) -> str:
+    """Keep "not parsed" distinct from "not found" (DR-006)."""
+    if context.dropped:
+        return NOTHING_FITS
+    unparsed = sum(status != "parsed" for status in statuses)
+    if unparsed == 0:
+        return NOTHING_RETRIEVED
+    return NOT_PARSED if unparsed == len(statuses) else PARTLY_NOT_PARSED
+
+
+def _no_evidence(context: AnswerContext, statuses: Collection[str]) -> ModelRun:
+    """The answer when there is nothing to show the model (FR-QA-004).
+
+    `statuses` are those of the documents the question selected, if any.
+    """
     logger.info("answering skipped_model dropped=%d", context.passages_dropped)
     return ModelRun(
         answer=ModelAnswer(
             statements=(),
             evidence_sufficiency="insufficient",
-            limitations=NOTHING_FITS if context.dropped else NOTHING_RETRIEVED,
+            limitations=_why_no_evidence(context, statuses),
         ),
         context=context,
         model=None,
@@ -191,5 +211,10 @@ class Answering:
             max_chars=limits.max_context_chars,
         )
         if not context.aliases:
-            return _no_evidence(context)
+            selected = (
+                []
+                if document_ids is None
+                else get_document_statuses(self._sessions, document_ids)
+            )
+            return _no_evidence(context, selected)
         return request_answer(self._model, context, limits)
