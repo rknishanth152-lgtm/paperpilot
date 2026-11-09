@@ -8,6 +8,7 @@ tasks before it returns, so processing has finished when a request returns.
 import hashlib
 import uuid
 from collections.abc import Iterator
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -379,6 +380,47 @@ def test_parsed_document_cannot_be_retried(
     assert error["details"] == {"status": "parsed"}
     assert parser.calls == 1
     assert count(sessions, Passage) == passages
+
+
+def in_progress(sessions: sessionmaker[Session], body: bytes = PDF) -> uuid.UUID:
+    """A document another request is still working on."""
+    with sessions.begin() as session:
+        document = Document(
+            sha256=hashlib.sha256(body).hexdigest(),
+            size_bytes=len(body),
+            storage_key="pdf/in-progress",
+            status="processing",
+            processing_started_at=datetime.now(UTC),
+        )
+        session.add(document)
+        session.flush()
+        return document.id
+
+
+def test_retry_while_processing_is_refused_and_starts_nothing(
+    client: TestClient, sessions: sessionmaker[Session], parser: FakeParser
+) -> None:
+    document_id = in_progress(sessions)
+
+    error = assert_error(
+        client.post(f"/documents/{document_id}/retry"), 409, "document_not_retryable"
+    )
+
+    assert error["details"] == {"status": "processing"}
+    assert parser.calls == 0
+
+
+def test_uploading_a_file_still_processing_returns_it_and_starts_nothing(
+    client: TestClient, sessions: sessionmaker[Session], parser: FakeParser
+) -> None:
+    document_id = in_progress(sessions)
+
+    response = upload(client)
+
+    assert response.json()["document_id"] == str(document_id)
+    assert response.json()["status"] == "processing"
+    assert parser.calls == 0
+    assert count(sessions, Document) == 1
 
 
 def test_retry_unknown_document(client: TestClient) -> None:

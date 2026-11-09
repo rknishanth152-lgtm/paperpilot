@@ -22,6 +22,9 @@ def get_engine() -> Engine:
         # Check a pooled connection before use, so a restarted PostgreSQL
         # gives a fresh connection instead of an error.
         pool_pre_ping=True,
+        # Error text must not carry the values being written: they can be paper
+        # text, and errors reach the logs (NFR-PRI-002).
+        hide_parameters=True,
     )
 
 

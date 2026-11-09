@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.models import Document, Paper, Passage
@@ -152,11 +153,22 @@ def process_in_background(ingestion: Ingestion, document_id: uuid.UUID) -> None:
 
     Another request may have started this document in the meantime; the row
     lock in `Ingestion.process` lets only one run, and the other stops here.
+
+    A database error stops here too, or the server would log its text, and
+    PostgreSQL's message can quote the row being written (NFR-PRI-002). Nothing
+    was committed: the document stays as it was until startup recovery marks it
+    `interrupted` (FR-ING-010).
     """
     try:
         ingestion.process(document_id)
     except DocumentStateError as error:
         logger.info("ingestion document_id=%s skipped: %s", document_id, error)
+    except SQLAlchemyError as error:
+        logger.error(
+            "ingestion document_id=%s database failure: %s",
+            document_id,
+            type(error).__name__,
+        )
 
 
 def get_paper_titles(
