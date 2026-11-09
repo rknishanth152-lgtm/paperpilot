@@ -83,6 +83,8 @@ class Settings(BaseSettings):
     # Small batches with pauses, because free-tier limits are not published.
     embedding_batch_size: int = Field(default=20, gt=0)
     embedding_pause_seconds: float = Field(default=10.0, ge=0)
+    # Passages examined per checklist item (FR-REP-002).
+    assessment_top_k: int = Field(default=8, gt=0)
     # What answering searches with. Semantic on recorded results
     # (docs/experiments/retrieval-comparison.md).
     retrieval_method: Literal["keyword", "semantic"] = "semantic"

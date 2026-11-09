@@ -69,8 +69,7 @@ def add_document(
                 Passage(
                     document_id=document.id,
                     ordinal=ordinal,
-                    region="body",
-                    **row,
+                    **{"region": "body", **row},
                 )
             )
         return document.id
