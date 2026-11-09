@@ -1,0 +1,74 @@
+{
+  "kind": "manual real-model run",
+  "provider": "gemini",
+  "requested_model": "gemini-3.5-flash-lite",
+  "run_at": "2026-11-09T04:03:53.751285+00:00",
+  "code_revision": "9654929ca41bbc56409f884fadc3b09c64833c16",
+  "working_tree_clean": true,
+  "prompt_version": "answer-v1",
+  "configuration": {
+    "retriever": "keyword_full_text",
+    "top_k": 5,
+    "max_query_chars": 2000,
+    "max_context_chars": 16000,
+    "max_output_tokens": 8000,
+    "timeout_seconds": 60.0,
+    "malformed_retries": 1,
+    "temperature": "provider default"
+  },
+  "evaluation_set_sha256": "2d903cc478e83dfa370e447c83f61d18d710408e4e37d1022c76d77d15d0fd86",
+  "limits": "Small set (20 questions, 5 open-access papers, 3 fields). Any Recall@5 from it is a coarse baseline, not a general accuracy figure (RISK-15). Fixed before the first harness run: changes after results are seen must be logged in progress.md.",
+  "stopped_early": null,
+  "summary": {
+    "questions_run": 1,
+    "answerable": {
+      "total": 1,
+      "errors": 0,
+      "validated_with_statements": 0,
+      "failed_validation": 0,
+      "said_insufficient": 1,
+      "expected_passage_retrieved": 0,
+      "expected_passage_cited": 0
+    },
+    "unanswerable": {
+      "total": 0,
+      "errors": 0,
+      "said_insufficient": 0,
+      "gave_statements": 0,
+      "failed_validation": 0
+    },
+    "input_tokens": 1423,
+    "output_tokens": 70,
+    "mean_model_seconds": 1.95,
+    "paid_equivalent_usd_per_answer": 0.0006
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "answerable": true,
+      "question": "Which optimizer and learning rate were used to pre-train the BERT model?",
+      "error": null,
+      "seconds": 1.987,
+      "model_calls": 1,
+      "model_seconds": 1.945,
+      "input_tokens": 1423,
+      "output_tokens": 70,
+      "evidence_sufficiency": "insufficient",
+      "validation_status": "validated",
+      "limitations": "The provided passages discuss the BERT model, fine-tuning on GLUE, and the pre-training objectives, but they do not contain information about the optimizer or learning rate used to pre-train the BERT model.",
+      "statements": [],
+      "retrieved_passage_ids": [
+        "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+        "01a1bc06-dcbf-79f3-ae33-e17574d26473",
+        "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+        "01a1bc06-dcfc-7da0-b530-4c40590d7da9",
+        "01a1bc06-dcb2-7a66-a9c6-1a15ee339d61"
+      ],
+      "evidence_passage_ids": [],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    }
+  ]
+}

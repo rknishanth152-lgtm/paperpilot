@@ -50,3 +50,23 @@ The question page was then tried in the browser on the same model with q02 and q
 ## 4. Decision
 
 **Interim model: `gemini-3.5-flash-lite`.** It was the only free model that completed the run. It stays interim until a comparison is possible.
+
+## 5. Second run (P6-T1)
+
+The same model and prompt were run again through `tests/evaluation/run_evaluation.py` at commit 9654929, with a clean working tree and the full configuration recorded: `benchmarks/results/answers-gemini-3.5-flash-lite-20261109T040343Z-9654929.json`. The first run's file records `working_tree_clean: false`, because an earlier result file was uncommitted at the time.
+
+| Measure | First run | Second run |
+|---|---|---|
+| Answerable: all citations valid, with statements | 13 of 16 | 13 of 16 |
+| Failed citation validation | 0 | 0 |
+| Answerable: said `insufficient` | 3 | 3 |
+| Unanswerable: said `insufficient` | 4 of 4 | **3 of 4** |
+| Mean model time per answer | 2.01 s | 1.97 s |
+
+Retrieval returned the same passages for all 20 questions, so every difference below comes from the model. No temperature is set, so the provider default applies.
+
+- **q19 (unanswerable, about astronomy) gave a statement**, labelled `partial`. The statement is true about microarray data and its limitations say the passages do not cover astronomy, but it does not answer the question.
+- **q12 moved from `partial` to `sufficient`** with the same off-question statement.
+- Statement wording differed in 10 of 20 answers.
+
+So one run's "4 of 4" is not a stable figure, and the model's own sufficiency label should not be read as a measure of quality. Two runs are too few to give a rate.

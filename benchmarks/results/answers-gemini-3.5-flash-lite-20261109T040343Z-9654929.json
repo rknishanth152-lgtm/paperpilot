@@ -1,0 +1,899 @@
+{
+  "kind": "manual real-model run",
+  "provider": "gemini",
+  "requested_model": "gemini-3.5-flash-lite",
+  "run_at": "2026-11-09T04:03:43.611060+00:00",
+  "code_revision": "9654929ca41bbc56409f884fadc3b09c64833c16",
+  "working_tree_clean": true,
+  "prompt_version": "answer-v1",
+  "configuration": {
+    "retriever": "keyword_full_text",
+    "top_k": 5,
+    "max_query_chars": 2000,
+    "max_context_chars": 16000,
+    "max_output_tokens": 8000,
+    "timeout_seconds": 60.0,
+    "malformed_retries": 1,
+    "temperature": "provider default"
+  },
+  "evaluation_set_sha256": "2d903cc478e83dfa370e447c83f61d18d710408e4e37d1022c76d77d15d0fd86",
+  "limits": "Small set (20 questions, 5 open-access papers, 3 fields). Any Recall@5 from it is a coarse baseline, not a general accuracy figure (RISK-15). Fixed before the first harness run: changes after results are seen must be logged in progress.md.",
+  "stopped_early": null,
+  "summary": {
+    "questions_run": 20,
+    "answerable": {
+      "total": 16,
+      "errors": 0,
+      "validated_with_statements": 13,
+      "failed_validation": 0,
+      "said_insufficient": 3,
+      "expected_passage_retrieved": 9,
+      "expected_passage_cited": 9
+    },
+    "unanswerable": {
+      "total": 4,
+      "errors": 0,
+      "said_insufficient": 3,
+      "gave_statements": 1,
+      "failed_validation": 0
+    },
+    "input_tokens": 38236,
+    "output_tokens": 3016,
+    "mean_model_seconds": 1.97,
+    "paid_equivalent_usd_per_answer": 0.00095
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "answerable": true,
+      "question": "Which optimizer and learning rate were used to pre-train the BERT model?",
+      "error": null,
+      "seconds": 1.501,
+      "model_calls": 1,
+      "model_seconds": 1.464,
+      "input_tokens": 1423,
+      "output_tokens": 49,
+      "evidence_sufficiency": "insufficient",
+      "validation_status": "validated",
+      "limitations": "The provided passages do not contain information about the optimizer and learning rate used to pre-train the BERT model.",
+      "statements": [],
+      "retrieved_passage_ids": [
+        "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+        "01a1bc06-dcbf-79f3-ae33-e17574d26473",
+        "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+        "01a1bc06-dcfc-7da0-b530-4c40590d7da9",
+        "01a1bc06-dcb2-7a66-a9c6-1a15ee339d61"
+      ],
+      "evidence_passage_ids": [],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q02",
+      "answerable": true,
+      "question": "Does making the network bigger help accuracy on the GLUE benchmark?",
+      "error": null,
+      "seconds": 1.983,
+      "model_calls": 1,
+      "model_seconds": 1.93,
+      "input_tokens": 1419,
+      "output_tokens": 259,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "Larger models lead to a strict accuracy improvement across all four datasets on selected GLUE tasks.",
+          "citations": [
+            {
+              "alias": "P4",
+              "quote": "We can see that larger models lead to a strict accuracy improvement across all four datasets, even for MRPC which only has 3,600 labeled training examples, and is substantially different from the pre-training tasks.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc06-dce1-7312-b870-87b914c06808"
+            }
+          ],
+          "has_valid_citation": true
+        },
+        {
+          "text": "Both BERT BASE and BERT LARGE outperform all systems on all tasks by a substantial margin, obtaining 4.5% and 7.0% respective average accuracy improvement over the prior state of the art.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "Both BERT BASE and BERT LARGE outperform all systems on all tasks by a substantial margin, obtaining 4.5% and 7.0% respective average accuracy improvement over the prior state of the art.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+        "01a1bc06-dcfc-7337-abde-4322efdf3e70",
+        "01a1bc06-dccd-7da2-89e7-392e6285fcb7",
+        "01a1bc06-dce1-7312-b870-87b914c06808",
+        "01a1bc06-dcff-75b2-9aba-404b4c0900ee"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+        "01a1bc06-dce1-7312-b870-87b914c06808"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q03",
+      "answerable": true,
+      "question": "What share of input words gets hidden at random during the masked-word objective?",
+      "error": null,
+      "seconds": 1.767,
+      "model_calls": 1,
+      "model_seconds": 1.729,
+      "input_tokens": 1711,
+      "output_tokens": 118,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "During the masked-word objective, 15% of all WordPiece tokens in each sequence are masked at random.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "In all of our experiments, we mask 15% of all WordPiece tokens in each sequence at random.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc06-dcc6-77ae-a987-06dbcaedea5e"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc06-dcc6-77ae-a987-06dbcaedea5e",
+        "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+        "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3",
+        "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+        "01a1bc06-dd07-7fe8-8cc1-f8b2d6eff7a7"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc06-dcc6-77ae-a987-06dbcaedea5e"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q04",
+      "answerable": true,
+      "question": "How much did effect sizes shrink when preclinical cancer studies were repeated?",
+      "error": null,
+      "seconds": 2.639,
+      "model_calls": 1,
+      "model_seconds": 2.589,
+      "input_tokens": 2209,
+      "output_tokens": 366,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "For original positive effects reported as numerical values, the median effect size for the replications was 0.43.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "For original positive effects that were reported as numerical values, the median effect size for the replications was 0.43, which was 85% smaller than the median of the original effect sizes (2.96).",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe"
+            }
+          ],
+          "has_valid_citation": true
+        },
+        {
+          "text": "The median replication effect size was 85% smaller than the median of the original effect sizes of 2.96.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "For original positive effects that were reported as numerical values, the median effect size for the replications was 0.43, which was 85% smaller than the median of the original effect sizes (2.96).",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe"
+            }
+          ],
+          "has_valid_citation": true
+        },
+        {
+          "text": "92% of replication effect sizes were smaller than the original when combining numeric and representative images.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "And although 79% of the replication effects were in the same direction as the original finding (random would be 50%), 92% of replication effect sizes were smaller than the original (combining numeric and representative images).",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+        "01a1bc07-06af-7771-8009-3e75d9cf2abd",
+        "01a1bc07-06a8-7072-9002-9148cb6fc8bd",
+        "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+        "01a1bc07-06b0-723c-8b04-7465df7c998d"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-06cc-748a-b90a-a0ca6097acfe"
+      ],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q05",
+      "answerable": true,
+      "question": "Does one unsuccessful repeat of a study prove that the original result was wrong?",
+      "error": null,
+      "seconds": 1.628,
+      "model_calls": 1,
+      "model_seconds": 1.584,
+      "input_tokens": 2260,
+      "output_tokens": 50,
+      "evidence_sufficiency": "insufficient",
+      "validation_status": "validated",
+      "limitations": "The provided passages do not contain information about whether one unsuccessful repeat of a study proves that the original result was wrong.",
+      "statements": [],
+      "retrieved_passage_ids": [
+        "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+        "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+        "01a1bc07-06e6-7ad4-9d75-c5485cbd8bff",
+        "01a1bc07-06b1-77e9-9a01-9a58fbd885cd",
+        "01a1bc07-06bc-7fc0-b4ce-733393d24906"
+      ],
+      "evidence_passage_ids": [],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q06",
+      "answerable": true,
+      "question": "How often did repeat studies succeed for results that originally showed no effect?",
+      "error": null,
+      "seconds": 1.684,
+      "model_calls": 1,
+      "model_seconds": 1.635,
+      "input_tokens": 2756,
+      "output_tokens": 227,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "For cases where the original result was a null effect, 10 out of the 15 (67%) meta-analytic effects were likewise null.",
+          "citations": [
+            {
+              "alias": "P2",
+              "quote": "For cases in which the original was a null effect, 10 of the 15 (67%) meta-analytic effects were likewise null (p > 0.05)",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-06c5-70bb-83ed-8406c2a2b743"
+            }
+          ],
+          "has_valid_citation": true
+        },
+        {
+          "text": "Combining the data for original null effects led to a third of cases showing statistically significant effects.",
+          "citations": [
+            {
+              "alias": "P2",
+              "quote": "meaning that combining the data led to a third of cases showing statistically significant effects, even though the original reported a null finding.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-06c5-70bb-83ed-8406c2a2b743"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-06b1-77e9-9a01-9a58fbd885cd",
+        "01a1bc07-06c5-70bb-83ed-8406c2a2b743",
+        "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+        "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+        "01a1bc07-06c0-7dfe-a099-3f5148f0feba"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-06c5-70bb-83ed-8406c2a2b743"
+      ],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q07",
+      "answerable": true,
+      "question": "Did studies in living animals reproduce as well as studies without animals?",
+      "error": null,
+      "seconds": 2.161,
+      "model_calls": 1,
+      "model_seconds": 2.109,
+      "input_tokens": 2351,
+      "output_tokens": 125,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "Animal experiments were less likely to replicate than non-animal experiments.",
+          "citations": [
+            {
+              "alias": "P5",
+              "quote": "Animal experiments were less likely to replicate than non-animal experiments and this may be a consequence of animal experiments eliciting smaller effect sizes on average than non-animal experiments (see main text for further discussion).",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-06ce-7986-8dff-5c9895beb786"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+        "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+        "01a1bc07-06b1-77e9-9a01-9a58fbd885cd",
+        "01a1bc07-06d8-74a9-a67b-1e2d135bcd5a",
+        "01a1bc07-06ce-7986-8dff-5c9895beb786"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-06ce-7986-8dff-5c9895beb786"
+      ],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q08",
+      "answerable": true,
+      "question": "Why are results from underpowered, small studies less trustworthy?",
+      "error": null,
+      "seconds": 3.328,
+      "model_calls": 1,
+      "model_seconds": 3.256,
+      "input_tokens": 2176,
+      "output_tokens": 221,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "Smaller sample sizes mean smaller statistical power.",
+          "citations": [
+            {
+              "alias": "P3",
+              "quote": "Small sample size means smaller power and, for all functions above, the PPV for a true research fi nding decreases as power decreases towards 1 -β = 0.05.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259"
+            }
+          ],
+          "has_valid_citation": true
+        },
+        {
+          "text": "As the statistical power decreases, the positive predictive value (PPV) for a true research finding also decreases.",
+          "citations": [
+            {
+              "alias": "P3",
+              "quote": "Small sample size means smaller power and, for all functions above, the PPV for a true research fi nding decreases as power decreases towards 1 -β = 0.05.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-2004-7b3d-99b3-20e379d31d39",
+        "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+        "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+        "01a1bc07-2002-7e21-b960-e2dc91ec082a",
+        "01a1bc07-2005-7685-be0f-aa431fdae3f3"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-1ffe-7bd5-9c04-ace5817f6259"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q09",
+      "answerable": true,
+      "question": "What happens to reliability when many groups compete on a fashionable topic?",
+      "error": null,
+      "seconds": 2.233,
+      "model_calls": 1,
+      "model_seconds": 2.178,
+      "input_tokens": 2046,
+      "output_tokens": 293,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "The hotter a scientific field with more scientific teams involved, the less likely the research findings are to be true.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "Corollary 6: The hotter a scientifi c fi eld (with more scientifi c teams involved), the less likely the research fi ndings are to be true.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde"
+            }
+          ],
+          "has_valid_citation": true
+        },
+        {
+          "text": "A research finding is less likely to be true when more teams are involved in a scientific field in chase of statistical significance.",
+          "citations": [
+            {
+              "alias": "P3",
+              "quote": "In this framework, a research fi nding is less likely to be true when the studies conducted in a fi eld are smaller; when effect sizes are smaller; when there is a greater number and lesser preselection of tested relationships; where there is greater fl exibility in designs, defi nitions, outcomes, and analytical modes; when there is greater fi nancial and other interest and prejudice; and when more teams are involved in a scientifi c fi eld in chase of statistical signifi cance.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+        "01a1bc07-1ff8-7056-89b0-0e9f8952a16e",
+        "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+        "01a1bc07-2002-7e21-b960-e2dc91ec082a",
+        "01a1bc07-200a-78fc-a55e-3989f1b6b0e2"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+        "01a1bc07-2003-7cfd-9a8c-29d467dc5fde"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q10",
+      "answerable": true,
+      "question": "Is it realistic to run very large studies for every question scientists ask?",
+      "error": null,
+      "seconds": 1.815,
+      "model_calls": 1,
+      "model_seconds": 1.765,
+      "input_tokens": 1908,
+      "output_tokens": 119,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "Large-scale evidence is impossible to obtain for all of the millions and trillions of research questions posed in current research.",
+          "citations": [
+            {
+              "alias": "P2",
+              "quote": "Moreover, large-scale evidence is impossible to obtain for all of the millions and trillions of research questions posed in current research.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-200a-78fc-a55e-3989f1b6b0e2",
+        "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+        "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+        "01a1bc07-1ffd-71d0-9ac6-c9931ceeaca4",
+        "01a1bc07-200b-731d-aae7-5bc65f996443"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-2009-7c0b-a430-df2f6142f7ea"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q11",
+      "answerable": true,
+      "question": "Where online were most of the shared gene expression datasets hosted?",
+      "error": null,
+      "seconds": 2.175,
+      "model_calls": 1,
+      "model_seconds": 2.136,
+      "input_tokens": 1607,
+      "output_tokens": 178,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "Most of the shared gene expression datasets were located on lab websites.",
+          "citations": [
+            {
+              "alias": "P2",
+              "quote": "Most data sets were located on lab websites (28), with a few found on publisher websites (4), or within public databases (6 in the Stanford Microarray Database (SMD) [8], 6 in Gene Expression Omnibus (GEO) [9], 2 in ArrayExpress [10], 2 in the NCI GeneExpression Data Portal (GEDP)(gedp.nci.nih.gov); some datasets in more than one location).",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+        "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+        "01a1bc07-2b9d-7818-b91a-1da1e3fde7f5",
+        "01a1bc07-2ba2-78ee-87ac-8568304dff2b",
+        "01a1bc07-2ba3-7466-bfaa-acec2f77c129"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-2b94-7e1b-bf16-72befbff6f30"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q12",
+      "answerable": true,
+      "question": "Among trials with public data, which properties went along with being cited more?",
+      "error": null,
+      "seconds": 1.718,
+      "model_calls": 1,
+      "model_seconds": 1.681,
+      "input_tokens": 1711,
+      "output_tokens": 132,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "Trials published in high impact journals, prior to 2001, or with US authors were more likely to share their data.",
+          "citations": [
+            {
+              "alias": "P3",
+              "quote": "As seen in Table 1, trials published in high impact journals, prior to 2001, or with US authors were more likely to share their data.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+        "01a1bc07-2b9a-73e5-9004-7854e35eab7d",
+        "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+        "01a1bc07-2ba3-7466-bfaa-acec2f77c129",
+        "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-2b94-7e1b-bf16-72befbff6f30"
+      ],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q13",
+      "answerable": true,
+      "question": "What caveat do the authors give about concluding that publishing data causes more citations?",
+      "error": null,
+      "seconds": 1.464,
+      "model_calls": 1,
+      "model_seconds": 1.414,
+      "input_tokens": 1468,
+      "output_tokens": 48,
+      "evidence_sufficiency": "insufficient",
+      "validation_status": "validated",
+      "limitations": "The provided passages do not contain any caveats given by the authors about concluding that publishing data causes more citations.",
+      "statements": [],
+      "retrieved_passage_ids": [
+        "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+        "01a1bc07-2bac-7519-9010-c9f20b2c99c3",
+        "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+        "01a1bc07-2ba8-7a81-a7cc-5da54dddaed9",
+        "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328"
+      ],
+      "evidence_passage_ids": [],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q14",
+      "answerable": true,
+      "question": "How many people extracted the information from the sampled articles?",
+      "error": null,
+      "seconds": 1.938,
+      "model_calls": 1,
+      "model_seconds": 1.891,
+      "input_tokens": 1520,
+      "output_tokens": 124,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "Data extraction from the 500 papers was done by a single investigator.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "Data extraction from the 500 papers was done by a single investigator (WQ) with cross-checking in the first 50 papers by two investigators (AA and MA).",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-3700-7308-a15c-c3193e4552e2",
+        "01a1bc07-36fd-7679-b5cd-e8ee6aa52417",
+        "01a1bc07-3706-7caf-b3d4-46db68c4ee6b",
+        "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+        "01a1bc07-3705-7b5c-b95a-b2bd27c97e80"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-3700-7308-a15c-c3193e4552e2"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q15",
+      "answerable": true,
+      "question": "Did having US federal grants make authors more likely to post their complete raw data?",
+      "error": null,
+      "seconds": 2.503,
+      "model_calls": 1,
+      "model_seconds": 2.439,
+      "input_tokens": 1872,
+      "output_tokens": 168,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "Among papers covered by a data availability policy, having US government funding did not significantly affect the proportion of papers depositing full primary data online.",
+          "citations": [
+            {
+              "alias": "P5",
+              "quote": "Among papers covered by some data availability policy (n = 351), the proportion depositing full primary data online was not different when US government funding (e.g. National Institutes of Health or National Science Foundation) was listed (15% versus 12% when US funding was not listed, P = 0.42)",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-3703-755a-9a93-472b1194282a"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-3702-74a0-9911-aed75e924563",
+        "01a1bc07-3707-7b4b-a915-2ae452889e2b",
+        "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+        "01a1bc07-3700-7308-a15c-c3193e4552e2",
+        "01a1bc07-3703-755a-9a93-472b1194282a"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-3703-755a-9a93-472b1194282a"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q16",
+      "answerable": true,
+      "question": "What was the usual way that articles broke their journal's rules on data?",
+      "error": null,
+      "seconds": 2.232,
+      "model_calls": 1,
+      "model_seconds": 2.186,
+      "input_tokens": 2147,
+      "output_tokens": 245,
+      "evidence_sufficiency": "sufficient",
+      "validation_status": "validated",
+      "limitations": null,
+      "statements": [
+        {
+          "text": "When articles failed to adhere to their journal's data availability instructions, they most commonly did so by not publicly depositing microarray data.",
+          "citations": [
+            {
+              "alias": "P1",
+              "quote": "Of the remaining 351 papers that were covered by some data availability policy (with or without data deposition as a condition of publication), 208/351 papers (59%) did not fully adhere to the data availability instructions of the journals they were published in, most commonly (73%) by not publicly depositing microarray data.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563"
+            },
+            {
+              "alias": "P2",
+              "quote": "Of the remaining 351 papers that were covered by some data availability policy, 208 papers (59%) did not fully adhere to the data availability instructions of the journals they were published in, most commonly (73%) by not publicly depositing microarray data.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-3702-74a0-9911-aed75e924563",
+        "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+        "01a1bc07-3705-7b5c-b95a-b2bd27c97e80",
+        "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+        "01a1bc07-3700-7308-a15c-c3193e4552e2"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-3702-74a0-9911-aed75e924563",
+        "01a1bc07-36f7-7707-9e37-2db2e62e9ee4"
+      ],
+      "expected_retrieved": true,
+      "expected_cited": true,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q17",
+      "answerable": false,
+      "question": "How much electricity or carbon did training the language model consume?",
+      "error": null,
+      "seconds": 1.808,
+      "model_calls": 1,
+      "model_seconds": 1.752,
+      "input_tokens": 1530,
+      "output_tokens": 50,
+      "evidence_sufficiency": "insufficient",
+      "validation_status": "validated",
+      "limitations": "The provided passages do not contain information about the amount of electricity or carbon consumed during the training of the language model.",
+      "statements": [],
+      "retrieved_passage_ids": [
+        "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+        "01a1bc06-dcb6-70c3-a38e-fb174e0228e7",
+        "01a1bc06-dcc8-7109-9c24-114317687824",
+        "01a1bc06-dce1-7e01-a055-ff0e4991c226",
+        "01a1bc06-dcb2-7a66-a9c6-1a15ee339d61"
+      ],
+      "evidence_passage_ids": [],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q18",
+      "answerable": false,
+      "question": "Did rates of posting research data differ between male and female lead authors?",
+      "error": null,
+      "seconds": 1.876,
+      "model_calls": 1,
+      "model_seconds": 1.851,
+      "input_tokens": 2447,
+      "output_tokens": 49,
+      "evidence_sufficiency": "insufficient",
+      "validation_status": "validated",
+      "limitations": "The provided passages do not contain any information regarding the rates of posting research data among male and female lead authors.",
+      "statements": [],
+      "retrieved_passage_ids": [
+        "01a1bc07-2b9d-7818-b91a-1da1e3fde7f5",
+        "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+        "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+        "01a1bc07-3702-74a0-9911-aed75e924563",
+        "01a1bc07-06ae-7050-a391-a13386df9f59"
+      ],
+      "evidence_passage_ids": [],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q19",
+      "answerable": false,
+      "question": "How does publishing raw data affect citation counts in astronomy?",
+      "error": null,
+      "seconds": 2.277,
+      "model_calls": 1,
+      "model_seconds": 2.227,
+      "input_tokens": 1571,
+      "output_tokens": 147,
+      "evidence_sufficiency": "partial",
+      "validation_status": "validated",
+      "limitations": "The provided passages discuss clinical trials and microarray data sharing, but do not contain information specifically about astronomy.",
+      "statements": [
+        {
+          "text": "Sharing raw probe data or actual microarray images did not result in additional citations for the studied trials.",
+          "citations": [
+            {
+              "alias": "P4",
+              "quote": "The few trials in this cohort which, in addition to gene expression fold-change or other preprocessed information, shared their raw probe data or actual microarray images did not receive additional citations.",
+              "valid": true,
+              "reason": null,
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c"
+            }
+          ],
+          "has_valid_citation": true
+        }
+      ],
+      "retrieved_passage_ids": [
+        "01a1bc07-2bac-7fb4-995d-d007a9a72696",
+        "01a1bc07-2bac-7519-9010-c9f20b2c99c3",
+        "01a1bc07-2b97-7fd7-a5da-7a46cf6d060f",
+        "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+        "01a1bc07-2baa-74f3-b77c-e614f4d94384"
+      ],
+      "evidence_passage_ids": [
+        "01a1bc07-2b99-7340-9dc4-bfae160e059c"
+      ],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    },
+    {
+      "id": "q20",
+      "answerable": false,
+      "question": "What was the total budget in dollars of the cancer biology replication project?",
+      "error": null,
+      "seconds": 1.719,
+      "model_calls": 1,
+      "model_seconds": 1.658,
+      "input_tokens": 2104,
+      "output_tokens": 48,
+      "evidence_sufficiency": "insufficient",
+      "validation_status": "validated",
+      "limitations": "The provided passages do not contain information about the total budget in dollars of the cancer biology replication project.",
+      "statements": [],
+      "retrieved_passage_ids": [
+        "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+        "01a1bc07-06a8-7072-9002-9148cb6fc8bd",
+        "01a1bc07-06b0-723c-8b04-7465df7c998d",
+        "01a1bc07-06d2-7c5b-b6f3-f9ae6bd5fd7a",
+        "01a1bc07-06d4-72d7-81aa-079e4eadfa4f"
+      ],
+      "evidence_passage_ids": [],
+      "expected_retrieved": false,
+      "expected_cited": false,
+      "model": "gemini-3.5-flash-lite",
+      "prompt_version": "answer-v1"
+    }
+  ]
+}
