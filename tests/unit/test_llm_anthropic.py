@@ -25,7 +25,8 @@ from app.services.llm import (
     ModelTruncatedError,
     ModelUnavailableError,
 )
-from app.services.llm_anthropic import AnthropicModel, build_language_model
+from app.services.llm_anthropic import AnthropicModel
+from app.services.llm_factory import build_language_model
 
 SCHEMA = {"type": "object", "additionalProperties": False}
 KEY = "test-key-not-real"

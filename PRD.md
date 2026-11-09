@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.10 (P5-T6 quote matching, 2026-11-08; see `progress.md` §6.14) |
+| Version | 0.11 (P5-T12 provider change, 2026-11-09; see `progress.md` §6.13) |
 | Date | 2026-11-03 |
 | Status | Planning. No application code exists yet (see `progress.md`). |
 | Companion documents | `CLAUDE.md` (development rules), `progress.md` (actual state), `docs/implementation-roadmap.md` (sequence and exit criteria) |
@@ -502,7 +502,7 @@ Human correction workflow, knowledge graph, research-gap exploration (as hypothe
 | OQ-008 | Representation of reported results (table, JSON, typed items). | Design review with hand-built examples | Phase 10 |
 | OQ-009 | Extraction strategy for long documents; extraction-matching rule for scoring. | Phase 7 experiment | Phase 7 |
 | OQ-010 | Initial reproducibility checklist items. | Hand-label 3 papers | Phase 11 |
-| OQ-011 | LLM provider and model for answers and extraction (cost, structured-output support). | **Interim 2026-11-08:** Anthropic, Claude Haiku 5.5, developer's choice for minimal cost (`progress.md` §6.13). Settled by a short comparison on the evaluation set at P5-T12 | Phase 5 |
+| OQ-011 | LLM provider and model for answers and extraction (cost, structured-output support). | **Interim 2026-11-09:** Google Gemini free tier, developer's choice because a paid API account was out of reach (`progress.md` §6.13). Open-access papers only on the free tier. Settled by a short comparison on the evaluation set at P5-T12 | Phase 5 |
 | OQ-012 | Embedding model, dimension, pgvector index choice and limits. Verify limits in pgvector docs. | Phase 8 | Phase 8 |
 | OQ-013 | Quote normalisation rules for PDF text artifacts. | **Resolved for VS-1, 2026-11-08, P5-T6** (`progress.md` §6.14): compare against stored passage text, never the PDF text layer, after Unicode NFKC and folding quotes and dashes, ignoring all whitespace; case is kept. Replaces the provisional split-ligature rule. | Phase 5 |
 | OQ-014 | Tooling: Python packaging/dependency tool, linter/formatter, type checker, test runner, frontend package manager and UI library, SQLAlchemy/driver versions. (Earlier videos used uv, pnpm, pytest and ruff [T]; none is mandated here.) | **Resolved 2026-11-03** (`progress.md` §6.8): Python 3.14 via uv, pytest, ruff, mypy, SQLAlchemy 2.1 + Alembic + psycopg 3; frontend Vite + React + TypeScript with pnpm, no component library or animation library chosen yet (P3-T9). | Phase 0 |

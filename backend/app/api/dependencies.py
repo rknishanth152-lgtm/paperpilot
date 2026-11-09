@@ -10,7 +10,7 @@ from app.database import get_sessionmaker
 from app.services.answering.pipeline import Answering, AnswerLimits
 from app.services.ingestion.grobid import GrobidClient
 from app.services.ingestion.pipeline import Ingestion
-from app.services.llm_anthropic import build_language_model
+from app.services.llm_factory import build_language_model
 from app.storage import get_storage
 
 

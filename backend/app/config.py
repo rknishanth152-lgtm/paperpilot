@@ -59,6 +59,8 @@ class Settings(BaseSettings):
     llm_provider: str | None = None
     llm_model: str | None = None
     llm_api_key: SecretStr | None = None
+    # Google's API address, used when LLM_PROVIDER=gemini.
+    gemini_base_url: HttpUrl = HttpUrl("https://generativelanguage.googleapis.com")
     # How long one model call may take before it fails with `model_timeout`.
     llm_timeout_seconds: float = Field(default=60.0, gt=0)
     # Upper bound on one response; only tokens actually produced are billed.

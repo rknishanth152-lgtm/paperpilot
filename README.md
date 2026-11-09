@@ -221,19 +221,23 @@ Parser limits you will see in the structure view are recorded in `progress.md` Â
 
 ## Connecting an AI model
 
-Uploading, parsing and search need no AI model; answering questions does. Create an API key at <https://platform.claude.com/settings/keys>, then set these in `.env` (never commit it):
+Uploading, parsing and search need no AI model; answering questions does. Set these in `.env` (never commit it), then restart the backend.
+
+**Google Gemini, free tier.** Create a key at <https://aistudio.google.com/apikey>; no billing is needed.
 
 ```text
-LLM_PROVIDER=anthropic
-LLM_MODEL=claude-haiku-5-5
+LLM_PROVIDER=gemini
+LLM_MODEL=gemini-3.8-flash
 LLM_API_KEY=your-key-here
 ```
 
-Restart the backend afterwards. Using the API costs money, billed to your Anthropic account.
+**Use the free tier only with open-access papers.** Google's terms say free-tier content is used to improve its products and that human reviewers may read it, and advise against submitting sensitive or confidential material. You must be 18 or older.
+
+**Anthropic Claude (paid).** Create a key at <https://platform.claude.com/settings/keys>, and use `LLM_PROVIDER=anthropic` with `LLM_MODEL=claude-haiku-5-5`. Anthropic's commercial API data is not used for training by default.
 
 ## Important limits
 
 - **Local, single-user only.** There is no authentication. Do not expose PaperPilot to a shared or public network (`NFR-SEC-006`).
 - **Only upload papers you are allowed to use**, including sending their text to the configured AI provider (`NFR-PRI-001`, `RISK-13`). Papers are never committed to this repository.
-- **Question answering sends text to an outside service (Phase 5).** With an API key configured, your question and the retrieved passages are sent to Anthropic's API (`NFR-PRI-001`). Nothing is sent without a key, and uploading and parsing stay on your machine. Anthropic's pages, read 2026-11-08, say commercial API inputs and outputs are not used for training by default and are deleted within 30 days, with exceptions such as legal requirements and Usage Policy enforcement. Check the current terms before using papers that are not open access.
+- **Question answering sends text to an outside service (Phase 5).** With an API key configured, your question and the retrieved passages are sent to the provider you chose (`NFR-PRI-001`); PDFs and whole papers are not. Nothing is sent without a key, and uploading and parsing stay on your machine. The terms differ a lot by provider, so read "Connecting an AI model" above and check the current terms before using papers that are not open access.
 - **Never commit secrets.** Settings go in `.env`, which is ignored; `.env.example` lists placeholders only (`NFR-SEC-001`).

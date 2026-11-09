@@ -10,11 +10,8 @@ import logging
 
 import anthropic
 
-from app.config import Settings
 from app.services.llm import (
-    LanguageModel,
     ModelAuthenticationError,
-    ModelNotConfiguredError,
     ModelRateLimitError,
     ModelRefusedError,
     ModelRequest,
@@ -75,12 +72,3 @@ class AnthropicModel:
             model=response.model,
             usage=ModelUsage(response.usage.input_tokens, response.usage.output_tokens),
         )
-
-
-def build_language_model(settings: Settings) -> LanguageModel:
-    """The configured model, or `ModelNotConfiguredError`."""
-    key = settings.llm_api_key
-    if settings.llm_provider != "anthropic" or not settings.llm_model or key is None:
-        raise ModelNotConfiguredError()
-    client = anthropic.Anthropic(api_key=key.get_secret_value(), max_retries=0)
-    return AnthropicModel(model=settings.llm_model, client=client)
