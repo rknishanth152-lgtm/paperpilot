@@ -1,0 +1,3264 @@
+{
+  "kind": "retrieval comparison",
+  "run_at": "2026-11-09T10:48:07.231728+00:00",
+  "code_revision": "e97811db5410cfe90c22959a95a76cd58089b694",
+  "working_tree_clean": true,
+  "configuration": {
+    "k": 5,
+    "embedding_model": "gemini-embedding-2",
+    "embedding_dimensions": 768,
+    "hybrid_candidates": 20,
+    "hybrid_rrf_constant": 60,
+    "minimum_gain": 2
+  },
+  "evaluation_set": {
+    "version": 1,
+    "sha256": "2d903cc478e83dfa370e447c83f61d18d710408e4e37d1022c76d77d15d0fd86",
+    "status": "reviewed",
+    "questions": 20
+  },
+  "limits": "Small set (20 questions, 5 open-access papers, 3 fields). Any Recall@5 from it is a coarse baseline, not a general accuracy figure (RISK-15). Fixed before the first harness run: changes after results are seen must be logged in progress.md.",
+  "recommended_default": "semantic",
+  "methods": {
+    "keyword": {
+      "summary": {
+        "k": 5,
+        "questions": 20,
+        "answerable": 16,
+        "evaluated": 16,
+        "unmatched_questions": 0,
+        "unmatched_quotes": 0,
+        "hits_all_papers": 8,
+        "recall_at_k_all_papers": 0.5,
+        "hits_question_paper": 9,
+        "recall_at_k_question_paper": 0.5625
+      },
+      "questions": [
+        {
+          "id": "q01",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.06148507
+            },
+            {
+              "passage_id": "01a1bc06-dcbf-79f3-ae33-e17574d26473",
+              "score": 0.05423873
+            },
+            {
+              "passage_id": "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+              "score": 0.051833287
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7da0-b530-4c40590d7da9",
+              "score": 0.051223487
+            },
+            {
+              "passage_id": "01a1bc06-dcb2-7a66-a9c6-1a15ee339d61",
+              "score": 0.051071506
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.06148507
+            },
+            {
+              "passage_id": "01a1bc06-dcbf-79f3-ae33-e17574d26473",
+              "score": 0.05423873
+            },
+            {
+              "passage_id": "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+              "score": 0.051833287
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7da0-b530-4c40590d7da9",
+              "score": 0.051223487
+            },
+            {
+              "passage_id": "01a1bc06-dcb2-7a66-a9c6-1a15ee339d61",
+              "score": 0.051071506
+            }
+          ]
+        },
+        {
+          "id": "q02",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc06-dce1-7312-b870-87b914c06808"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.023219436
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7337-abde-4322efdf3e70",
+              "score": 0.020505477
+            },
+            {
+              "passage_id": "01a1bc06-dccd-7da2-89e7-392e6285fcb7",
+              "score": 0.019540515
+            },
+            {
+              "passage_id": "01a1bc06-dce1-7312-b870-87b914c06808",
+              "score": 0.019540515
+            },
+            {
+              "passage_id": "01a1bc06-dcff-75b2-9aba-404b4c0900ee",
+              "score": 0.019540515
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 4,
+          "rank_question_paper": 4,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.023219436
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7337-abde-4322efdf3e70",
+              "score": 0.020505477
+            },
+            {
+              "passage_id": "01a1bc06-dccd-7da2-89e7-392e6285fcb7",
+              "score": 0.019540515
+            },
+            {
+              "passage_id": "01a1bc06-dce1-7312-b870-87b914c06808",
+              "score": 0.019540515
+            },
+            {
+              "passage_id": "01a1bc06-dcff-75b2-9aba-404b4c0900ee",
+              "score": 0.019540515
+            }
+          ]
+        },
+        {
+          "id": "q03",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc06-dcc6-77ae-a987-06dbcaedea5e"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcc6-77ae-a987-06dbcaedea5e",
+              "score": 0.04047031
+            },
+            {
+              "passage_id": "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+              "score": 0.039344516
+            },
+            {
+              "passage_id": "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3",
+              "score": 0.03114688
+            },
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.030396355
+            },
+            {
+              "passage_id": "01a1bc06-dd07-7fe8-8cc1-f8b2d6eff7a7",
+              "score": 0.027945884
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc06-dcc6-77ae-a987-06dbcaedea5e",
+              "score": 0.04047031
+            },
+            {
+              "passage_id": "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+              "score": 0.039344516
+            },
+            {
+              "passage_id": "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3",
+              "score": 0.03114688
+            },
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.030396355
+            },
+            {
+              "passage_id": "01a1bc06-dd07-7fe8-8cc1-f8b2d6eff7a7",
+              "score": 0.027945884
+            }
+          ]
+        },
+        {
+          "id": "q04",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.046380416
+            },
+            {
+              "passage_id": "01a1bc07-06af-7771-8009-3e75d9cf2abd",
+              "score": 0.045594532
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7072-9002-9148cb6fc8bd",
+              "score": 0.045529097
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.038203824
+            },
+            {
+              "passage_id": "01a1bc07-06b0-723c-8b04-7465df7c998d",
+              "score": 0.037784357
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.046380416
+            },
+            {
+              "passage_id": "01a1bc07-06af-7771-8009-3e75d9cf2abd",
+              "score": 0.045594532
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7072-9002-9148cb6fc8bd",
+              "score": 0.045529097
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.038203824
+            },
+            {
+              "passage_id": "01a1bc07-06b0-723c-8b04-7465df7c998d",
+              "score": 0.037784357
+            }
+          ]
+        },
+        {
+          "id": "q05",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+            "01a1bc07-06cd-72fe-8691-1b67e3bc9811"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+              "score": 0.039507035
+            },
+            {
+              "passage_id": "01a1bc07-2005-7685-be0f-aa431fdae3f3",
+              "score": 0.03877435
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.037718922
+            },
+            {
+              "passage_id": "01a1bc07-06e6-7ad4-9d75-c5485cbd8bff",
+              "score": 0.029843312
+            },
+            {
+              "passage_id": "01a1bc07-06b1-77e9-9a01-9a58fbd885cd",
+              "score": 0.029430572
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+              "score": 0.039507035
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.037718922
+            },
+            {
+              "passage_id": "01a1bc07-06e6-7ad4-9d75-c5485cbd8bff",
+              "score": 0.029843312
+            },
+            {
+              "passage_id": "01a1bc07-06b1-77e9-9a01-9a58fbd885cd",
+              "score": 0.029430572
+            },
+            {
+              "passage_id": "01a1bc07-06bc-7fc0-b4ce-733393d24906",
+              "score": 0.029235383
+            }
+          ]
+        },
+        {
+          "id": "q06",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06b1-77e9-9a01-9a58fbd885cd",
+              "score": 0.05053645
+            },
+            {
+              "passage_id": "01a1bc07-06c5-70bb-83ed-8406c2a2b743",
+              "score": 0.04471127
+            },
+            {
+              "passage_id": "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+              "score": 0.043396227
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.041726846
+            },
+            {
+              "passage_id": "01a1bc07-06c0-7dfe-a099-3f5148f0feba",
+              "score": 0.04131617
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06b1-77e9-9a01-9a58fbd885cd",
+              "score": 0.05053645
+            },
+            {
+              "passage_id": "01a1bc07-06c5-70bb-83ed-8406c2a2b743",
+              "score": 0.04471127
+            },
+            {
+              "passage_id": "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+              "score": 0.043396227
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.041726846
+            },
+            {
+              "passage_id": "01a1bc07-06c0-7dfe-a099-3f5148f0feba",
+              "score": 0.04131617
+            }
+          ]
+        },
+        {
+          "id": "q07",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06c5-7bcb-ac7f-cc267bcea7a9"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-3705-7b5c-b95a-b2bd27c97e80",
+              "score": 0.035462413
+            },
+            {
+              "passage_id": "01a1bc07-2004-7b3d-99b3-20e379d31d39",
+              "score": 0.027776077
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.025330296
+            },
+            {
+              "passage_id": "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+              "score": 0.024556315
+            },
+            {
+              "passage_id": "01a1bc07-200b-731d-aae7-5bc65f996443",
+              "score": 0.023923056
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.025330296
+            },
+            {
+              "passage_id": "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+              "score": 0.022797266
+            },
+            {
+              "passage_id": "01a1bc07-06b1-77e9-9a01-9a58fbd885cd",
+              "score": 0.020264236
+            },
+            {
+              "passage_id": "01a1bc07-06d8-74a9-a67b-1e2d135bcd5a",
+              "score": 0.020264236
+            },
+            {
+              "passage_id": "01a1bc07-06ce-7986-8dff-5c9895beb786",
+              "score": 0.01578617
+            }
+          ]
+        },
+        {
+          "id": "q08",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-1ffe-7bd5-9c04-ace5817f6259"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2004-7b3d-99b3-20e379d31d39",
+              "score": 0.04804031
+            },
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.04735358
+            },
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.036588203
+            },
+            {
+              "passage_id": "01a1bc07-06c5-70bb-83ed-8406c2a2b743",
+              "score": 0.035375167
+            },
+            {
+              "passage_id": "01a1bc07-06dc-7d1b-b2ef-429428e70115",
+              "score": 0.030396355
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 3,
+          "rank_question_paper": 3,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2004-7b3d-99b3-20e379d31d39",
+              "score": 0.04804031
+            },
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.04735358
+            },
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.036588203
+            },
+            {
+              "passage_id": "01a1bc07-2002-7e21-b960-e2dc91ec082a",
+              "score": 0.030396355
+            },
+            {
+              "passage_id": "01a1bc07-2005-7685-be0f-aa431fdae3f3",
+              "score": 0.028901868
+            }
+          ]
+        },
+        {
+          "id": "q09",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2003-7cfd-9a8c-29d467dc5fde"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcb6-7d6b-aa32-1f3cdb2ea99a",
+              "score": 0.0108558405
+            },
+            {
+              "passage_id": "01a1bc07-06aa-796c-a6b6-890e1afdb210",
+              "score": 0.0108558405
+            },
+            {
+              "passage_id": "01a1bc07-06d4-72d7-81aa-079e4eadfa4f",
+              "score": 0.0108558405
+            },
+            {
+              "passage_id": "01a1bc07-06f1-7588-99c4-c3b74a98f5c5",
+              "score": 0.0108558405
+            },
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.0108558405
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 5,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.0108558405
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7056-89b0-0e9f8952a16e",
+              "score": 0.008684673
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.008684673
+            },
+            {
+              "passage_id": "01a1bc07-2002-7e21-b960-e2dc91ec082a",
+              "score": 0.008684673
+            },
+            {
+              "passage_id": "01a1bc07-200a-78fc-a55e-3989f1b6b0e2",
+              "score": 0.008684673
+            }
+          ]
+        },
+        {
+          "id": "q10",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2009-7c0b-a430-df2f6142f7ea"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-200a-78fc-a55e-3989f1b6b0e2",
+              "score": 0.041214503
+            },
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.03307233
+            },
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.027441153
+            },
+            {
+              "passage_id": "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+              "score": 0.026016325
+            },
+            {
+              "passage_id": "01a1bc07-06d5-781a-8472-1d4849644de6",
+              "score": 0.022797266
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 2,
+          "rank_question_paper": 2,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-200a-78fc-a55e-3989f1b6b0e2",
+              "score": 0.041214503
+            },
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.03307233
+            },
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.027441153
+            },
+            {
+              "passage_id": "01a1bc07-1ffd-71d0-9ac6-c9931ceeaca4",
+              "score": 0.022151344
+            },
+            {
+              "passage_id": "01a1bc07-200b-731d-aae7-5bc65f996443",
+              "score": 0.019842064
+            }
+          ]
+        },
+        {
+          "id": "q11",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2b94-7e1b-bf16-72befbff6f30"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.0574857
+            },
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.04522584
+            },
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.02524305
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.0249616
+            },
+            {
+              "passage_id": "01a1bc07-3706-7caf-b3d4-46db68c4ee6b",
+              "score": 0.024556315
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 2,
+          "rank_question_paper": 2,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.0574857
+            },
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.04522584
+            },
+            {
+              "passage_id": "01a1bc07-2b9d-7818-b91a-1da1e3fde7f5",
+              "score": 0.020264236
+            },
+            {
+              "passage_id": "01a1bc07-2ba2-78ee-87ac-8568304dff2b",
+              "score": 0.020264236
+            },
+            {
+              "passage_id": "01a1bc07-2ba3-7466-bfaa-acec2f77c129",
+              "score": 0.020264236
+            }
+          ]
+        },
+        {
+          "id": "q12",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2b99-7340-9dc4-bfae160e059c"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+              "score": 0.034959584
+            },
+            {
+              "passage_id": "01a1bc07-2b9a-73e5-9004-7854e35eab7d",
+              "score": 0.03314047
+            },
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.03306237
+            },
+            {
+              "passage_id": "01a1bc07-2ba3-7466-bfaa-acec2f77c129",
+              "score": 0.032953594
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.03210925
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+              "score": 0.034959584
+            },
+            {
+              "passage_id": "01a1bc07-2b9a-73e5-9004-7854e35eab7d",
+              "score": 0.03314047
+            },
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.03306237
+            },
+            {
+              "passage_id": "01a1bc07-2ba3-7466-bfaa-acec2f77c129",
+              "score": 0.032953594
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.03210925
+            }
+          ]
+        },
+        {
+          "id": "q13",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2b9c-7537-8463-57f9767fc82a"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.03666349
+            },
+            {
+              "passage_id": "01a1bc07-2bac-7519-9010-c9f20b2c99c3",
+              "score": 0.035515185
+            },
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.034416813
+            },
+            {
+              "passage_id": "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+              "score": 0.0341959
+            },
+            {
+              "passage_id": "01a1bc07-2ba8-7a81-a7cc-5da54dddaed9",
+              "score": 0.0341959
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.03666349
+            },
+            {
+              "passage_id": "01a1bc07-2bac-7519-9010-c9f20b2c99c3",
+              "score": 0.035515185
+            },
+            {
+              "passage_id": "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+              "score": 0.0341959
+            },
+            {
+              "passage_id": "01a1bc07-2ba8-7a81-a7cc-5da54dddaed9",
+              "score": 0.0341959
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.029430572
+            }
+          ]
+        },
+        {
+          "id": "q14",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-3700-7308-a15c-c3193e4552e2"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+              "score": 0.02749463
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.023923056
+            },
+            {
+              "passage_id": "01a1bc07-06d4-72d7-81aa-079e4eadfa4f",
+              "score": 0.022797266
+            },
+            {
+              "passage_id": "01a1bc06-dce2-7905-93c1-244dc79cc06f",
+              "score": 0.020264236
+            },
+            {
+              "passage_id": "01a1bc07-06bb-7904-a00e-8f2c16156992",
+              "score": 0.020264236
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 2,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.023923056
+            },
+            {
+              "passage_id": "01a1bc07-36fd-7679-b5cd-e8ee6aa52417",
+              "score": 0.020264236
+            },
+            {
+              "passage_id": "01a1bc07-3706-7caf-b3d4-46db68c4ee6b",
+              "score": 0.020264236
+            },
+            {
+              "passage_id": "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+              "score": 0.010132118
+            },
+            {
+              "passage_id": "01a1bc07-3705-7b5c-b95a-b2bd27c97e80",
+              "score": 0.010132118
+            }
+          ]
+        },
+        {
+          "id": "q15",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-3703-755a-9a93-472b1194282a"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.039691992
+            },
+            {
+              "passage_id": "01a1bc07-3707-7b4b-a915-2ae452889e2b",
+              "score": 0.03449142
+            },
+            {
+              "passage_id": "01a1bc07-2005-7685-be0f-aa431fdae3f3",
+              "score": 0.029552013
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.02865532
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.027818719
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": 5,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.039691992
+            },
+            {
+              "passage_id": "01a1bc07-3707-7b4b-a915-2ae452889e2b",
+              "score": 0.03449142
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.027818719
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.02573975
+            },
+            {
+              "passage_id": "01a1bc07-3703-755a-9a93-472b1194282a",
+              "score": 0.023852695
+            }
+          ]
+        },
+        {
+          "id": "q16",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+            "01a1bc07-3702-74a0-9911-aed75e924563"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+              "score": 0.028225185
+            },
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.02752745
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.02639799
+            },
+            {
+              "passage_id": "01a1bc07-3705-7b5c-b95a-b2bd27c97e80",
+              "score": 0.026394622
+            },
+            {
+              "passage_id": "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+              "score": 0.026258925
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 2,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.02752745
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.02639799
+            },
+            {
+              "passage_id": "01a1bc07-3705-7b5c-b95a-b2bd27c97e80",
+              "score": 0.026394622
+            },
+            {
+              "passage_id": "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+              "score": 0.026258925
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.026081687
+            }
+          ]
+        },
+        {
+          "id": "q17",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+              "score": 0.035583034
+            },
+            {
+              "passage_id": "01a1bc06-dcb6-70c3-a38e-fb174e0228e7",
+              "score": 0.034497447
+            },
+            {
+              "passage_id": "01a1bc06-dcc8-7109-9c24-114317687824",
+              "score": 0.034497447
+            },
+            {
+              "passage_id": "01a1bc06-dce1-7e01-a055-ff0e4991c226",
+              "score": 0.034000494
+            },
+            {
+              "passage_id": "01a1bc06-dcb2-7a66-a9c6-1a15ee339d61",
+              "score": 0.03321646
+            }
+          ]
+        },
+        {
+          "id": "q18",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b9d-7818-b91a-1da1e3fde7f5",
+              "score": 0.03189741
+            },
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.031839244
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.02870767
+            },
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.027731339
+            },
+            {
+              "passage_id": "01a1bc07-06ae-7050-a391-a13386df9f59",
+              "score": 0.027018983
+            }
+          ]
+        },
+        {
+          "id": "q19",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2bac-7fb4-995d-d007a9a72696",
+              "score": 0.044689883
+            },
+            {
+              "passage_id": "01a1bc07-2bac-7519-9010-c9f20b2c99c3",
+              "score": 0.044267707
+            },
+            {
+              "passage_id": "01a1bc07-2b97-7fd7-a5da-7a46cf6d060f",
+              "score": 0.041553743
+            },
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.037652005
+            },
+            {
+              "passage_id": "01a1bc07-2baa-74f3-b77c-e614f4d94384",
+              "score": 0.036909856
+            }
+          ]
+        },
+        {
+          "id": "q20",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.055492442
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7072-9002-9148cb6fc8bd",
+              "score": 0.05396318
+            },
+            {
+              "passage_id": "01a1bc07-06b0-723c-8b04-7465df7c998d",
+              "score": 0.04993687
+            },
+            {
+              "passage_id": "01a1bc07-06d2-7c5b-b6f3-f9ae6bd5fd7a",
+              "score": 0.04408336
+            },
+            {
+              "passage_id": "01a1bc07-06d4-72d7-81aa-079e4eadfa4f",
+              "score": 0.03677107
+            }
+          ]
+        }
+      ]
+    },
+    "semantic": {
+      "summary": {
+        "k": 5,
+        "questions": 20,
+        "answerable": 16,
+        "evaluated": 16,
+        "unmatched_questions": 0,
+        "unmatched_quotes": 0,
+        "hits_all_papers": 16,
+        "recall_at_k_all_papers": 1.0,
+        "hits_question_paper": 16,
+        "recall_at_k_question_paper": 1.0
+      },
+      "questions": [
+        {
+          "id": "q01",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3",
+              "score": 0.825969464129649
+            },
+            {
+              "passage_id": "01a1bc06-dced-78d6-8493-c66c0954ea51",
+              "score": 0.8097543050594896
+            },
+            {
+              "passage_id": "01a1bc06-dcd9-7676-b9c3-e04285b4d774",
+              "score": 0.8083686130815921
+            },
+            {
+              "passage_id": "01a1bc06-dcd6-7716-bef1-c0d611f0465a",
+              "score": 0.7945937873544192
+            },
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.7941276667752171
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3",
+              "score": 0.825969464129649
+            },
+            {
+              "passage_id": "01a1bc06-dced-78d6-8493-c66c0954ea51",
+              "score": 0.8097543050594896
+            },
+            {
+              "passage_id": "01a1bc06-dcd9-7676-b9c3-e04285b4d774",
+              "score": 0.8083686130815921
+            },
+            {
+              "passage_id": "01a1bc06-dcd6-7716-bef1-c0d611f0465a",
+              "score": 0.7945937873544192
+            },
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.7941276667752171
+            }
+          ]
+        },
+        {
+          "id": "q02",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc06-dce1-7312-b870-87b914c06808"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dce1-7312-b870-87b914c06808",
+              "score": 0.8169558266454472
+            },
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.8038639788465531
+            },
+            {
+              "passage_id": "01a1bc06-dce1-7e01-a055-ff0e4991c226",
+              "score": 0.7871395780347324
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7337-abde-4322efdf3e70",
+              "score": 0.7657189331725673
+            },
+            {
+              "passage_id": "01a1bc06-dcb0-788b-90ae-cced8fd29258",
+              "score": 0.7655356107119832
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc06-dce1-7312-b870-87b914c06808",
+              "score": 0.8169558266454472
+            },
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.8038639788465531
+            },
+            {
+              "passage_id": "01a1bc06-dce1-7e01-a055-ff0e4991c226",
+              "score": 0.7871395780347324
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7337-abde-4322efdf3e70",
+              "score": 0.7657189331725673
+            },
+            {
+              "passage_id": "01a1bc06-dcb0-788b-90ae-cced8fd29258",
+              "score": 0.7655356107119832
+            }
+          ]
+        },
+        {
+          "id": "q03",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc06-dcc6-77ae-a987-06dbcaedea5e"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcc6-77ae-a987-06dbcaedea5e",
+              "score": 0.8312976554149819
+            },
+            {
+              "passage_id": "01a1bc06-dd07-7fe8-8cc1-f8b2d6eff7a7",
+              "score": 0.8152959768218911
+            },
+            {
+              "passage_id": "01a1bc06-dcc7-7395-ab16-ac77dbc5387e",
+              "score": 0.8058900032016828
+            },
+            {
+              "passage_id": "01a1bc06-dd09-7009-8fe7-5873010f782f",
+              "score": 0.7989188669178972
+            },
+            {
+              "passage_id": "01a1bc06-dd0c-76d8-9895-50279e85d22e",
+              "score": 0.7688773504936216
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc06-dcc6-77ae-a987-06dbcaedea5e",
+              "score": 0.8312976554149819
+            },
+            {
+              "passage_id": "01a1bc06-dd07-7fe8-8cc1-f8b2d6eff7a7",
+              "score": 0.8152959768218911
+            },
+            {
+              "passage_id": "01a1bc06-dcc7-7395-ab16-ac77dbc5387e",
+              "score": 0.8058900032016828
+            },
+            {
+              "passage_id": "01a1bc06-dd09-7009-8fe7-5873010f782f",
+              "score": 0.7989188669178972
+            },
+            {
+              "passage_id": "01a1bc06-dd0c-76d8-9895-50279e85d22e",
+              "score": 0.7688773504936216
+            }
+          ]
+        },
+        {
+          "id": "q04",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06c2-7379-addd-7716397c6aaa",
+              "score": 0.8679698345715119
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.860784845258612
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+              "score": 0.8587968093515428
+            },
+            {
+              "passage_id": "01a1bc07-06ea-7f0c-9185-2dc41800982c",
+              "score": 0.8525938049731887
+            },
+            {
+              "passage_id": "01a1bc07-06c7-7d48-8b2d-3a867175212f",
+              "score": 0.8411899866447136
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 3,
+          "rank_question_paper": 3,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06c2-7379-addd-7716397c6aaa",
+              "score": 0.8679698345715119
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.860784845258612
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+              "score": 0.8587968093515428
+            },
+            {
+              "passage_id": "01a1bc07-06ea-7f0c-9185-2dc41800982c",
+              "score": 0.8525938049731887
+            },
+            {
+              "passage_id": "01a1bc07-06c7-7d48-8b2d-3a867175212f",
+              "score": 0.8411899866447136
+            }
+          ]
+        },
+        {
+          "id": "q05",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+            "01a1bc07-06cd-72fe-8691-1b67e3bc9811"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06ab-790f-b5f7-ae0333f4eff4",
+              "score": 0.829068899154669
+            },
+            {
+              "passage_id": "01a1bc07-1ff7-7179-b588-8c84f571abb3",
+              "score": 0.8071949941647124
+            },
+            {
+              "passage_id": "01a1bc07-06cd-72fe-8691-1b67e3bc9811",
+              "score": 0.8018737317248551
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.7921614298628056
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+              "score": 0.7895586851370758
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 3,
+          "rank_question_paper": 2,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06ab-790f-b5f7-ae0333f4eff4",
+              "score": 0.829068899154669
+            },
+            {
+              "passage_id": "01a1bc07-06cd-72fe-8691-1b67e3bc9811",
+              "score": 0.8018737317248551
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.7921614298628056
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+              "score": 0.7895586851370758
+            },
+            {
+              "passage_id": "01a1bc07-06ae-7050-a391-a13386df9f59",
+              "score": 0.7826175482360946
+            }
+          ]
+        },
+        {
+          "id": "q06",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+              "score": 0.8087230679773403
+            },
+            {
+              "passage_id": "01a1bc07-06c9-7535-b0e3-f66a91deac94",
+              "score": 0.8059929137819806
+            },
+            {
+              "passage_id": "01a1bc07-06b7-74a0-9fad-9f84c8b70db9",
+              "score": 0.8045209399722341
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.7996818066022626
+            },
+            {
+              "passage_id": "01a1bc07-06bc-7fc0-b4ce-733393d24906",
+              "score": 0.7981039044981115
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+              "score": 0.8087230679773403
+            },
+            {
+              "passage_id": "01a1bc07-06c9-7535-b0e3-f66a91deac94",
+              "score": 0.8059929137819806
+            },
+            {
+              "passage_id": "01a1bc07-06b7-74a0-9fad-9f84c8b70db9",
+              "score": 0.8045209399722341
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.7996818066022626
+            },
+            {
+              "passage_id": "01a1bc07-06bc-7fc0-b4ce-733393d24906",
+              "score": 0.7981039044981115
+            }
+          ]
+        },
+        {
+          "id": "q07",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06c5-7bcb-ac7f-cc267bcea7a9"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06c5-7bcb-ac7f-cc267bcea7a9",
+              "score": 0.8512487790741717
+            },
+            {
+              "passage_id": "01a1bc07-06c7-7d48-8b2d-3a867175212f",
+              "score": 0.8359809562009215
+            },
+            {
+              "passage_id": "01a1bc07-06ce-7986-8dff-5c9895beb786",
+              "score": 0.812692888012184
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+              "score": 0.8024446239537769
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.8024262535924216
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06c5-7bcb-ac7f-cc267bcea7a9",
+              "score": 0.8512487790741717
+            },
+            {
+              "passage_id": "01a1bc07-06c7-7d48-8b2d-3a867175212f",
+              "score": 0.8359809562009215
+            },
+            {
+              "passage_id": "01a1bc07-06ce-7986-8dff-5c9895beb786",
+              "score": 0.812692888012184
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+              "score": 0.8024446239537769
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.8024262535924216
+            }
+          ]
+        },
+        {
+          "id": "q08",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-1ffe-7bd5-9c04-ace5817f6259"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.8170043204718529
+            },
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.798189711139146
+            },
+            {
+              "passage_id": "01a1bc07-2004-7b3d-99b3-20e379d31d39",
+              "score": 0.7910817599218016
+            },
+            {
+              "passage_id": "01a1bc07-2000-70e1-9483-d888d3bf7cc9",
+              "score": 0.7865809476605918
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.7802664477189012
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.8170043204718529
+            },
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.798189711139146
+            },
+            {
+              "passage_id": "01a1bc07-2004-7b3d-99b3-20e379d31d39",
+              "score": 0.7910817599218016
+            },
+            {
+              "passage_id": "01a1bc07-2000-70e1-9483-d888d3bf7cc9",
+              "score": 0.7865809476605918
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.7802664477189012
+            }
+          ]
+        },
+        {
+          "id": "q09",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2003-7cfd-9a8c-29d467dc5fde"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.8081034662754667
+            },
+            {
+              "passage_id": "01a1bc07-06ae-7050-a391-a13386df9f59",
+              "score": 0.7923259375192789
+            },
+            {
+              "passage_id": "01a1bc07-1ff6-749c-9d22-78835ac0d74b",
+              "score": 0.7849837391044581
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.7845531889821616
+            },
+            {
+              "passage_id": "01a1bc07-1ffd-71d0-9ac6-c9931ceeaca4",
+              "score": 0.7813136084062277
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.8081034662754667
+            },
+            {
+              "passage_id": "01a1bc07-1ff6-749c-9d22-78835ac0d74b",
+              "score": 0.7849837391044581
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.7845531889821616
+            },
+            {
+              "passage_id": "01a1bc07-1ffd-71d0-9ac6-c9931ceeaca4",
+              "score": 0.7813136084062277
+            },
+            {
+              "passage_id": "01a1bc07-1ff7-7179-b588-8c84f571abb3",
+              "score": 0.7758134968336792
+            }
+          ]
+        },
+        {
+          "id": "q10",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2009-7c0b-a430-df2f6142f7ea"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.80123184908354
+            },
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.7691661028070014
+            },
+            {
+              "passage_id": "01a1bc07-200a-78fc-a55e-3989f1b6b0e2",
+              "score": 0.7626499644965378
+            },
+            {
+              "passage_id": "01a1bc07-2000-70e1-9483-d888d3bf7cc9",
+              "score": 0.7548829586011419
+            },
+            {
+              "passage_id": "01a1bc07-2007-79bf-8335-aab0a761abe4",
+              "score": 0.7525640560266618
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.80123184908354
+            },
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.7691661028070014
+            },
+            {
+              "passage_id": "01a1bc07-200a-78fc-a55e-3989f1b6b0e2",
+              "score": 0.7626499644965378
+            },
+            {
+              "passage_id": "01a1bc07-2000-70e1-9483-d888d3bf7cc9",
+              "score": 0.7548829586011419
+            },
+            {
+              "passage_id": "01a1bc07-2007-79bf-8335-aab0a761abe4",
+              "score": 0.7525640560266618
+            }
+          ]
+        },
+        {
+          "id": "q11",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2b94-7e1b-bf16-72befbff6f30"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.8039581658815259
+            },
+            {
+              "passage_id": "01a1bc07-2ba3-7466-bfaa-acec2f77c129",
+              "score": 0.79889178309093
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.7405929124001926
+            },
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.7383014559745789
+            },
+            {
+              "passage_id": "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+              "score": 0.736319429245351
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.8039581658815259
+            },
+            {
+              "passage_id": "01a1bc07-2ba3-7466-bfaa-acec2f77c129",
+              "score": 0.79889178309093
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.7405929124001926
+            },
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.7383014559745789
+            },
+            {
+              "passage_id": "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+              "score": 0.736319429245351
+            }
+          ]
+        },
+        {
+          "id": "q12",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2b99-7340-9dc4-bfae160e059c"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b96-7f5a-9b6d-caf2941467fe",
+              "score": 0.8445114029977941
+            },
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.834410886098258
+            },
+            {
+              "passage_id": "01a1bc07-2b93-78ed-8b54-df95503a8299",
+              "score": 0.83427544457327
+            },
+            {
+              "passage_id": "01a1bc07-2b9a-73e5-9004-7854e35eab7d",
+              "score": 0.8306229160164205
+            },
+            {
+              "passage_id": "01a1bc07-2b97-7fd7-a5da-7a46cf6d060f",
+              "score": 0.8216712645700609
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 2,
+          "rank_question_paper": 2,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2b96-7f5a-9b6d-caf2941467fe",
+              "score": 0.8445114029977941
+            },
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.834410886098258
+            },
+            {
+              "passage_id": "01a1bc07-2b93-78ed-8b54-df95503a8299",
+              "score": 0.83427544457327
+            },
+            {
+              "passage_id": "01a1bc07-2b9a-73e5-9004-7854e35eab7d",
+              "score": 0.8306229160164205
+            },
+            {
+              "passage_id": "01a1bc07-2b97-7fd7-a5da-7a46cf6d060f",
+              "score": 0.8216712645700609
+            }
+          ]
+        },
+        {
+          "id": "q13",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2b9c-7537-8463-57f9767fc82a"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b9c-7537-8463-57f9767fc82a",
+              "score": 0.8565636191704061
+            },
+            {
+              "passage_id": "01a1bc07-2b9d-7818-b91a-1da1e3fde7f5",
+              "score": 0.8330068090578477
+            },
+            {
+              "passage_id": "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+              "score": 0.8209846019744932
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.8111568689346371
+            },
+            {
+              "passage_id": "01a1bc07-2b93-78ed-8b54-df95503a8299",
+              "score": 0.8086149946358805
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2b9c-7537-8463-57f9767fc82a",
+              "score": 0.8565636191704061
+            },
+            {
+              "passage_id": "01a1bc07-2b9d-7818-b91a-1da1e3fde7f5",
+              "score": 0.8330068090578477
+            },
+            {
+              "passage_id": "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+              "score": 0.8209846019744932
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.8111568689346371
+            },
+            {
+              "passage_id": "01a1bc07-2b93-78ed-8b54-df95503a8299",
+              "score": 0.8086149946358805
+            }
+          ]
+        },
+        {
+          "id": "q14",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-3700-7308-a15c-c3193e4552e2"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.7323672595234261
+            },
+            {
+              "passage_id": "01a1bc07-2ba5-7660-9364-f378b025645b",
+              "score": 0.6947501878886564
+            },
+            {
+              "passage_id": "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+              "score": 0.6891015833011997
+            },
+            {
+              "passage_id": "01a1bc07-370f-7aec-9fbe-3fa1e5900a8c",
+              "score": 0.6874578092462618
+            },
+            {
+              "passage_id": "01a1bc07-06b3-7360-9fea-b9d510b75852",
+              "score": 0.6822753086135552
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.7323672595234261
+            },
+            {
+              "passage_id": "01a1bc07-370f-7aec-9fbe-3fa1e5900a8c",
+              "score": 0.6874578092462618
+            },
+            {
+              "passage_id": "01a1bc07-370d-772c-b533-4766da246f59",
+              "score": 0.6765018841614231
+            },
+            {
+              "passage_id": "01a1bc07-36fd-7679-b5cd-e8ee6aa52417",
+              "score": 0.6688055191026264
+            },
+            {
+              "passage_id": "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+              "score": 0.6573390668963044
+            }
+          ]
+        },
+        {
+          "id": "q15",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-3703-755a-9a93-472b1194282a"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-3703-755a-9a93-472b1194282a",
+              "score": 0.8264371895584964
+            },
+            {
+              "passage_id": "01a1bc07-2b8f-7cef-9a9a-51b3455b1b74",
+              "score": 0.7730904912731521
+            },
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.7717420280633631
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.7687615385282583
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.7652320949940797
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-3703-755a-9a93-472b1194282a",
+              "score": 0.8264371895584964
+            },
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.7717420280633631
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.7652320949940797
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.760984380655946
+            },
+            {
+              "passage_id": "01a1bc07-3701-7574-b4bb-7c9101ca7e57",
+              "score": 0.752485252842763
+            }
+          ]
+        },
+        {
+          "id": "q16",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+            "01a1bc07-3702-74a0-9911-aed75e924563"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.7785700431884091
+            },
+            {
+              "passage_id": "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+              "score": 0.7718019025447813
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.7716385229295286
+            },
+            {
+              "passage_id": "01a1bc07-36f9-7536-acac-bb6b3ed6fe58",
+              "score": 0.7652315554533962
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.7514978137743846
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.7785700431884091
+            },
+            {
+              "passage_id": "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+              "score": 0.7718019025447813
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.7716385229295286
+            },
+            {
+              "passage_id": "01a1bc07-36f9-7536-acac-bb6b3ed6fe58",
+              "score": 0.7652315554533962
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.7514978137743846
+            }
+          ]
+        },
+        {
+          "id": "q17",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcea-7927-bcf2-9540e8ea571f",
+              "score": 0.7053911755188421
+            },
+            {
+              "passage_id": "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3",
+              "score": 0.6915496153310886
+            },
+            {
+              "passage_id": "01a1bc06-dccc-7939-838f-33bbb5192c83",
+              "score": 0.6837762201957844
+            },
+            {
+              "passage_id": "01a1bc06-dcc9-7078-89b9-697ed7a92936",
+              "score": 0.682995421140704
+            },
+            {
+              "passage_id": "01a1bc06-dcd9-7676-b9c3-e04285b4d774",
+              "score": 0.6795662676124722
+            }
+          ]
+        },
+        {
+          "id": "q18",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-3703-755a-9a93-472b1194282a",
+              "score": 0.7533379050098614
+            },
+            {
+              "passage_id": "01a1bc07-36f5-79d7-abcb-f15f864a8521",
+              "score": 0.7513399720192009
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.7506560087204033
+            },
+            {
+              "passage_id": "01a1bc07-2b93-78ed-8b54-df95503a8299",
+              "score": 0.7487037328547967
+            },
+            {
+              "passage_id": "01a1bc07-2ba1-7028-9a18-a391a080e3c6",
+              "score": 0.746840059757238
+            }
+          ]
+        },
+        {
+          "id": "q19",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.8182915557449143
+            },
+            {
+              "passage_id": "01a1bc07-2b93-78ed-8b54-df95503a8299",
+              "score": 0.8148958462352627
+            },
+            {
+              "passage_id": "01a1bc07-2b9a-73e5-9004-7854e35eab7d",
+              "score": 0.8130092267098796
+            },
+            {
+              "passage_id": "01a1bc07-2b9d-7818-b91a-1da1e3fde7f5",
+              "score": 0.8008516552094819
+            },
+            {
+              "passage_id": "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+              "score": 0.7938592556798916
+            }
+          ]
+        },
+        {
+          "id": "q20",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06b0-723c-8b04-7465df7c998d",
+              "score": 0.8016098974216164
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7072-9002-9148cb6fc8bd",
+              "score": 0.7997752426716572
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.7912110784557278
+            },
+            {
+              "passage_id": "01a1bc07-06ef-7c54-92cb-a29e68401b3f",
+              "score": 0.7828712645645536
+            },
+            {
+              "passage_id": "01a1bc07-06d4-72d7-81aa-079e4eadfa4f",
+              "score": 0.7769362163112784
+            }
+          ]
+        }
+      ]
+    },
+    "hybrid": {
+      "summary": {
+        "k": 5,
+        "questions": 20,
+        "answerable": 16,
+        "evaluated": 16,
+        "unmatched_questions": 0,
+        "unmatched_quotes": 0,
+        "hits_all_papers": 11,
+        "recall_at_k_all_papers": 0.6875,
+        "hits_question_paper": 12,
+        "recall_at_k_question_paper": 0.75
+      },
+      "questions": [
+        {
+          "id": "q01",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.03177805800756621
+            },
+            {
+              "passage_id": "01a1bc06-dcbf-79f3-ae33-e17574d26473",
+              "score": 0.02964254577157803
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7da0-b530-4c40590d7da9",
+              "score": 0.02844551282051282
+            },
+            {
+              "passage_id": "01a1bc06-dcec-7286-bd6d-0d1554bcdbd7",
+              "score": 0.02819138376017471
+            },
+            {
+              "passage_id": "01a1bc06-dcc9-7078-89b9-697ed7a92936",
+              "score": 0.027046783625730993
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.03177805800756621
+            },
+            {
+              "passage_id": "01a1bc06-dcbf-79f3-ae33-e17574d26473",
+              "score": 0.02964254577157803
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7da0-b530-4c40590d7da9",
+              "score": 0.02844551282051282
+            },
+            {
+              "passage_id": "01a1bc06-dcec-7286-bd6d-0d1554bcdbd7",
+              "score": 0.02819138376017471
+            },
+            {
+              "passage_id": "01a1bc06-dcc9-7078-89b9-697ed7a92936",
+              "score": 0.027046783625730993
+            }
+          ]
+        },
+        {
+          "id": "q02",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc06-dce1-7312-b870-87b914c06808"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc06-dce1-7312-b870-87b914c06808",
+              "score": 0.032018442622950824
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7337-abde-4322efdf3e70",
+              "score": 0.031754032258064516
+            },
+            {
+              "passage_id": "01a1bc06-dcff-75b2-9aba-404b4c0900ee",
+              "score": 0.030536130536130537
+            },
+            {
+              "passage_id": "01a1bc06-dcb0-788b-90ae-cced8fd29258",
+              "score": 0.030309988518943745
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 2,
+          "rank_question_paper": 2,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc06-dcce-7977-b285-06a2faaaefc6",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc06-dce1-7312-b870-87b914c06808",
+              "score": 0.032018442622950824
+            },
+            {
+              "passage_id": "01a1bc06-dcfc-7337-abde-4322efdf3e70",
+              "score": 0.031754032258064516
+            },
+            {
+              "passage_id": "01a1bc06-dcb0-788b-90ae-cced8fd29258",
+              "score": 0.030536130536130537
+            },
+            {
+              "passage_id": "01a1bc06-dcff-75b2-9aba-404b4c0900ee",
+              "score": 0.030536130536130537
+            }
+          ]
+        },
+        {
+          "id": "q03",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc06-dcc6-77ae-a987-06dbcaedea5e"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcc6-77ae-a987-06dbcaedea5e",
+              "score": 0.03278688524590164
+            },
+            {
+              "passage_id": "01a1bc06-dd07-7fe8-8cc1-f8b2d6eff7a7",
+              "score": 0.0315136476426799
+            },
+            {
+              "passage_id": "01a1bc06-dcc7-7395-ab16-ac77dbc5387e",
+              "score": 0.031024531024531024
+            },
+            {
+              "passage_id": "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3",
+              "score": 0.031024531024531024
+            },
+            {
+              "passage_id": "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+              "score": 0.030621785881252923
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc06-dcc6-77ae-a987-06dbcaedea5e",
+              "score": 0.03278688524590164
+            },
+            {
+              "passage_id": "01a1bc06-dd07-7fe8-8cc1-f8b2d6eff7a7",
+              "score": 0.0315136476426799
+            },
+            {
+              "passage_id": "01a1bc06-dcc7-7395-ab16-ac77dbc5387e",
+              "score": 0.031024531024531024
+            },
+            {
+              "passage_id": "01a1bc06-dce9-7e3c-89d1-0cb55bb617e3",
+              "score": 0.031024531024531024
+            },
+            {
+              "passage_id": "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+              "score": 0.030621785881252923
+            }
+          ]
+        },
+        {
+          "id": "q04",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7072-9002-9148cb6fc8bd",
+              "score": 0.03057889822595705
+            },
+            {
+              "passage_id": "01a1bc07-06c2-7379-addd-7716397c6aaa",
+              "score": 0.02921395544346364
+            },
+            {
+              "passage_id": "01a1bc07-06d2-7c5b-b6f3-f9ae6bd5fd7a",
+              "score": 0.02813852813852814
+            },
+            {
+              "passage_id": "01a1bc07-06e4-76e6-be10-a51561e07db6",
+              "score": 0.02782608695652174
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7072-9002-9148cb6fc8bd",
+              "score": 0.03057889822595705
+            },
+            {
+              "passage_id": "01a1bc07-06c2-7379-addd-7716397c6aaa",
+              "score": 0.029906956136464335
+            },
+            {
+              "passage_id": "01a1bc07-06e4-76e6-be10-a51561e07db6",
+              "score": 0.028577260665441927
+            },
+            {
+              "passage_id": "01a1bc07-06c4-7596-8255-a86eb099cca7",
+              "score": 0.028258706467661692
+            }
+          ]
+        },
+        {
+          "id": "q05",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5",
+            "01a1bc07-06cd-72fe-8691-1b67e3bc9811"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06c2-7379-addd-7716397c6aaa",
+              "score": 0.028790389395194696
+            },
+            {
+              "passage_id": "01a1bc07-06d4-72d7-81aa-079e4eadfa4f",
+              "score": 0.02702702702702703
+            },
+            {
+              "passage_id": "01a1bc07-06b0-7d0b-9d9e-3818c24014e2",
+              "score": 0.0261986301369863
+            },
+            {
+              "passage_id": "01a1bc07-06d2-7089-aef5-c945856fc0c1",
+              "score": 0.0259915611814346
+            },
+            {
+              "passage_id": "01a1bc07-06ab-790f-b5f7-ae0333f4eff4",
+              "score": 0.01639344262295082
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06c2-7379-addd-7716397c6aaa",
+              "score": 0.029631255487269532
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.029030910609857977
+            },
+            {
+              "passage_id": "01a1bc07-06d4-72d7-81aa-079e4eadfa4f",
+              "score": 0.02857142857142857
+            },
+            {
+              "passage_id": "01a1bc07-06bc-7fc0-b4ce-733393d24906",
+              "score": 0.027884615384615386
+            },
+            {
+              "passage_id": "01a1bc07-06b0-7d0b-9d9e-3818c24014e2",
+              "score": 0.027650648360030512
+            }
+          ]
+        },
+        {
+          "id": "q06",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06a8-7fb4-bcf2-9f1c27732cf5"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06c9-7535-b0e3-f66a91deac94",
+              "score": 0.03021353930031804
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.029910714285714284
+            },
+            {
+              "passage_id": "01a1bc07-06c5-70bb-83ed-8406c2a2b743",
+              "score": 0.028949545078577336
+            },
+            {
+              "passage_id": "01a1bc07-06c2-7379-addd-7716397c6aaa",
+              "score": 0.027651515151515153
+            },
+            {
+              "passage_id": "01a1bc07-06ba-7b4e-b300-91c469cd44d5",
+              "score": 0.027650648360030512
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": null,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06c9-7535-b0e3-f66a91deac94",
+              "score": 0.0304147465437788
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.030117753623188408
+            },
+            {
+              "passage_id": "01a1bc07-06c5-70bb-83ed-8406c2a2b743",
+              "score": 0.028949545078577336
+            },
+            {
+              "passage_id": "01a1bc07-06c2-7379-addd-7716397c6aaa",
+              "score": 0.02813852813852814
+            },
+            {
+              "passage_id": "01a1bc07-06ba-7b4e-b300-91c469cd44d5",
+              "score": 0.02786377708978328
+            }
+          ]
+        },
+        {
+          "id": "q07",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-06c5-7bcb-ac7f-cc267bcea7a9"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06c5-7bcb-ac7f-cc267bcea7a9",
+              "score": 0.030679156908665108
+            },
+            {
+              "passage_id": "01a1bc07-06ce-7986-8dff-5c9895beb786",
+              "score": 0.03036576949620428
+            },
+            {
+              "passage_id": "01a1bc07-06c7-7d48-8b2d-3a867175212f",
+              "score": 0.03021353930031804
+            },
+            {
+              "passage_id": "01a1bc07-06d8-74a9-a67b-1e2d135bcd5a",
+              "score": 0.028790389395194696
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.02854251012145749
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-06c5-7bcb-ac7f-cc267bcea7a9",
+              "score": 0.031544957774465976
+            },
+            {
+              "passage_id": "01a1bc07-06ce-7986-8dff-5c9895beb786",
+              "score": 0.03125763125763126
+            },
+            {
+              "passage_id": "01a1bc07-06c7-7d48-8b2d-3a867175212f",
+              "score": 0.031054405392392875
+            },
+            {
+              "passage_id": "01a1bc07-06cc-748a-b90a-a0ca6097acfe",
+              "score": 0.030090497737556562
+            },
+            {
+              "passage_id": "01a1bc07-06d8-74a9-a67b-1e2d135bcd5a",
+              "score": 0.029709507042253523
+            }
+          ]
+        },
+        {
+          "id": "q08",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-1ffe-7bd5-9c04-ace5817f6259"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.032266458495966696
+            },
+            {
+              "passage_id": "01a1bc07-2004-7b3d-99b3-20e379d31d39",
+              "score": 0.032266458495966696
+            },
+            {
+              "passage_id": "01a1bc07-2000-70e1-9483-d888d3bf7cc9",
+              "score": 0.029910714285714284
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.029273504273504274
+            },
+            {
+              "passage_id": "01a1bc07-2005-7685-be0f-aa431fdae3f3",
+              "score": 0.02900988017658188
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.032266458495966696
+            },
+            {
+              "passage_id": "01a1bc07-2004-7b3d-99b3-20e379d31d39",
+              "score": 0.032266458495966696
+            },
+            {
+              "passage_id": "01a1bc07-2000-70e1-9483-d888d3bf7cc9",
+              "score": 0.030776515151515152
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.030309988518943745
+            },
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.029827662395050816
+            }
+          ]
+        },
+        {
+          "id": "q09",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2003-7cfd-9a8c-29d467dc5fde"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.03177805800756621
+            },
+            {
+              "passage_id": "01a1bc07-06d4-72d7-81aa-079e4eadfa4f",
+              "score": 0.031024531024531024
+            },
+            {
+              "passage_id": "01a1bc06-dcb6-7d6b-aa32-1f3cdb2ea99a",
+              "score": 0.01639344262295082
+            },
+            {
+              "passage_id": "01a1bc07-06aa-796c-a6b6-890e1afdb210",
+              "score": 0.016129032258064516
+            },
+            {
+              "passage_id": "01a1bc07-06ae-7050-a391-a13386df9f59",
+              "score": 0.016129032258064516
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.03278688524590164
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.031746031746031744
+            },
+            {
+              "passage_id": "01a1bc07-200a-78fc-a55e-3989f1b6b0e2",
+              "score": 0.030536130536130537
+            },
+            {
+              "passage_id": "01a1bc07-2002-7e21-b960-e2dc91ec082a",
+              "score": 0.030117753623188408
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7056-89b0-0e9f8952a16e",
+              "score": 0.028629032258064516
+            }
+          ]
+        },
+        {
+          "id": "q10",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2009-7c0b-a430-df2f6142f7ea"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc07-200a-78fc-a55e-3989f1b6b0e2",
+              "score": 0.032266458495966696
+            },
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.030621785881252923
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.029857397504456328
+            },
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.029386529386529386
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2009-7c0b-a430-df2f6142f7ea",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc07-200a-78fc-a55e-3989f1b6b0e2",
+              "score": 0.032266458495966696
+            },
+            {
+              "passage_id": "01a1bc07-1ffe-7bd5-9c04-ace5817f6259",
+              "score": 0.031054405392392875
+            },
+            {
+              "passage_id": "01a1bc07-2003-7cfd-9a8c-29d467dc5fde",
+              "score": 0.03057889822595705
+            },
+            {
+              "passage_id": "01a1bc07-1ff8-7edc-aafa-ecfdf3e1700c",
+              "score": 0.030303030303030304
+            }
+          ]
+        },
+        {
+          "id": "q11",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2b94-7e1b-bf16-72befbff6f30"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.032018442622950824
+            },
+            {
+              "passage_id": "01a1bc07-2ba3-7466-bfaa-acec2f77c129",
+              "score": 0.0304147465437788
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.029910714285714284
+            },
+            {
+              "passage_id": "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+              "score": 0.02946912242686891
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.032018442622950824
+            },
+            {
+              "passage_id": "01a1bc07-2ba3-7466-bfaa-acec2f77c129",
+              "score": 0.0315136476426799
+            },
+            {
+              "passage_id": "01a1bc07-2b9f-77a7-bcc6-a9307c7494fa",
+              "score": 0.030536130536130537
+            },
+            {
+              "passage_id": "01a1bc07-2ba2-78ee-87ac-8568304dff2b",
+              "score": 0.030330882352941176
+            }
+          ]
+        },
+        {
+          "id": "q12",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2b99-7340-9dc4-bfae160e059c"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b9a-73e5-9004-7854e35eab7d",
+              "score": 0.031754032258064516
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.030536130536130537
+            },
+            {
+              "passage_id": "01a1bc07-2b93-78ed-8b54-df95503a8299",
+              "score": 0.03036576949620428
+            },
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.029206349206349208
+            },
+            {
+              "passage_id": "01a1bc07-2bac-7fb4-995d-d007a9a72696",
+              "score": 0.028665028665028666
+            }
+          ],
+          "outcome": "miss",
+          "rank_all_papers": null,
+          "rank_question_paper": 4,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2b9a-73e5-9004-7854e35eab7d",
+              "score": 0.031754032258064516
+            },
+            {
+              "passage_id": "01a1bc07-2b93-78ed-8b54-df95503a8299",
+              "score": 0.03057889822595705
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.030536130536130537
+            },
+            {
+              "passage_id": "01a1bc07-2b99-7340-9dc4-bfae160e059c",
+              "score": 0.02928692699490662
+            },
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.029206349206349208
+            }
+          ]
+        },
+        {
+          "id": "q13",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-2b9c-7537-8463-57f9767fc82a"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+              "score": 0.03149801587301587
+            },
+            {
+              "passage_id": "01a1bc07-2bac-7519-9010-c9f20b2c99c3",
+              "score": 0.03128054740957967
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.030330882352941176
+            },
+            {
+              "passage_id": "01a1bc07-2b9c-7537-8463-57f9767fc82a",
+              "score": 0.03009207275993712
+            },
+            {
+              "passage_id": "01a1bc07-2b94-7e1b-bf16-72befbff6f30",
+              "score": 0.02889344262295082
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 4,
+          "rank_question_paper": 3,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+              "score": 0.031746031746031744
+            },
+            {
+              "passage_id": "01a1bc07-2bac-7519-9010-c9f20b2c99c3",
+              "score": 0.03128054740957967
+            },
+            {
+              "passage_id": "01a1bc07-2b9c-7537-8463-57f9767fc82a",
+              "score": 0.031099324975891997
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.031009615384615385
+            },
+            {
+              "passage_id": "01a1bc07-2b9d-7818-b91a-1da1e3fde7f5",
+              "score": 0.029827662395050816
+            }
+          ]
+        },
+        {
+          "id": "q14",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-3700-7308-a15c-c3193e4552e2"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc07-06da-78f1-bf27-0dbc8ad5bb24",
+              "score": 0.031024531024531024
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.027809742999616416
+            },
+            {
+              "passage_id": "01a1bc07-2ba4-7ab1-900b-58992809e415",
+              "score": 0.027783137179239824
+            },
+            {
+              "passage_id": "01a1bc07-36fd-7679-b5cd-e8ee6aa52417",
+              "score": 0.027777777777777776
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.03278688524590164
+            },
+            {
+              "passage_id": "01a1bc07-36fd-7679-b5cd-e8ee6aa52417",
+              "score": 0.031754032258064516
+            },
+            {
+              "passage_id": "01a1bc07-370f-7aec-9fbe-3fa1e5900a8c",
+              "score": 0.031054405392392875
+            },
+            {
+              "passage_id": "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+              "score": 0.031009615384615385
+            },
+            {
+              "passage_id": "01a1bc07-3705-7b5c-b95a-b2bd27c97e80",
+              "score": 0.02871794871794872
+            }
+          ]
+        },
+        {
+          "id": "q15",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-3703-755a-9a93-472b1194282a"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.032266458495966696
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.03076923076923077
+            },
+            {
+              "passage_id": "01a1bc07-3703-755a-9a93-472b1194282a",
+              "score": 0.030679156908665108
+            },
+            {
+              "passage_id": "01a1bc07-2b8f-7cef-9a9a-51b3455b1b74",
+              "score": 0.02964254577157803
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.029631255487269532
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 3,
+          "rank_question_paper": 2,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc07-3703-755a-9a93-472b1194282a",
+              "score": 0.03177805800756621
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.031746031746031744
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.03125
+            },
+            {
+              "passage_id": "01a1bc07-3706-7caf-b3d4-46db68c4ee6b",
+              "score": 0.03007688828584351
+            }
+          ]
+        },
+        {
+          "id": "q16",
+          "answerable": true,
+          "expected_passage_ids": [
+            "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+            "01a1bc07-3702-74a0-9911-aed75e924563"
+          ],
+          "unmatched_quotes": [],
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.03252247488101534
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.031746031746031744
+            },
+            {
+              "passage_id": "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+              "score": 0.0315136476426799
+            },
+            {
+              "passage_id": "01a1bc07-3705-7b5c-b95a-b2bd27c97e80",
+              "score": 0.03055037313432836
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.030536130536130537
+            }
+          ],
+          "outcome": "hit",
+          "rank_all_papers": 1,
+          "rank_question_paper": 1,
+          "retrieved_question_paper": [
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.03278688524590164
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.03200204813108039
+            },
+            {
+              "passage_id": "01a1bc07-3704-7747-a9a5-2e1407bc06ef",
+              "score": 0.031754032258064516
+            },
+            {
+              "passage_id": "01a1bc07-3705-7b5c-b95a-b2bd27c97e80",
+              "score": 0.030798389007344232
+            },
+            {
+              "passage_id": "01a1bc07-3700-7308-a15c-c3193e4552e2",
+              "score": 0.03076923076923077
+            }
+          ]
+        },
+        {
+          "id": "q17",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc06-dcc9-7078-89b9-697ed7a92936",
+              "score": 0.029709507042253523
+            },
+            {
+              "passage_id": "01a1bc06-dcdd-7b5f-abd1-33d286c962a1",
+              "score": 0.025158227848101268
+            },
+            {
+              "passage_id": "01a1bc06-dcb5-71f8-bea7-a49b743b2081",
+              "score": 0.01639344262295082
+            },
+            {
+              "passage_id": "01a1bc06-dcea-7927-bcf2-9540e8ea571f",
+              "score": 0.01639344262295082
+            },
+            {
+              "passage_id": "01a1bc06-dcb6-70c3-a38e-fb174e0228e7",
+              "score": 0.016129032258064516
+            }
+          ]
+        },
+        {
+          "id": "q18",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.030158730158730156
+            },
+            {
+              "passage_id": "01a1bc07-36f7-7707-9e37-2db2e62e9ee4",
+              "score": 0.029857397504456328
+            },
+            {
+              "passage_id": "01a1bc07-3702-74a0-9911-aed75e924563",
+              "score": 0.0293236301369863
+            },
+            {
+              "passage_id": "01a1bc07-3703-755a-9a93-472b1194282a",
+              "score": 0.02921395544346364
+            },
+            {
+              "passage_id": "01a1bc07-2b9d-7818-b91a-1da1e3fde7f5",
+              "score": 0.01639344262295082
+            }
+          ]
+        },
+        {
+          "id": "q19",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-2bac-7519-9010-c9f20b2c99c3",
+              "score": 0.030621785881252923
+            },
+            {
+              "passage_id": "01a1bc07-2b97-7fd7-a5da-7a46cf6d060f",
+              "score": 0.030158730158730156
+            },
+            {
+              "passage_id": "01a1bc07-2b8e-7096-b9c7-27b4ab2fd328",
+              "score": 0.029051670471052088
+            },
+            {
+              "passage_id": "01a1bc07-2bac-7fb4-995d-d007a9a72696",
+              "score": 0.029051670471052088
+            },
+            {
+              "passage_id": "01a1bc07-2b9b-71eb-9db4-bfa10370748e",
+              "score": 0.02854251012145749
+            }
+          ]
+        },
+        {
+          "id": "q20",
+          "answerable": false,
+          "outcome": "unanswerable",
+          "returned_all_papers": 5,
+          "retrieved_all_papers": [
+            {
+              "passage_id": "01a1bc07-06b0-723c-8b04-7465df7c998d",
+              "score": 0.032266458495966696
+            },
+            {
+              "passage_id": "01a1bc07-06d9-7bdb-9bbf-b1a29951403f",
+              "score": 0.032266458495966696
+            },
+            {
+              "passage_id": "01a1bc07-06a8-7072-9002-9148cb6fc8bd",
+              "score": 0.03225806451612903
+            },
+            {
+              "passage_id": "01a1bc07-06d4-72d7-81aa-079e4eadfa4f",
+              "score": 0.03076923076923077
+            },
+            {
+              "passage_id": "01a1bc07-06d6-7268-aff8-6c8a233f0056",
+              "score": 0.03007688828584351
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "by_question": [
+    {
+      "id": "q01",
+      "rank_all_papers": {
+        "keyword": null,
+        "semantic": 1,
+        "hybrid": null
+      },
+      "rank_question_paper": {
+        "keyword": null,
+        "semantic": 1,
+        "hybrid": null
+      }
+    },
+    {
+      "id": "q02",
+      "rank_all_papers": {
+        "keyword": 4,
+        "semantic": 1,
+        "hybrid": 2
+      },
+      "rank_question_paper": {
+        "keyword": 4,
+        "semantic": 1,
+        "hybrid": 2
+      }
+    },
+    {
+      "id": "q03",
+      "rank_all_papers": {
+        "keyword": 1,
+        "semantic": 1,
+        "hybrid": 1
+      },
+      "rank_question_paper": {
+        "keyword": 1,
+        "semantic": 1,
+        "hybrid": 1
+      }
+    },
+    {
+      "id": "q04",
+      "rank_all_papers": {
+        "keyword": null,
+        "semantic": 3,
+        "hybrid": null
+      },
+      "rank_question_paper": {
+        "keyword": null,
+        "semantic": 3,
+        "hybrid": null
+      }
+    },
+    {
+      "id": "q05",
+      "rank_all_papers": {
+        "keyword": null,
+        "semantic": 3,
+        "hybrid": null
+      },
+      "rank_question_paper": {
+        "keyword": null,
+        "semantic": 2,
+        "hybrid": null
+      }
+    },
+    {
+      "id": "q06",
+      "rank_all_papers": {
+        "keyword": null,
+        "semantic": 1,
+        "hybrid": null
+      },
+      "rank_question_paper": {
+        "keyword": null,
+        "semantic": 1,
+        "hybrid": null
+      }
+    },
+    {
+      "id": "q07",
+      "rank_all_papers": {
+        "keyword": null,
+        "semantic": 1,
+        "hybrid": 1
+      },
+      "rank_question_paper": {
+        "keyword": null,
+        "semantic": 1,
+        "hybrid": 1
+      }
+    },
+    {
+      "id": "q08",
+      "rank_all_papers": {
+        "keyword": 3,
+        "semantic": 1,
+        "hybrid": 1
+      },
+      "rank_question_paper": {
+        "keyword": 3,
+        "semantic": 1,
+        "hybrid": 1
+      }
+    },
+    {
+      "id": "q09",
+      "rank_all_papers": {
+        "keyword": 5,
+        "semantic": 1,
+        "hybrid": 1
+      },
+      "rank_question_paper": {
+        "keyword": 1,
+        "semantic": 1,
+        "hybrid": 1
+      }
+    },
+    {
+      "id": "q10",
+      "rank_all_papers": {
+        "keyword": 2,
+        "semantic": 1,
+        "hybrid": 1
+      },
+      "rank_question_paper": {
+        "keyword": 2,
+        "semantic": 1,
+        "hybrid": 1
+      }
+    },
+    {
+      "id": "q11",
+      "rank_all_papers": {
+        "keyword": 2,
+        "semantic": 1,
+        "hybrid": 1
+      },
+      "rank_question_paper": {
+        "keyword": 2,
+        "semantic": 1,
+        "hybrid": 1
+      }
+    },
+    {
+      "id": "q12",
+      "rank_all_papers": {
+        "keyword": null,
+        "semantic": 2,
+        "hybrid": null
+      },
+      "rank_question_paper": {
+        "keyword": null,
+        "semantic": 2,
+        "hybrid": 4
+      }
+    },
+    {
+      "id": "q13",
+      "rank_all_papers": {
+        "keyword": null,
+        "semantic": 1,
+        "hybrid": 4
+      },
+      "rank_question_paper": {
+        "keyword": null,
+        "semantic": 1,
+        "hybrid": 3
+      }
+    },
+    {
+      "id": "q14",
+      "rank_all_papers": {
+        "keyword": 2,
+        "semantic": 1,
+        "hybrid": 1
+      },
+      "rank_question_paper": {
+        "keyword": 1,
+        "semantic": 1,
+        "hybrid": 1
+      }
+    },
+    {
+      "id": "q15",
+      "rank_all_papers": {
+        "keyword": null,
+        "semantic": 1,
+        "hybrid": 3
+      },
+      "rank_question_paper": {
+        "keyword": 5,
+        "semantic": 1,
+        "hybrid": 2
+      }
+    },
+    {
+      "id": "q16",
+      "rank_all_papers": {
+        "keyword": 2,
+        "semantic": 1,
+        "hybrid": 1
+      },
+      "rank_question_paper": {
+        "keyword": 1,
+        "semantic": 1,
+        "hybrid": 1
+      }
+    }
+  ]
+}

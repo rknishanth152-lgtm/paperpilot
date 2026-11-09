@@ -112,7 +112,7 @@ def test_passage_from_another_paper(
         kwargs.update(paper_ids=None)
         return search_passages(*args, **kwargs)
 
-    monkeypatch.setattr("app.services.answering.pipeline.search_passages", leaky)
+    monkeypatch.setattr("app.services.retrieval.selection.search_passages", leaky)
 
     result = ask(sessions, reply(citation("P1")), paper_ids=[wanted])
 

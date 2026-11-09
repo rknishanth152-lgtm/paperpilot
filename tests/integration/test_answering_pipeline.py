@@ -35,7 +35,7 @@ def spy_on_search(monkeypatch: pytest.MonkeyPatch) -> list[str]:
         calls.append(args[1])
         return search_passages(*args, **kwargs)
 
-    monkeypatch.setattr("app.services.answering.pipeline.search_passages", spy)
+    monkeypatch.setattr("app.services.retrieval.selection.search_passages", spy)
     return calls
 
 
@@ -414,7 +414,7 @@ def test_scope_is_checked_again_even_if_retrieval_leaks(
         kwargs.update(document_ids=None, paper_ids=None)
         return search_passages(*args, **kwargs)
 
-    monkeypatch.setattr("app.services.answering.pipeline.search_passages", leaky)
+    monkeypatch.setattr("app.services.retrieval.selection.search_passages", leaky)
     scope = {"document_ids": [wanted_document], "paper_ids": [wanted]}[scope_by]
     reply = stored_answer({"alias": "P1", "quote": None})
 

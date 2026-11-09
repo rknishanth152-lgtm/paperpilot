@@ -87,7 +87,7 @@ def test_a_changed_evaluation_set_makes_the_tree_dirty(repository: Path) -> None
 
 
 def test_configuration_records_every_limit_and_the_temperature() -> None:
-    assert answer_configuration(LIMITS) == {
+    assert answer_configuration(LIMITS, "keyword_full_text") == {
         "retriever": "keyword_full_text",
         "top_k": 5,
         "max_query_chars": 2000,
@@ -106,6 +106,7 @@ def record(model: str = "gemini-3.5-flash-lite") -> dict[str, object]:
         rows=[],
         stopped="model_rate_limited",
         limits=LIMITS,
+        retriever="keyword_full_text",
         state=STATE,
         run_at=RUN_AT,
         evaluation_limits="small set",
@@ -126,7 +127,7 @@ def test_record_carries_what_is_needed_to_interpret_the_run() -> None:
     assert saved["evaluation_set_sha256"] == "a" * 64
     assert saved["limits"] == "small set"
     assert saved["stopped_early"] == "model_rate_limited"
-    assert saved["configuration"] == answer_configuration(LIMITS)
+    assert saved["configuration"] == answer_configuration(LIMITS, "keyword_full_text")
     assert saved["questions"] == []
     assert isinstance(saved["summary"], dict)
     assert saved["summary"]["questions_run"] == 0

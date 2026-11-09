@@ -18,7 +18,7 @@ Logs carry counts only, never the question or paper text (NFR-PRI-002).
 import logging
 import uuid
 from collections.abc import Collection
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Self
 
 from sqlalchemy.orm import Session, sessionmaker
@@ -37,7 +37,11 @@ from app.services.answering.prompt import PROMPT_VERSION, SYSTEM_PROMPT
 from app.services.answering.response import assemble_response
 from app.services.ingestion.documents import get_document_statuses, get_paper_titles
 from app.services.llm import LanguageModel, ModelRequest, ModelUsage
-from app.services.retrieval.keyword import search_passages
+from app.services.retrieval.selection import (
+    KEYWORD_METHOD,
+    KeywordRetriever,
+    Retriever,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +89,7 @@ class ModelRun:
     prompt_version: str | None
     usage: ModelUsage  # across all attempts
     attempts: int
+    retrieval_method: str = KEYWORD_METHOD
 
 
 def _why_no_evidence(context: AnswerContext, statuses: Collection[str]) -> str:
@@ -157,10 +162,12 @@ class Answering:
         sessions: sessionmaker[Session],
         model: LanguageModel,
         limits: AnswerLimits,
+        retriever: Retriever | None = None,
     ) -> None:
         self._sessions = sessions
         self._model = model
         self._limits = limits
+        self._retrieve = retriever or KeywordRetriever(sessions)
 
     def answer(
         self,
@@ -180,6 +187,7 @@ class Answering:
             context=run.context,
             model=run.model,
             prompt_version=run.prompt_version,
+            retrieval_method=run.retrieval_method,
             paper_titles=get_paper_titles(
                 self._sessions,
                 {passage.paper_id for passage in run.context.aliases.values()},
@@ -194,14 +202,14 @@ class Answering:
         paper_ids: Collection[uuid.UUID] | None = None,
     ) -> ModelRun:
         limits = self._limits
-        passages = search_passages(
-            self._sessions,
+        retrieval = self._retrieve(
             question,
             k=limits.top_k,
             max_query_chars=limits.max_query_chars,
             document_ids=document_ids,
             paper_ids=paper_ids,
         )
+        passages = retrieval.passages
         context = build_context(
             question,
             passages,
@@ -216,5 +224,7 @@ class Answering:
                 if document_ids is None
                 else get_document_statuses(self._sessions, document_ids)
             )
-            return _no_evidence(context, selected)
-        return request_answer(self._model, context, limits)
+            run = _no_evidence(context, selected)
+        else:
+            run = request_answer(self._model, context, limits)
+        return replace(run, retrieval_method=retrieval.method)

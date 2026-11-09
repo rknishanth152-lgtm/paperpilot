@@ -6,6 +6,7 @@ setting has a placeholder in `.env.example` (CLAUDE.md §5).
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 from urllib.parse import quote
 
 from pydantic import Field, HttpUrl, SecretStr, field_validator
@@ -82,6 +83,9 @@ class Settings(BaseSettings):
     # Small batches with pauses, because free-tier limits are not published.
     embedding_batch_size: int = Field(default=20, gt=0)
     embedding_pause_seconds: float = Field(default=10.0, ge=0)
+    # What answering searches with. Semantic on recorded results
+    # (docs/experiments/retrieval-comparison.md).
+    retrieval_method: Literal["keyword", "semantic"] = "semantic"
     # Hybrid retrieval (FR-RET-006): passages each method supplies, and the
     # Reciprocal Rank Fusion constant, 60 being the value commonly used.
     hybrid_candidates: int = Field(default=20, gt=0)

@@ -13,7 +13,7 @@ from app.services.answering.citations import (
     ValidatedAnswer,
 )
 from app.services.answering.context import AnswerContext
-from app.services.answering.response import RETRIEVAL_METHOD, assemble_response
+from app.services.answering.response import assemble_response
 from app.services.retrieval.keyword import RetrievedPassage
 
 PAPER = uuid.uuid4()
@@ -189,7 +189,7 @@ def test_provenance_is_reported() -> None:
 
     assert result.model == "fake-x"
     assert result.prompt_version == "v9"
-    assert result.retrieval_method == RETRIEVAL_METHOD
+    assert result.retrieval_method == "keyword_full_text"
 
 
 def test_claim_support_is_always_not_evaluated() -> None:

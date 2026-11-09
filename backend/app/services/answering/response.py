@@ -15,8 +15,7 @@ from app.schemas.answer_response import (
 )
 from app.services.answering.citations import CheckedCitation, ValidatedAnswer
 from app.services.answering.context import AnswerContext
-
-RETRIEVAL_METHOD = "keyword_full_text"
+from app.services.retrieval.selection import KEYWORD_METHOD
 
 
 def _citation(citation: CheckedCitation) -> CitationResponse:
@@ -59,6 +58,7 @@ def assemble_response(
     model: str | None,
     prompt_version: str | None,
     paper_titles: Mapping[uuid.UUID, str | None],
+    retrieval_method: str = KEYWORD_METHOD,
 ) -> AnswerResponse:
     retrieved = [*context.aliases.values(), *context.dropped.values()]
     return AnswerResponse(
@@ -77,7 +77,7 @@ def assemble_response(
         claim_support="not_evaluated",
         retrieved_passage_ids=tuple(passage.passage_id for passage in retrieved),
         passages_dropped=context.passages_dropped,
-        retrieval_method=RETRIEVAL_METHOD,
+        retrieval_method=retrieval_method,
         model=model,
         prompt_version=prompt_version,
     )

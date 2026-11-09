@@ -47,9 +47,9 @@ from app.schemas.answer import MalformedAnswerError
 from app.schemas.answer_response import AnswerResponse
 from app.services.answering.pipeline import Answering, AnswerLimits
 from app.services.answering.prompt import PROMPT_VERSION
-from app.services.answering.response import RETRIEVAL_METHOD
 from app.services.llm import LanguageModel, ModelError, ModelRequest, ModelResponse
 from app.services.llm_factory import build_language_model
+from app.services.retrieval.selection import build_retriever
 
 RESULTS = REPO_ROOT / "benchmarks" / "results"
 DEFAULT_PAUSE = 7.0
@@ -131,6 +131,7 @@ def run_question(
         validation_status=result.validation_status,
         limitations=result.limitations,
         statements=[s.model_dump(mode="json") for s in result.statements],
+        retrieval_method=result.retrieval_method,
         retrieved_passage_ids=[str(i) for i in result.retrieved_passage_ids],
         evidence_passage_ids=[str(i) for i in cited],
         expected_retrieved=bool(set(expected) & set(result.retrieved_passage_ids)),
@@ -206,10 +207,10 @@ class AnswerRun:
     stopped: str | None
 
 
-def answer_configuration(limits: AnswerLimits) -> dict[str, Any]:
+def answer_configuration(limits: AnswerLimits, retriever: str) -> dict[str, Any]:
     """The settings that shape an answer. No request sets a temperature."""
     return {
-        "retriever": RETRIEVAL_METHOD,
+        "retriever": retriever,
         **asdict(limits),
         "temperature": "provider default",
     }
@@ -222,6 +223,7 @@ def answer_record(
     rows: Sequence[dict[str, Any]],
     stopped: str | None,
     limits: AnswerLimits,
+    retriever: str,
     state: CodeState,
     run_at: datetime,
     evaluation_limits: str,
@@ -236,7 +238,7 @@ def answer_record(
         "code_revision": state.revision,
         "working_tree_clean": state.clean,
         "prompt_version": PROMPT_VERSION,
-        "configuration": answer_configuration(limits),
+        "configuration": answer_configuration(limits, retriever),
         "evaluation_set_sha256": evaluation_sha256,
         "limits": evaluation_limits,
         "stopped_early": stopped,
@@ -269,7 +271,8 @@ def run_answer_evaluation(
     documents, passages = load_corpus(sessions, evaluation)
     tracker = TrackingModel(build_language_model(settings))
     limits = AnswerLimits.from_settings(settings)
-    answering = Answering(sessions, tracker, limits)
+    retriever = build_retriever(settings, sessions)
+    answering = Answering(sessions, tracker, limits, retriever)
 
     def answer(question: str, document_ids: list[uuid.UUID]) -> AnswerResponse:
         return answering.answer(question, document_ids=document_ids)
@@ -301,6 +304,7 @@ def run_answer_evaluation(
         rows=rows,
         stopped=stopped,
         limits=limits,
+        retriever=retriever.name,
         state=state,
         run_at=datetime.now(UTC),
         evaluation_limits=evaluation.limits,

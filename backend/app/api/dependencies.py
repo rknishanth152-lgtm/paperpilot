@@ -11,6 +11,7 @@ from app.services.answering.pipeline import Answering, AnswerLimits
 from app.services.ingestion.grobid import GrobidClient
 from app.services.ingestion.pipeline import Ingestion
 from app.services.llm_factory import build_language_model
+from app.services.retrieval.selection import build_retriever
 from app.storage import get_storage
 
 
@@ -25,8 +26,10 @@ def get_ingestion() -> Ingestion:
 
 
 def get_answering(settings: Annotated[Settings, Depends(get_settings)]) -> Answering:
+    sessions = get_sessionmaker()
     return Answering(
-        get_sessionmaker(),
+        sessions,
         build_language_model(settings),
         AnswerLimits.from_settings(settings),
+        build_retriever(settings, sessions),
     )
