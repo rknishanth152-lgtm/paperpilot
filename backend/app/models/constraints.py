@@ -27,6 +27,19 @@ PASSAGE_REGIONS = ("abstract", "body", "caption", "back")
 
 METADATA_SOURCES = ("grobid",)
 
+# FR-REP-002. `not_found` means not found in the material examined.
+REPRODUCIBILITY_STATUSES = (
+    "reported",
+    "partially_reported",
+    "not_found",
+    "needs_review",
+)
+REPRODUCIBILITY_REVIEW_REASONS = (
+    "parse_incomplete",
+    "evidence_unverified",
+    "model_uncertain",
+)
+
 
 def one_of(column: str, values: tuple[str, ...]) -> str:
     """SQL for a CHECK that `column` is one of `values`."""

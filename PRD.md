@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.14 (`AD-017`, semantic default, 2026-11-09; see `docs/experiments/retrieval-comparison.md`) |
+| Version | 0.15 (`OQ-010` provisional, 2026-11-09; see `backend/app/services/reproducibility/checklist.py`) |
 | Date | 2026-11-03 |
 | Status | In force. What actually exists is recorded in `progress.md`. |
 | Companion documents | `CLAUDE.md` (development rules), `progress.md` (actual state), `docs/implementation-roadmap.md` (sequence and exit criteria) |
@@ -504,7 +504,7 @@ Structured extraction (`FR-EXT-*`, `FR-EVL-005`), cross-paper comparison (`FR-CM
 | OQ-007 | Paper matching when DOI is absent. | **Deferred 2026-11-09** with Phase 9. Experiment if reopened | Phase 9 |
 | OQ-008 | Representation of reported results (table, JSON, typed items). | **Deferred 2026-11-09** with Phase 10. Design review with hand-built examples if reopened | Phase 10 |
 | OQ-009 | Extraction strategy for long documents; extraction-matching rule for scoring. | **Deferred 2026-11-09** with Phase 7. Experiment if reopened | Phase 7 |
-| OQ-010 | Initial reproducibility checklist items. | Hand-label 3 papers | Phase 11 |
+| OQ-010 | Initial reproducibility checklist items. | **Provisional 2026-11-09:** six items in `checklist-v1` (`backend/app/services/reproducibility/checklist.py`), reduced from the `FR-REP-001` topics to apply across fields. Confirmed by hand-labelling 3 papers in R5 | Phase 11 |
 | OQ-011 | LLM provider and model for answers and extraction (cost, structured-output support). | **Interim 2026-11-09:** Google Gemini free tier, `gemini-3.5-flash-lite`, developer's choice because a paid API account was out of reach (`progress.md` §6.13, `docs/experiments/answer-baseline.md`). Open-access papers only on the free tier. Settled by a short comparison on the evaluation set at P5-T12 | Phase 5 |
 | OQ-012 | Embedding model, dimension, pgvector index choice and limits. Verify limits in pgvector docs. | **Resolved 2026-11-09** (`docs/design/embeddings.md`): `gemini-embedding-2`, 768 dimensions, no approximate index (exact search), limits checked in the pgvector README | Phase 8 |
 | OQ-013 | Quote normalisation rules for PDF text artifacts. | **Resolved for VS-1, 2026-11-08, P5-T6** (`progress.md` §6.14): compare against stored passage text, never the PDF text layer, after Unicode NFKC and folding quotes and dashes, ignoring all whitespace; case is kept. Replaces the provisional split-ligature rule. | Phase 5 |

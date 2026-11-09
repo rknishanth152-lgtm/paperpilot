@@ -12,7 +12,8 @@ from app.config import Settings
 CORE_TABLES = {"papers", "documents", "passages"}
 BEFORE_SEARCH = "d2ea199dd3d3"
 AFTER_SEARCH = "e3ab5ad233d7"
-HEAD = "f4a9c1d27b60"
+AFTER_EMBEDDINGS = "f4a9c1d27b60"
+HEAD = "a7d3e5f1c829"
 
 
 @pytest.fixture
@@ -137,7 +138,7 @@ def test_embeddings_migration_adds_the_table_and_reverses(empty_engine: Engine) 
             {"d": document_id},
         )
 
-    run_alembic(empty_engine, "upgrade", "head")
+    run_alembic(empty_engine, "upgrade", AFTER_EMBEDDINGS)
 
     assert "passage_embeddings" in tables(empty_engine)
     assert extension_count(empty_engine) == 1
@@ -157,3 +158,25 @@ def extension_count(engine: Engine) -> int:
             text("SELECT count(*) FROM pg_extension WHERE extname = 'vector'")
         ).scalar_one()
     return count
+
+
+ASSESSMENT_TABLES = {
+    "reproducibility_assessments",
+    "reproducibility_items",
+    "reproducibility_item_passages",
+}
+
+
+def test_assessment_migration_adds_the_tables_and_reverses(
+    empty_engine: Engine,
+) -> None:
+    """R5: the new tables can be removed again."""
+    run_alembic(empty_engine, "upgrade", AFTER_EMBEDDINGS)
+    assert not ASSESSMENT_TABLES & tables(empty_engine)
+
+    run_alembic(empty_engine, "upgrade", "head")
+    assert ASSESSMENT_TABLES <= tables(empty_engine)
+
+    run_alembic(empty_engine, "downgrade", "-1")
+    assert not ASSESSMENT_TABLES & tables(empty_engine)
+    assert "passage_embeddings" in tables(empty_engine)

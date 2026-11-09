@@ -36,4 +36,16 @@ uv run python -m http.server 8765 --bind 127.0.0.1 --directory data/labelling
 
 Labels changed after a result was seen go in a new file, `benchmarks/claim_support_labels_v2.json`. `report --revised` saves a new result listing every changed label and marking it as made after seeing results (`CLAUDE.md` §6). The first labels and result stay in place.
 
+Reproducibility labels (R5, `FR-EVL-006`): `reproducibility_labels.py sheet` writes the labelling page to the git-ignored `data/labelling` folder. The guide is `benchmarks/reproducibility_guide_v1.md`. Labels are given before any model assesses these papers, and are saved as `benchmarks/reproducibility_labels_v1.json`:
+
+```bash
+uv run python -m tests.evaluation.reproducibility_labels sheet
+```
+
+Retrieval comparison (R4, `FR-RET-007`): `compare_retrieval.py` scores keyword, semantic and hybrid retrieval on the same questions and applies the rule fixed in advance. It sends each question once to the embedding provider:
+
+```bash
+uv run python -m tests.evaluation.compare_retrieval
+```
+
 Evaluation results are produced only by saved harness runs, never edited by hand (`CLAUDE.md` §6).
