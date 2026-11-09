@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { AssessmentItem, AssessmentResponse } from "../api/types";
-import { ChecklistPanel } from "./ChecklistPanel";
+import { ChecklistPane } from "./ChecklistPane";
 
 const DOCUMENT_ID = "0190a1b2-0000-7000-8000-000000000001";
 const URL = `/api/documents/${DOCUMENT_ID}/assessment`;
@@ -14,7 +14,7 @@ function item(overrides: Partial<AssessmentItem> = {}): AssessmentItem {
     title: "Code availability",
     question: "Does the paper say how a reader can obtain the code?",
     status: "reported",
-    status_label: "Reported",
+    status_label: "Stated in the paper",
     status_description: "The passages state this.",
     review_reason: null,
     explanation: "A link is given.",
@@ -61,7 +61,7 @@ const REVIEW = item({
   key: "data_preparation",
   title: "Data preparation",
   status: "needs_review",
-  status_label: "Needs review",
+  status_label: "Needs your review",
   status_description: "The evidence could not be verified.",
   review_reason: "evidence_unverified",
   explanation: null,
@@ -93,7 +93,7 @@ describe("before a run", () => {
   it("loads without running anything and offers to run", async () => {
     server({ [`GET ${URL}`]: NONE_YET });
 
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
     expect(await screen.findByRole("button", { name: "Run checklist" })).toBeTruthy();
     expect(vi.mocked(fetch).mock.calls).toHaveLength(1);
@@ -104,7 +104,7 @@ describe("before a run", () => {
   it("shows an error from loading in plain words and can still run", async () => {
     server({ [`GET ${URL}`]: { status: 500, body: envelope("internal_error", "It broke.") } });
 
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
     expect((await screen.findByRole("alert")).textContent).toContain("It broke.");
     expect(screen.getByRole("button", { name: "Run checklist" })).toBeTruthy();
@@ -117,13 +117,13 @@ describe("a saved assessment", () => {
       [`GET ${URL}`]: { status: 200, body: assessment({ items: [item(), NOT_FOUND, REVIEW] }) },
     });
 
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
     const row = (await screen.findByRole("heading", { name: "Software" })).closest("li");
     expect(row).toBeTruthy();
     expect(within(row as HTMLElement).getByText("Not found in the material examined")).toBeTruthy();
-    expect(screen.getByText("Reported")).toBeTruthy();
-    expect(screen.getByText("Needs review")).toBeTruthy();
+    expect(screen.getByText("Stated in the paper")).toBeTruthy();
+    expect(screen.getByText("Needs your review")).toBeTruthy();
     expect(screen.getByText("The evidence could not be verified.")).toBeTruthy();
   });
 
@@ -132,22 +132,25 @@ describe("a saved assessment", () => {
       [`GET ${URL}`]: { status: 200, body: assessment({ items: [item(), NOT_FOUND, REVIEW] }) },
     });
 
-    const { container } = render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    const { container } = render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
     await screen.findByRole("heading", { name: "Software" });
 
     expect(container.textContent).not.toMatch(/\d+\s*(of|\/)\s*\d+\s*(items|reported)/i);
     expect(container.textContent?.toLowerCase()).not.toMatch(/\bscore:|\bgrade|verdict:/);
   });
 
-  it("shows the quote and its stored location, with the full passage available", async () => {
+  it("shows the quote and its stored location, and opens it in the paper", async () => {
     server({ [`GET ${URL}`]: { status: 200, body: assessment() } });
+    const onCite = vi.fn();
+    const user = userEvent.setup();
 
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={onCite} />);
 
     expect((await screen.findByText("code is at example.org")).tagName).toBe("MARK");
     expect(screen.getByText(/5 Methods/)).toBeTruthy();
     expect(screen.getByText(/pages 3–4/)).toBeTruthy();
-    expect(screen.getByText("Our code is at example.org for everyone.")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Show in the paper" }));
+    expect(onCite).toHaveBeenCalledWith("pass-1", "code is at example.org");
   });
 
   it("says when a location is unknown", async () => {
@@ -158,7 +161,7 @@ describe("a saved assessment", () => {
     });
     server({ [`GET ${URL}`]: { status: 200, body: assessment({ items: [unknown] }) } });
 
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
     expect(await screen.findByText(/section unknown/)).toBeTruthy();
     expect(screen.getByText(/page unknown/)).toBeTruthy();
@@ -167,13 +170,14 @@ describe("a saved assessment", () => {
   it("states what was examined and what produced the result", async () => {
     server({ [`GET ${URL}`]: { status: 200, body: assessment() } });
 
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
-    expect(await screen.findByText(/8 passages examined/)).toBeTruthy();
-    const details = screen.getByText(/checklist-v1/);
+    expect(await screen.findByText(/checked 8 parts of the paper/i)).toBeTruthy();
+    await userEvent.setup().click(screen.getByRole("button", { name: "How this was checked" }));
+    const details = await screen.findByText(/checklist-v1/);
     expect(details.textContent).toContain("fake-model");
     expect(details.textContent).toContain("reproducibility-v1");
-    expect(details.textContent).toContain("semantic_cosine");
+    expect(details.textContent).toContain("by meaning");
   });
 
   it("uses the singular for one passage, and says when no model was used", async () => {
@@ -189,16 +193,17 @@ describe("a saved assessment", () => {
       },
     });
 
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
-    expect(await screen.findByText(/1 passage examined/)).toBeTruthy();
-    expect(screen.getByText(/No AI model was used/)).toBeTruthy();
+    expect(await screen.findByText(/checked 1 part of the paper/i)).toBeTruthy();
+    await userEvent.setup().click(screen.getByRole("button", { name: "How this was checked" }));
+    expect(await screen.findByText(/No AI model was used/)).toBeTruthy();
   });
 
   it("offers to run again", async () => {
     server({ [`GET ${URL}`]: { status: 200, body: assessment() } });
 
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
     expect(await screen.findByRole("button", { name: "Run again" })).toBeTruthy();
   });
@@ -211,7 +216,7 @@ describe("running", () => {
       [`POST ${URL}`]: { status: 200, body: assessment() },
     });
     const user = userEvent.setup();
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
     await user.click(await screen.findByRole("button", { name: "Run checklist" }));
 
@@ -233,7 +238,7 @@ describe("running", () => {
       ),
     );
     const user = userEvent.setup();
-    const { container } = render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    const { container } = render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
     await user.click(await screen.findByRole("button", { name: "Run checklist" }));
 
@@ -256,7 +261,7 @@ describe("running", () => {
       ),
     );
     const user = userEvent.setup();
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
     const button = await screen.findByRole("button", { name: "Run checklist" });
 
     await user.click(button);
@@ -274,7 +279,7 @@ describe("running", () => {
       [`POST ${URL}`]: { status: 429, body: envelope("model_rate_limited", "Rate limit reached.") },
     });
     const user = userEvent.setup();
-    render(<ChecklistPanel documentId={DOCUMENT_ID} />);
+    render(<ChecklistPane documentId={DOCUMENT_ID} onCite={vi.fn()} />);
 
     await user.click(await screen.findByRole("button", { name: "Run again" }));
 

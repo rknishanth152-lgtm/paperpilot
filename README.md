@@ -215,9 +215,9 @@ uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 npm --prefix frontend run dev
 ```
 
-Open `http://127.0.0.1:5173`, upload a PDF, and wait for it to reach `Parsed` or `Failed`. There is no list of uploaded documents yet: to get back to one, keep its address, or upload the same file again, which opens the existing document without processing it again.
+Open `http://127.0.0.1:5173` and add a PDF. Your papers are listed on the left; ask questions in the middle, and the paper opens on the right. Selecting a citation highlights the exact sentence it came from.
 
-Parser limits you will see in the structure view are recorded in `progress.md` §6.12. Passages are shown exactly as stored, including the parser's mistakes.
+Text is shown exactly as stored, including mistakes from reading the PDF. Known limits are recorded in `progress.md` §6.12.
 
 ## Connecting an AI model
 

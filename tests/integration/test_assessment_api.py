@@ -90,7 +90,7 @@ def test_evidence_shows_the_quote_and_the_stored_location(
     item = client.post(url(document)).json()["items"][0]
 
     assert item["status"] == "reported"
-    assert item["status_label"] == "Reported"
+    assert item["status_label"] == "Stated in the paper"
     assert item["explanation"] == "Explained."
     assert item["passages_examined"] == 1
     [evidence] = item["evidence"]
@@ -145,7 +145,7 @@ def test_a_document_not_parsed_says_so_and_never_not_found(
     for item in body["items"]:
         assert item["status"] == "needs_review"
         assert item["review_reason"] == "parse_incomplete"
-        assert item["status_label"] == "Needs review"
+        assert item["status_label"] == "Needs your review"
         assert "not fully processed" in item["status_description"]
         assert item["passages_examined"] == 0
 

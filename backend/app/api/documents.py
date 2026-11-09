@@ -23,6 +23,7 @@ from app.config import Settings, get_settings
 from app.schemas.documents import (
     DocumentResponse,
     ErrorResponse,
+    LibraryResponse,
     StructureResponse,
     UploadResponse,
 )
@@ -94,6 +95,14 @@ async def upload_document(
             **DocumentResponse.model_validate(record).model_dump(),
             "created": registration.created,
         }
+    )
+
+
+@router.get("")
+def list_documents(sessions: Sessions) -> LibraryResponse:
+    """Every paper, newest first. Holds no paper text."""
+    return LibraryResponse.model_validate(
+        {"documents": documents.list_documents(sessions)}
     )
 
 

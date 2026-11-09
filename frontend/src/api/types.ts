@@ -16,6 +16,15 @@ export interface DocumentResponse {
   updated_at: string;
 }
 
+export interface LibraryDocument {
+  document_id: string;
+  status: DocumentStatus;
+  failure_explanation: string | null;
+  original_filename: string | null;
+  title: string | null;
+  created_at: string;
+}
+
 export interface UploadResponse extends DocumentResponse {
   created: boolean;
 }

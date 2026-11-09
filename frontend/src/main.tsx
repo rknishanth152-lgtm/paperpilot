@@ -1,7 +1,7 @@
-import "@fontsource/ibm-plex-sans/400.css";
-import "@fontsource/ibm-plex-sans/500.css";
-import "@fontsource/ibm-plex-sans/600.css";
-import "@fontsource/ibm-plex-serif/400.css";
+import "@fontsource/atkinson-hyperlegible-next/400.css";
+import "@fontsource/atkinson-hyperlegible-next/500.css";
+import "@fontsource/atkinson-hyperlegible-next/600.css";
+import "@fontsource-variable/newsreader/opsz.css";
 import "./styles/tokens.css";
 import "./styles/app.css";
 

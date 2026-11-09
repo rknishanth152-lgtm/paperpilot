@@ -6,19 +6,19 @@ paper. Statements here describe what was examined, never the work itself.
 
 _PLAIN: dict[str, tuple[str, str]] = {
     "reported": (
-        "Reported",
-        "The passages examined state this. A quote is shown as evidence.",
+        "Stated in the paper",
+        "The parts of the paper we checked state this. A quote shows where.",
     ),
     "partially_reported": (
-        "Partly reported",
-        "The passages examined state part of this. A quote is shown as evidence.",
+        "Partly stated",
+        "The parts of the paper we checked state some of this. A quote shows where.",
     ),
     "not_found": (
         "Not found in the material examined",
         (
-            "The passages examined do not contain this. It does not mean the paper "
-            "leaves it out, because tables, figures, supplements and other passages "
-            "were not examined."
+            "The parts of the paper we checked do not contain this. It does not mean "
+            "the paper leaves it out, because tables, figures, supplements and other "
+            "text were not checked."
         ),
     ),
 }
@@ -32,8 +32,8 @@ _REVIEW: dict[str, str] = {
         "status is given. Check the paper directly."
     ),
     "model_uncertain": (
-        "The passages examined did not settle this, or point to a table, figure "
-        "or supplement. Check the paper directly."
+        "The parts of the paper we checked did not settle this, or point to a "
+        "table, figure or supplement. Check the paper directly."
     ),
 }
 
@@ -41,5 +41,5 @@ _REVIEW: dict[str, str] = {
 def status_text(status: str, review_reason: str | None) -> tuple[str, str]:
     """(label, description) for a stored status."""
     if status == "needs_review" and review_reason is not None:
-        return "Needs review", _REVIEW[review_reason]
+        return "Needs your review", _REVIEW[review_reason]
     return _PLAIN[status]

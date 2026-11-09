@@ -53,6 +53,16 @@ class DocumentRecord:
 
 
 @dataclass(frozen=True)
+class LibraryRecord:
+    document_id: uuid.UUID
+    status: str
+    failure_explanation: str | None
+    original_filename: str | None
+    title: str | None
+    created_at: datetime
+
+
+@dataclass(frozen=True)
 class PaperRecord:
     paper_id: uuid.UUID
     title: str | None
@@ -82,6 +92,31 @@ class StructureRecord:
     page_count: int | None
     paper: PaperRecord
     passages: list[PassageRecord]
+
+
+def list_documents(sessions: sessionmaker[Session]) -> list[LibraryRecord]:
+    """Every document, newest first, with its paper's title if it has one."""
+    with sessions() as session:
+        rows = session.execute(
+            select(Document, Paper.title)
+            .outerjoin(Paper, Document.paper_id == Paper.id)
+            .order_by(Document.created_at.desc(), Document.id.desc())
+        ).all()
+    return [
+        LibraryRecord(
+            document_id=document.id,
+            status=document.status,
+            failure_explanation=(
+                FAILURE_EXPLANATIONS[document.failure_reason]
+                if document.failure_reason
+                else None
+            ),
+            original_filename=document.original_filename,
+            title=title,
+            created_at=document.created_at,
+        )
+        for document, title in rows
+    ]
 
 
 def get_document(

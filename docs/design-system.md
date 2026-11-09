@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **§2 agreed and implemented** (P3-T9, `frontend/src/styles/tokens.css`). §3 motion: only the tokens and patterns used so far are implemented; the rest remains proposed. |
+| Status | **§1 and §2 agreed and implemented** (redesign, 2026-11-09). §3 motion: only the tokens and patterns used so far are implemented; the rest remains proposed. |
 | Owns | Visual and motion tokens, reusable patterns, implementation conventions |
 | Implements | `NFR-UX-001` (interface quality) and `NFR-ACC-001` in `PRD.md` |
 | Does not own | Requirements (`PRD.md`), working rules (`CLAUDE.md`) |
@@ -11,54 +11,52 @@ This document is where tokens live once agreed. Components use tokens from here,
 
 ## 1. Product character
 
-PaperPilot is a concentration tool for reading and checking evidence. The interface should feel **precise, calm and trustworthy**: the evidence and its status are the most important things on any screen. Visual direction: cool grey-white surfaces, near-black ink, one ink-blue accent, and a reading serif for source text (agreed with the developer at P3-T9).
+PaperPilot is a reading desk for students and researchers: your papers, the conversation about one paper, and the paper itself. Agreed with the developer on 2026-11-09, replacing the earlier design. Areas are separated by tone and space, not cards. The one memorable moment is the highlighter drawn over the exact sentence behind a citation.
 
-**Developer requirements (2026-11-03):**
+On screen, words describe what people do, not how PaperPilot is built. Technical details such as the model and search method stay inside "How this answer was made".
 
-- **Light theme first.** The primary design is a light theme. No dark background with neon or acid-bright accents: the developer considers that look "AI slop". A dark mode, if ever added, is secondary and also avoids neon.
-- **Polished, purposeful motion** as defined in §3.
-- **Colour theme explained before building.** Before any UI is implemented, the proposed palette is presented to the developer (named colours, hex values, where each is used and why) and agreed.
+**Developer requirements:** light theme first, with no dark background and no neon accents. The colour theme is explained and agreed before any UI is built.
 
 ## 2. Visual tokens
 
-Agreed with the developer at P3-T9. The CSS custom properties in `frontend/src/styles/tokens.css` are the implementation. Contrast ratios were measured in the browser from those tokens.
+`frontend/src/styles/tokens.css` is the implementation. Contrast was measured from these values.
 
 | Colour | Hex | Use |
 |---|---|---|
-| Mist | `#F5F7FA` | Page background |
-| Sheet | `#FFFFFF` | Panels |
-| Frost | `#EDF0F4` | Passage blocks |
-| Rule | `#D9DEE5` | Borders, dividers |
-| Ink | `#161A1F` | Body and passage text (16.28:1 on Mist, 15.29:1 on Frost) |
-| Slate text | `#535B66` | Secondary text, labels (6.40:1 on Mist, 6.01:1 on Frost) |
-| Ink blue | `#1F4F82` | Primary button, links, focus ring (7.83:1 on Mist; white text on it 8.40:1) |
-| Ink blue hover | `#183F69` | Primary button hover |
-| Blue wash | `#E6EEF7` | Hover, selected (Ink blue on it 7.18:1) |
-| Marker | `#FFF1B8` | The evidence passage a citation points to (Ink on it 15.42:1, Slate text 6.06:1) |
+| Lichen | `#EEF2EE` | The desk behind everything |
+| Fern | `#E2E9E4` | Hover on the desk |
+| Sheet | `#FFFFFF` | The paper being read (Ink 15.43:1) |
+| Ink | `#1B2723` | Text (13.64:1 on Lichen) |
+| Moss | `#566660` | Secondary text (5.36:1 on Lichen, 6.06:1 on Sheet) |
+| Deep teal | `#0E5A5E` | Buttons, links, citations (7.03:1 on Lichen; white on it 7.95:1) |
+| Teal wash | `#DDEBEA` | Citations at rest (teal on it 6.49:1) |
+| Highlighter | `#FFE36E` | The sentence behind a citation (Ink on it 12.10:1) |
 
-| Status | Text on background | Contrast | Icon |
-|---|---|---|---|
-| Pending | `#4A5560` on `#EEF0F2` | 6.66:1 | Clock |
-| Processing | `#8A5A00` on `#FBF1DC` | 5.28:1 | Spinner |
-| Parsed | `#1E6B3A` on `#E5F2E8` | 5.65:1 | Check |
-| Failed | `#A3302A` on `#FBEAE7` | 5.98:1 | Alert |
+| Paper status | Words shown |
+|---|---|
+| `pending` | Waiting to start |
+| `processing` | Reading this paper… |
+| `parsed` | Ready to read |
+| `failed` | Couldn't read this file |
 
-Reporting checklist statuses (agreed with the developer at R7). Existing colours only, with deliberately no red or green, so nothing reads as a pass or fail grade (`FR-REP-004`).
+Reporting checklist statuses use existing colours only, with deliberately no red or green, so nothing reads as a pass or fail grade (`FR-REP-004`).
 
-| Status | Text on background | Contrast | Icon |
-|---|---|---|---|
-| Reported | `#1F4F82` on `#E6EEF7` | 7.18:1 | Check |
-| Partly reported | `#1F4F82` on `#FFFFFF`, inset `#D9DEE5` border | 8.40:1 | Half circle |
-| Not found in the material examined | `#4A5560` on `#EEF0F2` | 6.66:1 | Info |
-| Needs review | `#8A5A00` on `#FBF1DC` | 5.28:1 | Alert |
+| Status | Words shown | Text on background | Contrast | Icon |
+|---|---|---|---|---|
+| `reported` | Stated in the paper | `#0E5A5E` on `#DDEBEA` | 6.49:1 | Check |
+| `partially_reported` | Partly stated | `#0E5A5E` on `#FFFFFF`, inset border | 7.95:1 | Half circle |
+| `not_found` | Not found in the material examined | `#46534D` on `#E8ECE9` | 6.76:1 | Info |
+| `needs_review` | Needs your review | `#7D5200` on `#FBF0D6` | 6.02:1 | Alert |
 
 A status is always a word plus an icon; colour only reinforces it (`NFR-ACC-001`).
 
-**Type.** IBM Plex Sans (interface; 400, 500, 600) and IBM Plex Serif (paper titles and passage text; 400), self-hosted through `@fontsource`, so no font request leaves the machine. Sizes: `--text-sm` 13px, `--text-base` 15px, `--text-reading` 17px, `--text-lg` 20px, `--text-xl` 24px. Passage text is limited to `--measure-reading` (68 characters wide).
+**Type.** Newsreader for paper text, answers and titles, chosen for long reading. Atkinson Hyperlegible Next for the interface, chosen for legibility. Both are self-hosted, so no font request leaves the machine.
 
-**Space and shape.** `--space-1` to `--space-7` (4, 8, 12, 16, 24, 32, 48 px); `--radius-sm` 4px, `--radius-md` 8px. No shadows or gradients.
+**Components.** `react-aria-components` for tabs, tooltips and disclosure sections, `react-resizable-panels` for the three areas, `lucide-react` for icons. Styling is plain CSS with these tokens.
 
-**Breakpoints.** At 64rem (1024px) and above, the section list becomes a sticky left column. At 30rem (480px) and below, page and panel padding tighten.
+**Layout.** At 64rem and above, three resizable areas. Below that, one area at a time with tabs along the bottom.
+
+**Logo.** Lines of text that form a heading, the highlighted line leading. `frontend/public/favicon.svg` and `components/Logo.tsx`.
 
 ## 3. Motion system
 

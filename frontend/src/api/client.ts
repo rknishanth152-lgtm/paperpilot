@@ -6,6 +6,7 @@ import type {
   AnswerResponse,
   AssessmentResponse,
   DocumentResponse,
+  LibraryDocument,
   StructureResponse,
   UploadResponse,
 } from "./types";
@@ -80,6 +81,10 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     // between, such as the dev proxy when the backend is stopped.
     "The PaperPilot server did not respond properly. Check that the backend is running, then try again.",
   );
+}
+
+export function listDocuments(): Promise<{ documents: LibraryDocument[] }> {
+  return request<{ documents: LibraryDocument[] }>(BASE);
 }
 
 export function uploadDocument(file: File): Promise<UploadResponse> {

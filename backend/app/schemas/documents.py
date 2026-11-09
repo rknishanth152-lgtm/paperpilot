@@ -27,6 +27,21 @@ class DocumentResponse(_Contract):
     updated_at: datetime
 
 
+class LibraryDocument(_Contract):
+    """One row of the library. A null title means none was found."""
+
+    document_id: uuid.UUID
+    status: DocumentStatus
+    failure_explanation: str | None
+    original_filename: str | None
+    title: str | None
+    created_at: datetime
+
+
+class LibraryResponse(_Contract):
+    documents: list[LibraryDocument]
+
+
 class UploadResponse(DocumentResponse):
     """`created` is false when an identical file was already uploaded (PRD §8.3)."""
 
