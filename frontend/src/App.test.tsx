@@ -144,7 +144,7 @@ describe("the library", () => {
 
     await userEvent.setup().click(await screen.findByRole("button", { name: /A Synthetic Paper/ }));
 
-    expect(await screen.findByRole("heading", { level: 1, name: "A Synthetic Paper" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { level: 2, name: "A Synthetic Paper" })).toBeTruthy();
     expect(window.location.search).toBe(`?document=${ID}`);
   });
 
@@ -176,6 +176,66 @@ describe("the library", () => {
     render(<App pollIntervalMs={POLL} />);
 
     expect(await screen.findByText(/isn't in your library/i)).toBeTruthy();
+  });
+});
+
+function narrowScreen(): void {
+  vi.stubGlobal(
+    "matchMedia",
+    (query: string) =>
+      ({
+        matches: false,
+        media: query,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      }) as unknown as MediaQueryList,
+  );
+}
+
+describe("page structure (R10, axe findings)", () => {
+  it("has one top-level heading and a main area that the skip link reaches", async () => {
+    on("GET", LIST, ok({ documents: [] }));
+
+    render(<App pollIntervalMs={POLL} />);
+    await screen.findByText(/your library is empty/i);
+
+    const top = screen.getAllByRole("heading", { level: 1 });
+    expect(top.map((heading) => heading.textContent)).toEqual(["PaperPilot"]);
+    expect(screen.getByRole("main").id).toBe("main");
+    expect(screen.getByRole("link", { name: "Skip to content" }).getAttribute("href")).toBe("#main");
+  });
+
+  it("keeps the main area and heading on a narrow screen showing the library", async () => {
+    narrowScreen();
+    on("GET", LIST, ok({ documents: [row()] }));
+
+    render(<App pollIntervalMs={POLL} />);
+    await screen.findByRole("button", { name: /A Synthetic Paper/ });
+
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("main").id).toBe("main");
+  });
+
+  it("names the handles that resize each area", async () => {
+    window.history.replaceState(null, "", `/?document=${ID}`);
+    ready();
+
+    render(<App pollIntervalMs={POLL} />);
+    await screen.findByText("A synthetic sentence.");
+
+    expect(
+      screen.getAllByRole("separator").map((handle) => handle.getAttribute("aria-label")),
+    ).toEqual(["Resize the library", "Resize the paper"]);
+  });
+
+  it("lets the keyboard reach the paper so it can be scrolled", async () => {
+    window.history.replaceState(null, "", `/?document=${ID}`);
+    ready();
+
+    render(<App pollIntervalMs={POLL} />);
+    await screen.findByText("A synthetic sentence.");
+
+    expect(screen.getByRole("region", { name: "The paper" }).getAttribute("tabindex")).toBe("0");
   });
 });
 

@@ -94,13 +94,13 @@ export function PaperPane({ documentId, focus }: { documentId: string; focus: Pa
   const { paper, passages } = structure;
   return (
     <article>
-      <h1 className="paper-title">{paper.title ?? "Untitled paper"}</h1>
+      <h2 className="paper-title">{paper.title ?? "Untitled paper"}</h2>
       <p className="muted byline">
         {paper.authors.length > 0 ? paper.authors.join(", ") : "Authors unknown"}
       </p>
       {groupPassages(passages).map((group) => (
         <section key={group.key}>
-          <h2 className="section-title">{group.label}</h2>
+          <h3 className="section-title">{group.label}</h3>
           {group.passages.map((passage) => (
             <Para key={passage.passage_id} passage={passage} focus={focus} />
           ))}

@@ -65,7 +65,7 @@ describe("the paper", () => {
 
     render(<PaperPane documentId={ID} focus={null} />);
 
-    expect(await screen.findByRole("heading", { level: 1, name: "A Paper" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { level: 2, name: "A Paper" })).toBeTruthy();
     expect(screen.getByText("Ada Example")).toBeTruthy();
     expect(
       screen.getByText((_, element) => element?.textContent === "Spaced   text,  kept." && element.tagName === "P"),
@@ -92,7 +92,7 @@ describe("the paper", () => {
 
     render(<PaperPane documentId={ID} focus={null} />);
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Untitled paper" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { level: 2, name: "Untitled paper" })).toBeTruthy();
   });
 
   it("explains a loading failure", async () => {

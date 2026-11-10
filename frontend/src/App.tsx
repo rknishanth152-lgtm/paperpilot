@@ -26,7 +26,7 @@ type Area = "library" | "work" | "paper";
 function Home({ onAdded }: { onAdded: (upload: UploadResponse) => void }) {
   return (
     <div className="home">
-      <h1 className="home-title">Start with a paper</h1>
+      <h2 className="home-title">Start with a paper</h2>
       <p className="home-text">
         Add a PDF, ask questions in your own words, and see the exact sentence behind every
         answer.
@@ -91,7 +91,7 @@ function PaperArea({
   if (document.status === "failed") {
     return (
       <div className="placeholder">
-        <h1 className="paper-title">{STATUS_TEXT.failed}</h1>
+        <h2 className="paper-title">{STATUS_TEXT.failed}</h2>
         <p>{document.failure_explanation ?? "No reason was recorded."}</p>
         {retryProblem && (
           <p className="alert small" role="alert">
@@ -202,12 +202,13 @@ export default function App({ pollIntervalMs = POLL_INTERVAL_MS }: { pollInterva
     );
   }
 
-  const workPane = (
-    <main id="main" className="pane work">
-      {work}
-    </main>
+  // The skip link's target. On a narrow screen the whole visible area is the
+  // main region, so it exists whichever area is showing.
+  const paperPane = (
+    <section className="sheet" aria-label="The paper" tabIndex={0}>
+      {paper}
+    </section>
   );
-  const paperPane = <section className="sheet" aria-label="The paper">{paper}</section>;
 
   return (
     <div className="app">
@@ -215,10 +216,10 @@ export default function App({ pollIntervalMs = POLL_INTERVAL_MS }: { pollInterva
         Skip to content
       </a>
       <header className="topbar">
-        <span className="logo">
+        <h1 className="logo">
           <LogoMark />
           PaperPilot
-        </span>
+        </h1>
         <span className="tagline">Read research with every answer traced to its source</span>
       </header>
 
@@ -227,11 +228,13 @@ export default function App({ pollIntervalMs = POLL_INTERVAL_MS }: { pollInterva
           <Panel defaultSize="21%" minSize="15%">
             {library}
           </Panel>
-          <Separator className="gutter" />
+          <Separator className="gutter" aria-label="Resize the library" />
           <Panel defaultSize={paper ? "37%" : "79%"} minSize="26%">
-            {workPane}
+            <main id="main" className="pane work">
+              {work}
+            </main>
           </Panel>
-          {paper && <Separator className="gutter" />}
+          {paper && <Separator className="gutter" aria-label="Resize the paper" />}
           {paper && (
             <Panel defaultSize="42%" minSize="26%">
               <div className="pane">{paperPane}</div>
@@ -240,11 +243,11 @@ export default function App({ pollIntervalMs = POLL_INTERVAL_MS }: { pollInterva
         </Group>
       ) : (
         <div className="narrow">
-          <div className="narrow-area">
+          <main id="main" className="narrow-area">
             {area === "library" && library}
-            {area === "work" && workPane}
+            {area === "work" && <div className="pane work">{work}</div>}
             {area === "paper" && <div className="pane">{paperPane}</div>}
-          </div>
+          </main>
           <nav className="bottom-nav" aria-label="Sections">
             <button
               type="button"

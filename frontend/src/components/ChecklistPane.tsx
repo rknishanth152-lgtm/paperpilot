@@ -37,7 +37,15 @@ function asMessage(error: unknown): string {
   return error instanceof ApiError ? error.message : "The checklist failed. Try again.";
 }
 
-function Evidence({ evidence, onCite }: { evidence: AssessmentEvidence; onCite: OnCite }) {
+function Evidence({
+  evidence,
+  title,
+  onCite,
+}: {
+  evidence: AssessmentEvidence;
+  title: string;
+  onCite: OnCite;
+}) {
   return (
     <li className="check-evidence">
       <p className="check-quote">
@@ -50,6 +58,7 @@ function Evidence({ evidence, onCite }: { evidence: AssessmentEvidence; onCite: 
         <button
           type="button"
           className="link-button"
+          aria-label={`Show the ${title} quote in the paper`}
           onClick={() => onCite(evidence.passage_id, evidence.quote)}
         >
           Show in the paper
@@ -76,7 +85,12 @@ function Item({ item, onCite }: { item: AssessmentItem; onCite: OnCite }) {
       {item.evidence.length > 0 && (
         <ul>
           {item.evidence.map((evidence) => (
-            <Evidence key={evidence.passage_id} evidence={evidence} onCite={onCite} />
+            <Evidence
+              key={evidence.passage_id}
+              evidence={evidence}
+              title={item.title}
+              onCite={onCite}
+            />
           ))}
         </ul>
       )}

@@ -149,7 +149,7 @@ describe("a saved assessment", () => {
     expect((await screen.findByText("code is at example.org")).tagName).toBe("MARK");
     expect(screen.getByText(/5 Methods/)).toBeTruthy();
     expect(screen.getByText(/pages 3–4/)).toBeTruthy();
-    await user.click(screen.getByRole("button", { name: "Show in the paper" }));
+    await user.click(screen.getByRole("button", { name: "Show the Code availability quote in the paper" }));
     expect(onCite).toHaveBeenCalledWith("pass-1", "code is at example.org");
   });
 

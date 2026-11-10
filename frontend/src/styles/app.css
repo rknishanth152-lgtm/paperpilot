@@ -93,6 +93,7 @@ ul {
 
 .logo {
   display: inline-flex;
+  margin: 0;
   align-items: center;
   gap: var(--s2);
   font: 600 1.4375rem / 1 var(--font-read);
