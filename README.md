@@ -145,6 +145,7 @@ PaperPilot was built by a student with Claude Code as a learning project, one sm
 | [`docs/experiments/`](docs/experiments/) | Evaluation reports |
 | [`docs/reviews/release-review.md`](docs/reviews/release-review.md) | Security, privacy and licence review |
 | [`docs/design-system.md`](docs/design-system.md) | Colours, type and motion |
+| [`docs/history/commit-id-map.md`](docs/history/commit-id-map.md) | Old and new commit IDs after the history was rewritten |
 | [`CLAUDE.md`](CLAUDE.md) | Working rules for development with Claude Code |
 
 ## Licence
