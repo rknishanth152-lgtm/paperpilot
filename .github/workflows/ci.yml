@@ -1,0 +1,101 @@
+# Runs every check from README.md on each push and pull request (P0-T9, R9).
+# PostgreSQL and GROBID run as throwaway service containers, so integration tests
+# run too. No AI model is called: tests use the fake provider, and no key is set.
+# Actions are pinned to the commit of their release, checked 2026-11-10.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.7-pg18-trixie
+        env:
+          POSTGRES_DB: paperpilot
+          POSTGRES_USER: paperpilot
+          # A throwaway container that exists only for this job; not a secret.
+          POSTGRES_PASSWORD: ci-only-not-a-secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U paperpilot -d paperpilot"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+      grobid:
+        image: grobid/grobid:0.9.1-crf
+        ports:
+          - 8070:8070
+        options: >-
+          --init
+          --health-cmd "curl -fsS http://localhost:8070/api/isalive"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 30
+          --health-start-period 30s
+    env:
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: paperpilot
+      POSTGRES_USER: paperpilot
+      POSTGRES_PASSWORD: ci-only-not-a-secret
+      GROBID_URL: http://127.0.0.1:8070
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - name: Install
+        run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format
+        run: uv run ruff format --check .
+      - name: Types
+        run: uv run mypy .
+      - name: Migrations
+        run: |
+          uv run alembic upgrade head
+          uv run alembic check
+      - name: Tests, unit and integration
+        run: uv run pytest -q -m "integration or not integration"
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Types
+        run: npm run typecheck
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Audit runtime dependencies
+        run: npm audit --omit=dev
