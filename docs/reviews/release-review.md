@@ -57,6 +57,10 @@ The repository is MIT, chosen by the developer on 2026-11-10.
 
 All are compatible with an MIT project when used as they are. The LGPL and MPL packages are used unmodified as libraries, and the OFL fonts are bundled unchanged. GROBID (Apache-2.0) runs as a separate service and is not part of this code.
 
+**Bundled Claude Code skills** (checked in R12, 2026-11-10). `.claude/skills/` holds six third-party skills used while building the project, each with its licence file: `design-motion-principles` (MIT, Kyle Zantos), `systematic-debugging`, `test-driven-development` and `verification-before-completion` (MIT, Jesse Vincent), `ui-ux-pro-max` (MIT, Next Level Builder), and `playwright-cli` (Apache-2.0, Microsoft). The Apache-2.0 text for `playwright-cli` was missing and was added from the upstream repository. `paperpilot-engineering` is the project's own.
+
+**Before going public** (R12): the full history up to 221c70c was scanned again, about 131,000 added lines, with no secret found, and no PDF, `.env` or `data/` file was ever committed. Older commits show the developer's email address as author; the developer chose to keep the history unchanged, and later commits use a GitHub no-reply address. `notes/` is published by the developer's choice: the developer's own learning notes, with short quotes from two tutorial videos' captions.
+
 ## 5. Continuous integration
 
 `.github/workflows/ci.yml` runs on every push to `main` and every pull request: lint, formatting, types, migrations and `alembic check`, every backend test including integration tests against real PostgreSQL and GROBID containers, then the frontend types, tests, build and runtime audit. Actions are pinned to the commit of their release, the workflow can only read the repository, and no secret is configured, so no AI model is called in CI.
