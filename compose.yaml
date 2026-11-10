@@ -8,6 +8,10 @@ name: paperpilot
 services:
   postgres:
     image: pgvector/pgvector:0.8.7-pg18-trixie
+    # A rejected row is written to the server log with its values, which can be
+    # paper text (NFR-PRI-002). Log only fatal problems; the application still
+    # receives every error. Found in the R9 review.
+    command: ["postgres", "-c", "log_min_messages=fatal", "-c", "log_min_error_statement=panic"]
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-paperpilot}
       POSTGRES_USER: ${POSTGRES_USER:-paperpilot}

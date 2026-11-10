@@ -255,6 +255,10 @@ Create the missing ones. This sends the text of those passages to Google, so use
 uv run python scripts/embed_passages.py
 ```
 
+## Licence
+
+MIT. See `LICENSE`. Dependency licences are reviewed in `docs/reviews/release-review.md`.
+
 ## Important limits
 
 - **Local, single-user only.** There is no authentication. Do not expose PaperPilot to a shared or public network (`NFR-SEC-006`).
