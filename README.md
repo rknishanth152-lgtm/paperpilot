@@ -1,267 +1,152 @@
-# PaperPilot
+<p align="center">
+  <img src="docs/brand/paperpilot-banner.svg" alt="PaperPilot: read research with every answer traced to its source" width="840">
+</p>
 
-An evidence-first research intelligence and scientific-reproducibility platform. It turns academic papers into structured, searchable knowledge in which every derived statement links to a stored source passage.
+<p align="center">
+  <a href="https://github.com/rknishanth152-lgtm/paperpilot/actions/workflows/ci.yml"><img src="https://github.com/rknishanth152-lgtm/paperpilot/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-0E5A5E" alt="MIT licence"></a>
+</p>
 
-**Status:** Phase 0 (environment setup); local services run. No application code exists yet. What is actually done and verified is recorded in [`progress.md`](progress.md).
+PaperPilot reads academic papers and answers questions about them, and every sentence it gives you links to the exact passage it came from. Click a citation and the paper opens with the quoted words highlighted. A second view checks what a paper says about six things a reader needs to repeat the work, such as where the data and code are, and shows the quote for each.
 
-## Documents
+It runs on your own computer. It is a student project, built step by step with tests and measured against a small labelled set of papers. The results and their limits are reported below as they came out.
 
-| Document | Purpose |
-|---|---|
-| [`PRD.md`](PRD.md) | Requirements, decisions, open questions |
-| [`docs/implementation-roadmap.md`](docs/implementation-roadmap.md) | Phase order, tasks, exit criteria |
-| [`progress.md`](progress.md) | Verified state, decisions log, verification log |
-| [`CLAUDE.md`](CLAUDE.md) | Rules for development with Claude Code |
-| [`docs/design-system.md`](docs/design-system.md) | Design and motion system (proposed) |
+![Asking a question: three answer sentences, each with a numbered source, and the paper on the right with the quote for source 2 highlighted](docs/images/ask-and-cite.png)
 
-`notes/` holds learning notes. They are not requirements.
+<sub>The paper shown is Errington et al. (2021), "Investigating the replicability of preclinical cancer biology", *eLife* 10:e71601, [doi:10.7554/eLife.71601](https://doi.org/10.7554/eLife.71601), CC BY 4.0. Screenshot of PaperPilot running locally with Gemini 3.5 Flash-Lite on 2026-11-10.</sub>
 
-## Prerequisites
+## What it does
 
-Verified on the developer's machine on 2026-11-03 (see `progress.md` §7):
+- **Answers with sources you can check.** You ask a question about one paper or several. PaperPilot finds the five most relevant passages, asks the model for an answer that quotes them, and then checks in code that every quote really appears in the passage it cites. An answer that fails the check is marked as failed, not shown as if it were fine.
+- **Says when the paper does not answer.** If the passages found do not answer the question, you get "not enough evidence" rather than a guess.
+- **Shows where each quote is.** Section and page come from the stored paper, never from the model. Selecting a source scrolls the paper to the quote and highlights it.
+- **Reporting checklist.** For six items (data access, code availability, data preparation, analysis procedure, measures and comparisons, software environment) it shows whether the paper states them, with the quote. "Not found in the material examined" is never presented as a verdict on the paper, and a paper that could not be read fully gets "needs your review" instead.
+- **Plain wording.** The interface avoids internal terms, keeps answers when you switch views, and works on a phone-sized screen.
 
-- Docker Desktop with the WSL 2 backend
-- Git
-- Node.js 24 with npm (frontend)
+![Reporting checklist: data access and code availability marked "Stated in the paper" with their quotes, and the data availability statement highlighted in the paper](docs/images/reporting-checklist.png)
 
-- uv 0.13 and Python 3.14 (below)
+<sub>Same paper and licence as above.</sub>
 
-## Python environment
+<details>
+<summary>Phone-sized layout</summary>
 
-The project uses [uv](https://docs.astral.sh/uv/) with Python 3.14 (pinned in `.python-version`). Tools: pytest, ruff, mypy (`pyproject.toml`).
+<img src="docs/images/library-narrow.png" alt="The library on a 390-pixel-wide screen, with Library, Ask and Paper tabs at the bottom" width="300">
 
-**One-time machine setup** (done on the developer's machine 2026-11-03):
+</details>
 
-```bash
-winget install --id astral-sh.uv -e --scope user
+## How it works
+
+```mermaid
+flowchart LR
+    subgraph local["On your computer"]
+        UI["Browser<br/>React + TypeScript"] -->|"/api"| API["FastAPI"]
+        API --> ING["Ingestion"]
+        ING --> GROBID["GROBID<br/>reads the PDF"]
+        API --> ANS["Answering"]
+        API --> REP["Reporting checklist"]
+        ANS --> RET["Retrieval<br/>semantic or keyword"]
+        REP --> RET
+        ANS --> VAL["Schema and<br/>quote checks"]
+        REP --> VAL
+        ING --> DB[("PostgreSQL + pgvector")]
+        RET --> DB
+        REP --> DB
+    end
+    ANS --> LLM["AI provider<br/>Gemini or Claude"]
+    REP --> LLM
 ```
 
-Set two user environment variables so uv keeps Python and its cache on E: (C: is short of space, and the Claude desktop app cannot use uv's default AppData location): `UV_PYTHON_INSTALL_DIR=E:\uv\python` and `UV_CACHE_DIR=E:\uv\cache`. Open a new terminal afterwards. Then:
+1. **Reading a paper.** An uploaded PDF is checked by its content, stored under a generated name, and sent to [GROBID](https://github.com/kermitt2/grobid), which splits it into sections. Each paragraph and caption becomes a stored **passage** with its section and page (the reference list is left out). Passages never change after they are stored, and an identical file uploaded twice is not stored twice.
+2. **Finding passages.** By default each question is matched against passage embeddings (`gemini-embedding-2`, exact cosine search in pgvector). If some passages have no embedding yet, PostgreSQL full-text search is used instead, and the answer says which method was used.
+3. **Answering.** The model sees the passages under short labels such as `S1`, `S2`, and must reply in a fixed JSON format. Code maps each label back to a stored passage, and marks the answer as failed if a label is unknown or a quote is not found in its passage. There is no agent loop.
+4. **What is stored.** Source text and machine-generated results live in separate tables. Every checklist result records the passages it used and the model, prompt and checklist versions that produced it. Answers are not stored.
 
-```bash
-uv python install 3.14
-```
+The backend is a single FastAPI application with separate modules for ingestion, retrieval, answering and the checklist. The design decisions and their reasons are in [`PRD.md`](PRD.md).
 
-**In the repository** (verified 2026-11-03):
+## Measured results
 
-```bash
-uv sync
-```
+All figures come from saved runs in [`benchmarks/results/`](benchmarks/results/). The sets are small: 5 open-access papers, 20 questions (16 answerable, 4 not) and 18 checklist items, labelled by one person, the developer. Read them as a check that the system behaves as designed, not as general accuracy.
 
-```bash
-uv run ruff check .
-```
-
-```bash
-uv run ruff format --check .
-```
-
-```bash
-uv run pytest
-```
-
-This runs the unit tests only: fast and offline. Tests that need PostgreSQL or GROBID live in `tests/integration` and run only when asked, with the services started (`docker compose up -d --wait`). If a service is down they fail with instructions rather than being skipped:
-
-```bash
-uv run pytest -m integration
-```
-
-Schema tests never touch your development database: they create a temporary database (`<POSTGRES_DB>_test`) on the same server, migrate it with Alembic, and drop it afterwards.
-
-Test folders: `tests/unit` (default), `tests/integration` (marker `integration`), `tests/evaluation` (marker `evaluation`, from Phase 4). Markers are applied by folder in `tests/conftest.py`.
-
-```bash
-uv run mypy .
-```
-
-## Database migrations
-
-The schema is managed with Alembic (migrations in `backend/migrations/`). The database connection comes from `.env` through `backend/app/config.py`; `alembic.ini` holds only logging settings. Run from the repository folder with PostgreSQL running (verified 2026-11-03):
-
-```bash
-uv run alembic upgrade head
-```
-
-```bash
-uv run alembic current
-```
-
-`uv run alembic check` reports whether the models and the migrations disagree. Alembic reads its settings from `pyproject.toml` in the current folder, so run these commands from the repository folder.
-
-## Configuration
-
-All settings are read in one place, `backend/app/config.py`, from environment variables and `.env`. `.env.example` lists every setting with a placeholder; the same `POSTGRES_*` values configure Docker Compose and the backend. The backend refuses to start with a missing or invalid value.
-
-## Local services (PostgreSQL and GROBID)
-
-Defined in [`compose.yaml`](compose.yaml). Both are reachable from this computer only (`127.0.0.1`).
-
-| Service | Image | Address |
+| What was measured | Result | Report |
 |---|---|---|
-| PostgreSQL 18 (pgvector available, not enabled) | `pgvector/pgvector:0.8.7-pg18-trixie` | `127.0.0.1:5432` |
-| GROBID 0.9.1 (CPU, CRF models) | `grobid/grobid:0.9.1-crf` | `http://127.0.0.1:8070` |
+| Expected passage among the top 5 retrieved, semantic search | 16 of 16 (keyword search: 8 of 16) | [Retrieval comparison](docs/experiments/retrieval-comparison.md) |
+| Answerable questions answered with every citation passing validation | 16 of 16, latest run (2026-11-10) | [Retrieval comparison](docs/experiments/retrieval-comparison.md) |
+| Citations whose quote was found in the cited passage | 29 of 29, latest run | same run |
+| Unanswerable questions correctly refused | 4 of 4, latest run | same run |
+| Statements supported by their cited passages, as judged by the labeller | 20 of 20 (keyword-search answers) | [Baseline report](docs/experiments/vs1-baseline-report.md) |
+| Statements that fully answer the question | 12 of 20 | [Baseline report](docs/experiments/vs1-baseline-report.md) |
+| Checklist items agreeing with the labels | 15 of 18; always answering "stated" would get 16 of 18 | [Checklist baseline](docs/experiments/reproducibility-baseline.md) |
 
-GROBID uses about 3 GB of memory while running.
+Some of these need reading with care:
 
-**First time:** create `.env` from `.env.example` and set `POSTGRES_PASSWORD` to a value of your own. `.env` is never committed.
+- **16 of 16 for semantic search is on questions written against these same papers.** It shows that keyword search was failing on vocabulary. It does not show that semantic search will find the right passage on any paper.
+- **A passing citation check proves the quote exists, not that it supports the sentence.** Whether a passage supports a statement was judged by hand on 20 statements, one labeller, with three labels revised after seeing the first results. Both sets of labels are kept and reported.
+- **The checklist does not beat the simplest guess.** Its disagreements were all cautious: every item it marked "stated" was labelled "stated", and it never claimed more than the labeller did.
 
-Run from the repository folder (verified 2026-11-03, see `progress.md` §7):
+Engineering checks, run on every push by [CI](.github/workflows/ci.yml): 1,191 backend tests (696 unit, 495 against real PostgreSQL and GROBID containers), 72 frontend tests, ruff, mypy, migration checks, a production build and `npm audit`. `pip-audit` found no known vulnerabilities in the Python packages when run for the [release review](docs/reviews/release-review.md). Rules about evidence, validation and statuses were also checked by deliberately breaking the code and confirming a test fails. Accessibility was checked with axe-core (WCAG 2.2 AA) with no violations on the screens tested, along with keyboard-only use and reduced-motion settings.
 
-```bash
-docker compose up -d --wait
-```
+## Known limitations
 
-```bash
-docker compose ps
-```
+- **Local and single-user only.** There is no sign-in. Do not put it on a shared or public network.
+- **Small evaluation.** Five papers, one labeller, one model family (Gemini). Results may differ on other papers, fields or models. The Claude provider is implemented and unit-tested but was not used for the measured runs.
+- **Reading PDFs is imperfect.** Text is shown exactly as GROBID extracted it, including joined words, stray figure text and broken equations. Section titles can be missing or wrong.
+- **New papers are not embedded automatically.** Until you run the embedding script, questions on them use keyword search, which found the right passage less often.
+- **Support is not checked automatically.** The interface tells you every quote was found, and asks you to judge whether the source fully proves the sentence.
+- **Text leaves your computer when you ask.** Questions, the passages found and checklist inputs are sent to the AI provider you configure. On Gemini's free tier, Google may use that content and people may read it, so use it only with open-access papers.
+- **Not built yet:** extracting datasets and metrics, searching for papers online, and comparing papers side by side. These are planned after v1.0 ([roadmap](docs/implementation-roadmap.md)).
+- **Not tested:** use with a real screen reader, and a first-time setup on a machine without Docker images and package caches already downloaded.
 
-```bash
-curl.exe http://127.0.0.1:8070/api/isalive
-```
+## Quick start
 
-The last command prints `true` when GROBID is ready. In Windows PowerShell, type `curl.exe`, not `curl` (which is a different PowerShell command).
-
-`compose.yaml` fixes the Docker project name to `paperpilot`. A second checkout of this repository on the same computer therefore controls the **same** containers and database volume. To run a separate copy (for example a fresh-clone check), stop the first one and set `COMPOSE_PROJECT_NAME` to another name in that terminal.
-
-Stop the services (database data is kept in the `paperpilot_postgres-data` volume):
-
-```bash
-docker compose down
-```
-
-## Running the backend
-
-The backend has a health endpoint and the document API (upload, status, structure, retry). It reads `.env` at startup and refuses to start if a setting is missing or invalid. Run from the repository folder (verified 2026-11-03):
+You need Docker Desktop, Git, Node.js 24, and [uv](https://docs.astral.sh/uv/). The full guide, with every check and the API reference, is in [`docs/getting-started.md`](docs/getting-started.md).
 
 ```bash
+git clone https://github.com/rknishanth152-lgtm/paperpilot.git
+cd paperpilot
+cp .env.example .env          # then set POSTGRES_PASSWORD, and LLM_API_KEY to ask questions
+uv sync
+docker compose up -d --wait   # PostgreSQL and GROBID, on this computer only
+uv run alembic upgrade head
 uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
-Run **one** server process (uvicorn's default; do not pass `--workers`). At startup the server marks every document still `processing` as `failed` with reason `interrupted`, because only a crash can leave one there; this assumes no other process is ingesting (`AD-010`). If PostgreSQL is unreachable, startup fails.
-
-Check it in another terminal; it prints `{"status":"ok"}`:
+In a second terminal:
 
 ```bash
-curl.exe http://127.0.0.1:8000/health
-```
-
-The health endpoint only says the API process is running. It does not check PostgreSQL or GROBID. Always keep `--host 127.0.0.1` (`NFR-SEC-006`). Stop the server with Ctrl+C.
-
-### Document API (verified 2026-11-04)
-
-PostgreSQL and GROBID must be running. Upload sends the PDF bytes as the request body (not a form); the optional `X-Filename` header carries the file name, percent-encoded, for display only. Processing runs after the response; poll the status until it is `parsed` or `failed`.
-
-```bash
-curl.exe -X POST http://127.0.0.1:8000/documents --data-binary "@paper.pdf" -H "Content-Type: application/pdf" -H "X-Filename: paper.pdf"
-```
-
-| Method and path | Result |
-|---|---|
-| `POST /documents` | `202` and a new `pending` document, or `200` and the existing document for an identical file (`created: false`; it is not processed again) |
-| `GET /documents/{id}` | Status, `failure_reason` and a plain-language `failure_explanation` |
-| `GET /documents/{id}/structure` | Metadata and passages in order with section and page (`null` = unknown); `409 document_not_parsed` with status and reason otherwise |
-| `POST /documents/{id}/retry` | `202` and processing again for a `failed` (or stuck `pending`) document; `409 document_not_retryable` otherwise |
-| `POST /answers` | Body: `question` and `document_ids` and/or `paper_ids`. A checked answer with `validation_status`, per-citation validity and evidence passages. Without a configured model this returns `503 model_not_configured` |
-
-Every error is `{"error": {"code", "message", "details"?}}` with no internal details. Upload rejections create nothing: `empty_file` (400), `file_too_large` (413, reading stops at `MAX_UPLOAD_MB`), `not_pdf` (415, decided by content). The interactive API docs are at `http://127.0.0.1:8000/docs`.
-
-## Running the frontend
-
-The frontend is in `frontend/` (React, TypeScript, Vite). Run these from that folder (verified 2026-11-08). First time only:
-
-```bash
+cd frontend
 npm ci
-```
-
-```bash
 cp .env.example .env
-```
-
-With the backend running on port 8000, start the dev server and open `http://127.0.0.1:5173`:
-
-```bash
 npm run dev
 ```
 
-The dev server forwards `/api` to `API_PROXY_TARGET` in `frontend/.env`, and refuses to start if that is not set. Checks:
+Open <http://127.0.0.1:5173> and add a PDF. Uploading and reading papers works without an AI key; asking questions and running the checklist need one. A free Gemini key works ([setup](docs/getting-started.md#connecting-an-ai-model)).
 
-```bash
-npm test
-```
+## Built with
 
-```bash
-npm run typecheck
-```
+| Part | Tools |
+|---|---|
+| Backend | Python 3.14, FastAPI, Pydantic, SQLAlchemy, Alembic |
+| Storage | PostgreSQL 18, pgvector |
+| PDF reading | GROBID 0.9.1 |
+| AI | Gemini 3.5 Flash-Lite and `gemini-embedding-2` by default; Anthropic Claude supported |
+| Frontend | React, TypeScript, Vite, React Aria Components, react-resizable-panels, Lucide icons |
+| Checks | pytest, ruff, mypy, Vitest, Testing Library, GitHub Actions; axe-core and Playwright for manual browser checks |
 
-```bash
-npm run build
-```
+## How this was built
 
-Commands are added here only after they have been run and verified.
+PaperPilot was built by a student with Claude Code as a learning project, one small task at a time. Each task started from a written requirement, had its tests written first, and was recorded in [`progress.md`](progress.md) only after it was checked.
 
-## Trying it end to end
-
-Verified 2026-11-08 with five real papers. In three terminals, from the repository folder:
-
-```bash
-docker compose up -d --wait
-```
-
-```bash
-uv run uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
-```
-
-```bash
-npm --prefix frontend run dev
-```
-
-Open `http://127.0.0.1:5173` and add a PDF. Your papers are listed on the left; ask questions in the middle, and the paper opens on the right. Selecting a citation highlights the exact sentence it came from.
-
-Text is shown exactly as stored, including mistakes from reading the PDF. Known limits are recorded in `progress.md` §6.12.
-
-## Connecting an AI model
-
-Uploading, parsing and search need no AI model; answering questions does. Set these in `.env` (never commit it), then restart the backend.
-
-**Google Gemini, free tier.** Create a key at <https://aistudio.google.com/apikey>; no billing is needed.
-
-```text
-LLM_PROVIDER=gemini
-LLM_MODEL=gemini-3.5-flash-lite
-LLM_API_KEY=your-key-here
-```
-
-**Use the free tier only with open-access papers.** Google's terms say free-tier content is used to improve its products and that human reviewers may read it, and advise against submitting sensitive or confidential material. You must be 18 or older.
-
-**Anthropic Claude (paid).** Create a key at <https://platform.claude.com/settings/keys>, and use `LLM_PROVIDER=anthropic` with `LLM_MODEL=claude-haiku-5-5`. Anthropic's commercial API data is not used for training by default.
-
-## Reporting checklist
-
-A parsed paper's page has a **Reporting checklist** panel. It checks what the paper states about six reporting items and shows a status in words, with quoted evidence and its section and page. It gives no score or verdict, and **Not found in the material examined** is not a judgement about the paper.
-
-Running it sends passages found in the paper to the configured provider, once per item. `GET /documents/{id}/assessment` returns the latest result and `POST` runs a new one. Earlier results are kept.
-
-## Embeddings
-
-Questions are answered with semantic retrieval by default, because it was measured to find more of the expected passages (`docs/experiments/retrieval-comparison.md`). It needs an embedding for each stored passage, made with `gemini-embedding-2` using the same `LLM_API_KEY`. New uploads are not embedded automatically: until they are, a question on them uses keyword search, and the answer names the method used. See how many are missing without sending anything:
-
-```bash
-uv run python scripts/embed_passages.py --check
-```
-
-Create the missing ones. This sends the text of those passages to Google, so use it only with papers you may send there. It is safe to run again, and continues after a rate limit:
-
-```bash
-uv run python scripts/embed_passages.py
-```
+| Document | What it holds |
+|---|---|
+| [`PRD.md`](PRD.md) | Requirements, design decisions and open questions |
+| [`docs/implementation-roadmap.md`](docs/implementation-roadmap.md) | Phases, tasks and exit criteria |
+| [`progress.md`](progress.md) | What is done and how it was verified |
+| [`docs/getting-started.md`](docs/getting-started.md) | Setup, commands and API |
+| [`docs/experiments/`](docs/experiments/) | Evaluation reports |
+| [`docs/reviews/release-review.md`](docs/reviews/release-review.md) | Security, privacy and licence review |
+| [`docs/design-system.md`](docs/design-system.md) | Colours, type and motion |
+| [`CLAUDE.md`](CLAUDE.md) | Working rules for development with Claude Code |
 
 ## Licence
 
-MIT. See `LICENSE`. Dependency licences are reviewed in `docs/reviews/release-review.md`.
-
-## Important limits
-
-- **Local, single-user only.** There is no authentication. Do not expose PaperPilot to a shared or public network (`NFR-SEC-006`).
-- **Only upload papers you are allowed to use**, including sending their text to the configured AI provider (`NFR-PRI-001`, `RISK-13`). Papers are never committed to this repository.
-- **Question answering sends text to an outside service (Phase 5).** With an API key configured, your question and the retrieved passages are sent to the provider you chose (`NFR-PRI-001`); PDFs are not. Running `scripts/embed_passages.py` also sends the text of every stored passage once. Nothing is sent without a key, and uploading and parsing stay on your machine. The terms differ a lot by provider, so read "Connecting an AI model" above and check the current terms before using papers that are not open access.
-- **Never commit secrets.** Settings go in `.env`, which is ignored; `.env.example` lists placeholders only (`NFR-SEC-001`).
+MIT, see [`LICENSE`](LICENSE). No papers are included in this repository. Only upload papers you are allowed to use, including sending their text to the AI provider you configure.
